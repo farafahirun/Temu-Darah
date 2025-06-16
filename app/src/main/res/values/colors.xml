@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="utama_dark">#99172F</color>
+    <color name="utama">#C11E3B</color>
+    <color name="abu_abu">#333333</color>
+    <color name="background">#F5F5F5</color>
 </resources>
