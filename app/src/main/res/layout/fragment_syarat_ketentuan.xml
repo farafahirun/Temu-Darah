@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- Toolbar -->
+    <RelativeLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#FFFFFF"
+        android:elevation="2dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            android:src="@drawable/ic_back" />
+
+        <ImageButton
+            android:id="@+id/btnNotification"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            android:src="@drawable/ic_notification" />
+    </RelativeLayout>
+
+    <!-- Pink divider -->
+    <View
+        android:id="@+id/pinkDivider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/toolbar"
+        android:background="#FFEBEE" />
+
+    <!-- Scrollable content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/pinkDivider"
+        android:background="#F9F9F9"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Main container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/tvTitleSyarat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:text="Syarat &amp; Ketentuan"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <!-- Divider -->
+                <View
+                    android:id="@+id/dividerTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E0E0E0" />
+
+                <!-- Introduction -->
+                <TextView
+                    android:id="@+id/tvIntroduction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Selamat datang di aplikasi Temu Darah! Dengan mengakses atau menggunakan aplikasi ini, Anda setuju untuk terikat oleh Syarat dan Ketentuan Penggunaan serta Kebijakan Privasi yang kami tetapkan. Jika Anda tidak setuju dengan syarat dan kebijakan ini, harap berhenti menggunakan aplikasi kami."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Divider -->
+                <View
+                    android:id="@+id/dividerIntro"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E0E0E0" />
+
+                <!-- Terms of Use -->
+                <TextView
+                    android:id="@+id/tvSyaratPenggunaan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Syarat Penggunaan Aplikasi"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!-- Term 1 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="1. Penggunaan Aplikasi"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Aplikasi Temu Darah hanya dapat digunakan oleh individu yang berusia minimal 17 tahun dan maksimal 65 tahun, serta dalam kondisi medis yang memenuhi syarat untuk mendonorkan darah."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Term 2 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="2. Tanggung Jawab Pengguna"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Anda bertanggung jawab untuk memastikan bahwa data yang Anda masukkan ke dalam aplikasi adalah akurat dan terbaru. Anda wajib memperbarui data jika ada perubahan dalam informasi pribadi atau kesehatan Anda."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Term 3 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="3. Larangan Penggguna"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Pengguna dilarang menggunakan aplikasi Temu Darah untuk tujuan selain untuk mendonorkan darah atau berbagi informasi kesehatan. Penggunaan aplikasi untuk tujuan komersial tanpa izin dari pengelola aplikasi adalah dilarang."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E0E0E0" />
+
+                <!-- Privacy Policy -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Kebijakan Privasi"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!-- Privacy 1 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="1. Pengumpulan Data"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Kami mengumpulkan informasi pribadi yang Anda berikan saat mendaftar di aplikasi, termasuk nama, email, nomor telepon, golongan darah, riwayat kesehatan, dan data lainnya yang diperlukan untuk memverifikasi kelayakan donor darah Anda."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Privacy 2 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="2. Penggunaan Data"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Data yang kami kumpulkan digunakan untuk tujuan:"
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:drawablePadding="8dp"
+                        android:text="Memverifikasi kelayakan Anda untuk mendonorkan darah."
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:drawablePadding="8dp"
+                        android:text="Memberikan pengingat untuk donor darah berikutnya."
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:drawablePadding="8dp"
+                        android:text="Menghubungi Anda terkait informasi donor darah dan kesehatan."
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawablePadding="8dp"
+                        android:text="Meningkatkan pengalaman pengguna dalam aplikasi."
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Privacy 3 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="3. Keamanan Data"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Data Anda dilindungi dengan langkah-langkah keamanan yang sesuai, termasuk enkripsi, untuk mencegah akses yang tidak sah. Kami juga memastikan bahwa hanya pihak yang berwenang yang dapat mengakses informasi sensitif Anda."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Privacy 4 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="4. Penyimpanan dan Penghapusan Data"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Data Anda akan disimpan selama akun Anda aktif. Jika akun Anda dinonaktifkan atau dihapus, data pribadi Anda akan dihapus sesuai dengan kebijakan privasi kami."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E0E0E0" />
+
+                <!-- Rights and Obligations -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Hak dan Kewajiban"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <!-- Rights 1 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="1. Hak TemuDarah"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Temu Darah berhak untuk mengubah, menangguhkan, atau menghapus fitur aplikasi kapan saja tanpa pemberitahuan sebelumnya jika dianggap perlu untuk perbaikan atau pembaruan aplikasi."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Rights 2 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="2. Batasan Tanggung Jawab"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Temu Darah tidak bertanggung jawab atas kerugian atau kerusakan yang disebabkan oleh penggunaan aplikasi atau informasi yang diberikan dalam aplikasi, termasuk akibat kesalahan dalam pengisian data atau kelalaian pengguna."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Rights 3 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="3. Peruahan Kebijakan"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Kami dapat mengubah atau memperbarui syarat dan kebijakan ini dari waktu ke waktu. Pengguna akan diberitahu melalui pemberitahuan dalam aplikasi atau email jika ada perubahan penting. Penggunaan aplikasi setelah perubahan kebijakan dianggap sebagai penerimaan atas kebijakan yang diperbarui."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <!-- Rights 4 -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="4. Ketentuan Hukum yang Berlaku"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:justificationMode="inter_word"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Syarat dan kebijakan ini tunduk pada hukum yang berlaku di Indonesia. Setiap sengketa yang timbul sehubungan dengan penggunaan aplikasi ini akan diselesaikan melalui prosedur penyelesaian sengketa sesuai hukum yang berlaku di Indonesia."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

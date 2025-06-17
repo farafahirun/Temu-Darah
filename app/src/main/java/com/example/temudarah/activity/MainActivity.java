@@ -1,4 +1,4 @@
-package com.example.temudarah;
+package com.example.temudarah.activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +9,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+
+import com.example.temudarah.R;
 import com.example.temudarah.databinding.ActivityMainBinding;
 import com.example.temudarah.fragment.BerandaFragment;
 import com.example.temudarah.fragment.KegiatanFragment;

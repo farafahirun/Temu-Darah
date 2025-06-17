@@ -6,4 +6,6 @@
     <color name="utama">#C11E3B</color>
     <color name="abu_abu">#333333</color>
     <color name="background">#F5F5F5</color>
+    <color name="text_utama">#990C0F14</color>
+    <color name="text_info">#670C0F14</color>
 </resources>

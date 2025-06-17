@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
+
+        <View
+            android:id="@+id/warna_notifikasi"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="0dp"
+            android:background="#FF9800"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/icon_notification"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/notifikasi_off"
+            app:layout_constraintStart_toEndOf="@+id/warna_notifikasi"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/tv_notification_description"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:tint="#616161"
+            tools:ignore="ContentDescription" />
+
+        <TextView
+            android:id="@+id/tv_notification_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Reminder!"
+            android:textColor="#212121"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/tv_notification_time"
+            app:layout_constraintStart_toEndOf="@+id/icon_notification"
+            app:layout_constraintTop_toTopOf="@+id/icon_notification"
+            app:layout_constraintBottom_toTopOf="@+id/tv_notification_description" />
+
+        <TextView
+            android:id="@+id/tv_notification_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="23 menit"
+            android:textColor="#757575"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tv_notification_title"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_notification_title" />
+
+        <TextView
+            android:id="@+id/tv_notification_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="16dp"
+            android:text="Hai!, waktunya mendonorkan darah! jadwal donor Anda besok. Jangan lupa datang. Terima kasih!"
+            android:textColor="#424242"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/warna_notifikasi"
+            app:layout_constraintTop_toBottomOf="@+id/icon_notification"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

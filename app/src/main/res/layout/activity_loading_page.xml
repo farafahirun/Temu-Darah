@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    tools:context=".activity.LoadingPageActivity">
+
+    <!-- Image Container -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#F5F5F5">
+
+        <ImageView
+            android:id="@+id/iv_building"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/loading_page"
+            android:contentDescription="Building Image" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/efek_loading_page" />
+    </FrameLayout>
+
+    <!-- Content Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center"
+        android:background="#FFFFFF">
+
+        <!-- Main Title -->
+        <TextView
+            android:id="@+id/tv_main_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Darah Tersalurkan, Hidup Terselamatkan"
+            android:fontFamily="sans-serif-black"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#C41E3A"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tv_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ayo, temukan harapan bersama TemuDarah."
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#666666"
+            android:gravity="center"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Start Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_memulaiLoadingPage"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Memulai"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#C41E3A"
+            android:cornerRadius="5dp"
+            android:elevation="4dp"
+            android:paddingStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:paddingEnd="16dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="10dp">
+
+            <!-- Text "Sudah Punya Akun?" -->
+            <TextView
+                android:id="@+id/tv_adaAkun"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sudah Punya Akun?"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginEnd="6dp" />
+
+            <!-- Text "Masuk" -->
+            <TextView
+                android:id="@+id/tv_masuk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Masuk"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#C41E3A"
+                android:focusable="true" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
