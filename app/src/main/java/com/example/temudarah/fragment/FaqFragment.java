@@ -63,6 +63,15 @@ public class FaqFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_faq, container, false);
 
+        // Fungsi tombol back
+        View btnBack = view.findViewById(R.id.iv_back);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requireActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
+
         // Setup toggle for all FAQ items (1-8) with error log if id not found
         int[] arrowIds = {R.id.arrowItem1, R.id.arrowItem2, R.id.arrowItem3, R.id.arrowItem4, R.id.arrowItem5, R.id.arrowItem6, R.id.arrowItem7, R.id.arrowItem8};
         int[] answerIds = {R.id.answerItem1, R.id.answerItem2, R.id.answerItem3, R.id.answerItem4, R.id.answerItem5, R.id.answerItem6, R.id.answerItem7, R.id.answerItem8};

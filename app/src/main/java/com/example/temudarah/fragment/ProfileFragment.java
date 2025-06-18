@@ -31,6 +31,19 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // Navigasi ke Syarat & Ketentuan saat layoutTerms diklik
+        View layoutTerms = view.findViewById(R.id.layoutTerms);
+        layoutTerms.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigasi ke SyaratKetentuanFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new SyaratKetentuanFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
         return view;
     }
 }
