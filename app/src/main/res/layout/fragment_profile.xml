@@ -12,39 +12,45 @@
         android:background="#F8E8EB">
 
         <LinearLayout
-            android:id="@+id/appBar"
+            android:id="@+id/navbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="@color/background"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:contentDescription="Logo Temu Darah"
-                    android:src="@drawable/logo_merah" />
-
-            </LinearLayout>
+            android:paddingStart="20dp"
+            android:paddingBottom="5dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="20dp">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center_vertical"
-                android:contentDescription="Notifikasi"
-                android:src="@drawable/notifikasi_off" />
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:contentDescription="Logo"
+                android:src="@drawable/logo_merah" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/iv_notification"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:contentDescription="Notification"
+                android:src="@drawable/notifikasi_on"
+                app:tint="@color/utama" />
         </LinearLayout>
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/appBar">
+            android:layout_below="@id/navbar">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -318,8 +324,8 @@
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:layout_marginBottom="16dp"
                             android:layout_marginTop="16dp"
+                            android:layout_marginBottom="16dp"
                             android:background="#E0E0E0" />
 
                         <TextView
