@@ -18,6 +18,32 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        // Navigasi ke Edit Profile saat layoutNotifikasi diklik
+        View layoutEditProfile = view.findViewById(R.id.layoutEditProfile);
+        layoutEditProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigasi ke FaqFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new EditProfileFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        // Navigasi ke Notifikasi saat layoutNotifikasi diklik
+        View layoutNotifikasi = view.findViewById(R.id.layoutNotifications);
+        layoutNotifikasi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigasi ke FaqFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new PengaturanNotifikasiFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
         // Navigasi ke FAQ saat layoutFAQs diklik
         View layoutFAQs = view.findViewById(R.id.layoutFAQs);
         layoutFAQs.setOnClickListener(new View.OnClickListener() {

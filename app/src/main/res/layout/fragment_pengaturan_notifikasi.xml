@@ -102,9 +102,9 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:checked="true"
-                            app:thumbTint="#D32F2F"
-                            app:trackTint="#F8D7DA" />
+                            android:checked="false"
+                            app:thumbTint="@drawable/thumb_selector"
+                            app:trackTint="@drawable/track_selector" />
                     </RelativeLayout>
 
                     <View
@@ -156,9 +156,9 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:checked="true"
-                            app:thumbTint="#D32F2F"
-                            app:trackTint="#F8D7DA" />
+                            android:checked="false"
+                            app:thumbTint="@drawable/thumb_selector"
+                            app:trackTint="@drawable/track_selector" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -196,9 +196,9 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:checked="true"
-                            app:thumbTint="#D32F2F"
-                            app:trackTint="#F8D7DA" />
+                            android:checked="false"
+                            app:thumbTint="@drawable/thumb_selector"
+                            app:trackTint="@drawable/track_selector" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -236,9 +236,9 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:checked="true"
-                            app:thumbTint="#D32F2F"
-                            app:trackTint="#F8D7DA" />
+                            android:checked="false"
+                            app:thumbTint="@drawable/thumb_selector"
+                            app:trackTint="@drawable/track_selector" />
                     </RelativeLayout>
 
                     <View
@@ -291,9 +291,9 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:checked="true"
-                            app:thumbTint="#D32F2F"
-                            app:trackTint="#F8D7DA" />
+                            android:checked="false"
+                            app:thumbTint="@drawable/thumb_selector"
+                            app:trackTint="@drawable/track_selector" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -331,9 +331,9 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:checked="true"
-                            app:thumbTint="#D32F2F"
-                            app:trackTint="#F8D7DA" />
+                            android:checked="false"
+                            app:thumbTint="@drawable/thumb_selector"
+                            app:trackTint="@drawable/track_selector" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -371,9 +371,9 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:checked="true"
-                            app:thumbTint="#D32F2F"
-                            app:trackTint="#F8D7DA" />
+                            android:checked="false"
+                            app:thumbTint="@drawable/thumb_selector"
+                            app:trackTint="@drawable/track_selector" />
                     </RelativeLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
