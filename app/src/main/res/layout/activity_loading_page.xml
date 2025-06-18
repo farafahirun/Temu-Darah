@@ -6,6 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="#FFFFFF"
+    android:id="@+id/main"
     tools:context=".activity.LoadingPageActivity">
 
     <!-- Image Container -->

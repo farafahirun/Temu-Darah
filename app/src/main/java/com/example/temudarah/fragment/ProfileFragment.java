@@ -1,5 +1,6 @@
 package com.example.temudarah.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.temudarah.R;
+import com.example.temudarah.activity.LoadingPageActivity;
 
 public class ProfileFragment extends Fragment {
 
@@ -17,6 +19,32 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        // Navigasi ke Edit Profile saat layoutNotifikasi diklik
+        View layoutEditProfile = view.findViewById(R.id.layoutEditProfile);
+        layoutEditProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigasi ke FaqFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new EditProfileFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        // Navigasi ke Notifikasi saat layoutNotifikasi diklik
+        View layoutNotifikasi = view.findViewById(R.id.layoutNotifications);
+        layoutNotifikasi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigasi ke FaqFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new PengaturanNotifikasiFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
 
         // Navigasi ke FAQ saat layoutFAQs diklik
         View layoutFAQs = view.findViewById(R.id.layoutFAQs);
@@ -67,6 +95,17 @@ public class ProfileFragment extends Fragment {
                         .replace(R.id.fragment_container, new HelpCenterFragment())
                         .addToBackStack(null)
                         .commit();
+            }
+        });
+
+        // Navigasi ke Logout saat layoutLogout diklik
+        View layoutLogout = view.findViewById(R.id.layoutLogout);
+        layoutLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start LoadingPageActivity
+                Intent intent = new Intent(getActivity(), LoadingPageActivity.class);
+                startActivity(intent);
             }
         });
 

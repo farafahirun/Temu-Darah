@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "298988680694",
+    "project_id": "temudarah",
+    "storage_bucket": "temudarah.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298988680694:android:bab3ad43438a56d35383d7",
+        "android_client_info": {
+          "package_name": "com.example.temudarah"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgWApRjfn_dFL8sXPtHycih601-e8oq9M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
