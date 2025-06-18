@@ -1,5 +1,6 @@
 package com.example.temudarah.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.temudarah.R;
+import com.example.temudarah.activity.LoadingPageActivity;
 
 public class ProfileFragment extends Fragment {
 
@@ -93,6 +95,17 @@ public class ProfileFragment extends Fragment {
                         .replace(R.id.fragment_container, new HelpCenterFragment())
                         .addToBackStack(null)
                         .commit();
+            }
+        });
+
+        // Navigasi ke Logout saat layoutLogout diklik
+        View layoutLogout = view.findViewById(R.id.layoutLogout);
+        layoutLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start LoadingPageActivity
+                Intent intent = new Intent(getActivity(), LoadingPageActivity.class);
+                startActivity(intent);
             }
         });
 
