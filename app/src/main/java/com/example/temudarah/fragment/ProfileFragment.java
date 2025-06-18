@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.example.temudarah.R;
 import com.example.temudarah.activity.LoadingPageActivity;
@@ -19,6 +20,15 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        // Inisialisasi dan event klik pada ikon notifikasi
+        ImageView ivNotification = view.findViewById(R.id.iv_notification);
+        ivNotification.setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new NotifikasiFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         // Navigasi ke Edit Profile saat layoutNotifikasi diklik
         View layoutEditProfile = view.findViewById(R.id.layoutEditProfile);
