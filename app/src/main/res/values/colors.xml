@@ -8,4 +8,6 @@
     <color name="background">#F5F5F5</color>
     <color name="text_utama">#990C0F14</color>
     <color name="text_info">#670C0F14</color>
+    <color name="sukses">#2E7D32</color>
+    <color name="penerima">#F9A825</color>
 </resources>
