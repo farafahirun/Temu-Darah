@@ -44,6 +44,19 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // Navigasi ke Privasi saat layoutPrivacy diklik
+        View layoutPrivacy = view.findViewById(R.id.layoutPrivacy);
+        layoutPrivacy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigasi ke PrivasiFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new PrivasiFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
         return view;
     }
 }
