@@ -27,7 +27,7 @@
         android:text="Silahkan masuk!"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="#C41E3A"
+        android:textColor="@color/utama"
         app:layout_constraintTop_toBottomOf="@id/iv_back"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="32dp"
@@ -52,8 +52,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        app:boxStrokeColor="#C11E3B"
-        app:hintTextColor="#C11E3B"
+        app:boxStrokeColor="@color/utama"
+        app:hintTextColor="@color/utama"
         app:boxCornerRadiusTopStart="8dp"
         app:boxCornerRadiusTopEnd="8dp"
         app:boxCornerRadiusBottomStart="8dp"
@@ -104,26 +104,20 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Login Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_login"
-        android:layout_width="350dp"
+        android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#C41E3A"
-        android:elevation="4dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:text="Masuk"
-        android:textColor="#FFFFFF"
+        android:backgroundTint="@color/utama"
+        android:text="Daftar"
+        android:textColor="@color/white"
         android:textSize="18sp"
+        android:layout_marginHorizontal="24dp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.491"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/til_password"
-        app:layout_constraintVertical_bias="0.962" />
+        android:layout_marginBottom="16dp"
+        app:cornerRadius="10dp"
+        app:strokeColor="@color/utama" />
 
     <!-- Footer Text: Belum Punya Akun? Daftar -->
     <LinearLayout
@@ -156,7 +150,7 @@
             android:focusable="true"
             android:text="Daftar"
             android:textStyle="bold"
-            android:textColor="#C41E3A"
+            android:textColor="@color/utama"
             android:textSize="14sp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
