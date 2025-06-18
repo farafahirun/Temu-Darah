@@ -20,6 +20,8 @@ public class PengaturanNotifikasiFragment extends Fragment {
 
         binding = FragmentPengaturanNotifikasiBinding.inflate(inflater, container, false);
 
+        binding.btnBack.setOnClickListener(v -> {getParentFragmentManager().popBackStack(); });
+
         sharedPreferences = getActivity().getSharedPreferences("AppSettings", getContext().MODE_PRIVATE);
         // Mengakses SwitchCompat menggunakan binding
         SwitchCompat switchAllNotifications = binding.switchAllNotifications;
