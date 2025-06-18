@@ -16,6 +16,21 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        // Navigasi ke FAQ saat layoutFAQs diklik
+        View layoutFAQs = view.findViewById(R.id.layoutFAQs);
+        layoutFAQs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigasi ke FaqFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new FaqFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        return view;
     }
 }

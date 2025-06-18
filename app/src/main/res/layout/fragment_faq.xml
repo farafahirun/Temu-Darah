@@ -68,8 +68,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
-                    android:padding="16dp"
-                    android:onClick="toggleAnswer1">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -121,8 +120,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
-                    android:padding="16dp"
-                    android:onClick="toggleAnswer2">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -174,8 +172,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
-                    android:padding="16dp"
-                    android:onClick="toggleAnswer3">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -227,8 +224,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
-                    android:padding="16dp"
-                    android:onClick="toggleAnswer4">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -280,8 +276,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
-                    android:padding="16dp"
-                    android:onClick="toggleAnswer5">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -333,8 +328,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
-                    android:padding="16dp"
-                    android:onClick="toggleAnswer6">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -386,8 +380,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
-                    android:padding="16dp"
-                    android:onClick="toggleAnswer7">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -439,8 +432,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="#FFFFFF"
-                    android:padding="16dp"
-                    android:onClick="toggleAnswer8">
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"

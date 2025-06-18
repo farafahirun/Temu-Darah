@@ -61,6 +61,31 @@ public class FaqFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_faq, container, false);
+        View view = inflater.inflate(R.layout.fragment_faq, container, false);
+
+        // Setup toggle for all FAQ items (1-8) with error log if id not found
+        int[] arrowIds = {R.id.arrowItem1, R.id.arrowItem2, R.id.arrowItem3, R.id.arrowItem4, R.id.arrowItem5, R.id.arrowItem6, R.id.arrowItem7, R.id.arrowItem8};
+        int[] answerIds = {R.id.answerItem1, R.id.answerItem2, R.id.answerItem3, R.id.answerItem4, R.id.answerItem5, R.id.answerItem6, R.id.answerItem7, R.id.answerItem8};
+        for (int i = 0; i < arrowIds.length; i++) {
+            final View answer = view.findViewById(answerIds[i]);
+            View arrow = view.findViewById(arrowIds[i]);
+            if (arrow != null && answer != null) {
+                arrow.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (answer.getVisibility() == View.VISIBLE) {
+                            answer.setVisibility(View.GONE);
+                        } else {
+                            answer.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+            } else {
+                // Log error jika id tidak ditemukan
+                android.util.Log.e("FaqFragment", "FAQ arrow or answer id not found: arrow=" + arrowIds[i] + ", answer=" + answerIds[i]);
+            }
+        }
+
+        return view;
     }
 }
