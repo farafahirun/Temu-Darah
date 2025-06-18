@@ -13,7 +13,7 @@
         android:background="#FFFFFF"
         android:elevation="2dp">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/btnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -21,9 +21,9 @@
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="12dp"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/kembali" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/btnNotification"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -31,7 +31,7 @@
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="12dp"
-            android:src="@drawable/ic_notification" />
+            android:src="@drawable/notifikasi_off" />
     </RelativeLayout>
 
     <!-- Pink divider -->

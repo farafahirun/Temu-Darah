@@ -14,14 +14,14 @@
         android:paddingVertical="12dp">
 
 
-        <ImageButton
+        <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:background="@null"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/kembali" />
 
         <TextView
             android:id="@+id/tvHelpCenterTitle"
@@ -33,14 +33,14 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/btnNotification"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:background="@null"
-            android:src="@drawable/ic_notification" />
+            android:src="@drawable/notifikasi_off" />
     </RelativeLayout>
 
     <!-- Content -->
@@ -68,7 +68,7 @@
                 <ImageView
                     android:layout_width="162dp"
                     android:layout_height="98dp"
-                    android:src="@drawable/ic_temu_darah_logo" />
+                    android:src="@drawable/logo_merah" />
 
 
             </LinearLayout>
@@ -104,12 +104,13 @@
                     android:textSize="16sp" />
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_search" />
+                    android:src="@drawable/search"
+                    app:tint="@color/abu_abu" />
             </RelativeLayout>
 
             <!-- Help Topics -->
@@ -139,7 +140,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_flag" />
+                        android:src="@drawable/flag" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -161,7 +162,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_chat" />
+                        android:src="@drawable/chats" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -183,7 +184,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_user_manual" />
+                        android:src="@drawable/user_manual" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -205,7 +206,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_business" />
+                        android:src="@drawable/connect" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -227,7 +228,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_call" />
+                        android:src="@drawable/call" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -249,7 +250,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_communities" />
+                        android:src="@drawable/komunitas_help" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -271,7 +272,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_privacy" />
+                        android:src="@drawable/privasi_help" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -293,7 +294,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_account" />
+                        android:src="@drawable/akun" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -316,7 +317,7 @@
                         android:id="@+id/icTutorialVideo"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_video" />
+                        android:src="@drawable/video" />
 
                     <TextView
                         android:id="@+id/tvTutorialVideo"
@@ -340,7 +341,7 @@
                         android:id="@+id/icBugReport"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ic_bug" />
+                        android:src="@drawable/bug" />
 
                     <TextView
                         android:id="@+id/tvBugReport"
@@ -372,7 +373,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_question" />
+            android:src="@drawable/question" />
 
         <TextView
             android:layout_width="wrap_content"

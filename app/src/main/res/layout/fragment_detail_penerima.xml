@@ -71,7 +71,7 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:src="@drawable/ic_blood_type"
+                    android:src="@drawable/darah"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_nama" />
 
@@ -93,7 +93,7 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:src="@drawable/ic_gender"
+                    android:src="@drawable/gender"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/icon_blood_type" />
 
@@ -115,7 +115,7 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:src="@drawable/ic_weight"
+                    android:src="@drawable/weight"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/icon_gender" />
 
@@ -137,7 +137,7 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:src="@drawable/ic_height"
+                    android:src="@drawable/height"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/icon_weight" />
 
@@ -159,7 +159,7 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:src="@drawable/ic_location"
+                    android:src="@drawable/maps"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/icon_height" />
 
@@ -183,7 +183,7 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:src="@drawable/ic_calendar"
+                    android:src="@drawable/kegiatan_off"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/icon_location" />
 
@@ -205,7 +205,7 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:src="@drawable/ic_time"
+                    android:src="@drawable/jam"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/icon_date" />
 
