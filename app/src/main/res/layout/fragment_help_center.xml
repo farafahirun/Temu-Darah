@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="#FFFFFF"
+    android:layout_marginBottom="72dp">
 
     <!-- Toolbar -->
     <RelativeLayout
@@ -13,14 +15,13 @@
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
 
-
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:background="@null"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/kembali" />
 
         <TextView
@@ -29,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Help Center"
-            android:textColor="#000000"
+            android:textColor="#484848"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -39,12 +40,12 @@
             android:layout_height="24dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:background="@null"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/notifikasi_off" />
     </RelativeLayout>
 
     <!-- Content -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
@@ -66,11 +67,10 @@
                 android:orientation="horizontal">
 
                 <ImageView
+                    android:id="@+id/ivLogo"
                     android:layout_width="162dp"
                     android:layout_height="98dp"
                     android:src="@drawable/logo_merah" />
-
-
             </LinearLayout>
 
             <!-- Help Text -->
@@ -78,19 +78,21 @@
                 android:id="@+id/tvHelpPrompt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
                 android:layout_marginBottom="16dp"
                 android:text="Bagaimana kami dapat membantu?"
-                android:textColor="#000000"
-                android:layout_marginStart="25dp"
+                android:textColor="#484848"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
             <!-- Search Bar -->
             <RelativeLayout
+                android:id="@+id/searchBarContainer"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginBottom="24dp"
-                android:background="@drawable/search_bar_background">
+                android:background="@drawable/search_bar_background"
+                android:elevation="2dp">
 
                 <TextView
                     android:id="@+id/tvSearchBar"
@@ -104,6 +106,7 @@
                     android:textSize="16sp" />
 
                 <ImageView
+                    android:id="@+id/ivSearch"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_alignParentEnd="true"
@@ -125,14 +128,19 @@
 
             <!-- Menu Items -->
             <LinearLayout
+                android:id="@+id/llHelpItems"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <!-- Get Started -->
                 <LinearLayout
+                    android:id="@+id/llGetStarted"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -147,14 +155,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Get Started"
-                        android:textColor="#000000"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Chats -->
                 <LinearLayout
+                    android:id="@+id/llChats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -169,14 +181,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Chats"
-                        android:textColor="#000000"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- User Manual -->
                 <LinearLayout
+                    android:id="@+id/llUserManual"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -191,14 +207,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="User Manual"
-                        android:textColor="#000000"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Connect with Business -->
                 <LinearLayout
+                    android:id="@+id/llConnect"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -212,15 +232,19 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Connect with Bussiness"
-                        android:textColor="#000000"
+                        android:text="Connect with Business"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Voice and Video Calls -->
                 <LinearLayout
+                    android:id="@+id/llCalls"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -235,14 +259,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Voice and Video Calls"
-                        android:textColor="#000000"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Communities -->
                 <LinearLayout
+                    android:id="@+id/llCommunities"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -257,14 +285,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Communities"
-                        android:textColor="#000000"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Privacy, Safety, and Security -->
                 <LinearLayout
+                    android:id="@+id/llPrivacy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -279,14 +311,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Privacy, Safety, and Security"
-                        android:textColor="#000000"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Accounts and Account Bans -->
                 <LinearLayout
+                    android:id="@+id/llAccounts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -301,14 +337,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Accounts and Account Bans"
-                        android:textColor="#000000"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Tutorial Video -->
                 <LinearLayout
+                    android:id="@+id/llTutorialVideo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -325,14 +365,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Tutorial Video"
-                        android:textColor="#000000"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Bug Report -->
                 <LinearLayout
+                    android:id="@+id/llBugReport"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="12dp">
@@ -349,12 +393,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="Bug Report"
-                        android:textColor="#000000"
+                        android:textColor="#484848"
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Contact Us Button -->
     <RelativeLayout
@@ -365,6 +409,8 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="24dp"
         android:background="@drawable/contact_button_background"
+        android:clickable="true"
+        android:focusable="true"
         android:paddingHorizontal="16dp"
         android:paddingVertical="8dp">
 

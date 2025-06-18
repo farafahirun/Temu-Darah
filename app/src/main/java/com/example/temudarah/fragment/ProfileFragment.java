@@ -57,6 +57,19 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        // Navigasi ke Pusat Bantuan saat layoutHelpCenter diklik
+        View layoutHelpCenter = view.findViewById(R.id.layoutHelpCenter);
+        layoutHelpCenter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigasi ke HelpCenterFragment
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new HelpCenterFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
         return view;
     }
 }
