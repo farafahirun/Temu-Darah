@@ -125,7 +125,6 @@ public class EditProfileFragment extends Fragment {
 
     private void setupListeners() {
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
-        binding.btnCancel.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         binding.btnSave.setOnClickListener(v -> saveUserData());
         binding.profileImage.setOnClickListener(v -> {
             if (binding.imageUploadProgressBar.getVisibility() == View.GONE) {
@@ -211,11 +210,14 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void populateUi(User user) {
+        binding.editNamaPengguna.setText(user.getUsername() != null ? user.getUsername() : "");
         binding.editFullName.setText(user.getFullName() != null ? user.getFullName() : "");
         binding.editDateOfBirth.setText(user.getBirthDate() != null ? user.getBirthDate() : "");
         binding.editBloodType.setText(user.getBloodType() != null ? user.getBloodType() : "");
         binding.editWeight.setText(user.getWeight() > 0 ? String.valueOf(user.getWeight()) : "");
         binding.editHeight.setText(user.getHeight() > 0 ? String.valueOf(user.getHeight()) : "");
+        binding.editNomorKTP.setText(user.getKtpNumber() != null ? user.getKtpNumber() : "");
+        binding.editAlamatLengkap.setText(user.getAddress() != null ? user.getAddress() : "");
         if (user.getGender() != null) {
             if (user.getGender().equalsIgnoreCase("Laki-laki") || user.getGender().equalsIgnoreCase("Male")) {
                 binding.radioMale.setChecked(true);
@@ -244,6 +246,7 @@ public class EditProfileFragment extends Fragment {
         }
         Toast.makeText(getContext(), "Menyimpan...", Toast.LENGTH_SHORT).show();
 
+        String namaPengguna = binding.editNamaPengguna.getText().toString().trim();
         String fullName = binding.editFullName.getText().toString().trim();
         String dateOfBirth = binding.editDateOfBirth.getText().toString().trim();
         String bloodType = binding.editBloodType.getText().toString().trim();
@@ -257,8 +260,11 @@ public class EditProfileFragment extends Fragment {
         if (!binding.editHeight.getText().toString().trim().isEmpty()) {
             height = Integer.parseInt(binding.editHeight.getText().toString().trim());
         }
+        String address = binding.editAlamatLengkap.getText().toString().trim();
+        String ktpNumber = binding.editNomorKTP.getText().toString().trim();
 
         Map<String, Object> updates = new HashMap<>();
+        updates.put("username", namaPengguna);
         updates.put("fullName", fullName);
         updates.put("birthDate", dateOfBirth);
         updates.put("gender", gender);
@@ -266,6 +272,8 @@ public class EditProfileFragment extends Fragment {
         updates.put("weight", weight);
         updates.put("height", height);
         updates.put("age", age);
+        updates.put("address", address);
+        updates.put("ktpNumber", ktpNumber);
 
         db.collection("users").document(currentUser.getUid()).update(updates)
                 .addOnSuccessListener(aVoid -> {
@@ -277,9 +285,29 @@ public class EditProfileFragment extends Fragment {
     }
 
     private boolean validateInput() {
+        if (TextUtils.isEmpty(binding.editNamaPengguna.getText().toString().trim())) {
+            binding.editNamaPengguna.setError("Nama Pengguna tidak boleh kosong");
+            binding.editNamaPengguna.requestFocus();
+            return false;
+        }
         if (TextUtils.isEmpty(binding.editFullName.getText().toString().trim())) {
-            binding.editFullName.setError("Nama tidak boleh kosong");
+            binding.editFullName.setError("Nama Lengkap tidak boleh kosong");
             binding.editFullName.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(binding.editAlamatLengkap.getText().toString().trim())) {
+            binding.editAlamatLengkap.setError("Alamat tidak boleh kosong");
+            binding.editAlamatLengkap.requestFocus();
+            return false;
+        }
+        String ktpNumber = binding.editNomorKTP.getText().toString().trim();
+        if (TextUtils.isEmpty(ktpNumber)) {
+            binding.editNomorKTP.setError("Nomor KTP tidak boleh kosong");
+            binding.editNomorKTP.requestFocus();
+            return false;
+        } else if (ktpNumber.length() != 16) {
+            binding.editNomorKTP.setError("Nomor KTP harus 16 digit");
+            binding.editNomorKTP.requestFocus();
             return false;
         }
         if (!binding.radioMale.isChecked() && !binding.radioFemale.isChecked()) {
