@@ -50,4 +50,6 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
+    implementation(libs.glide)
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }

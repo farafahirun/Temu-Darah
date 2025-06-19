@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
 import com.example.temudarah.R;
 import com.example.temudarah.activity.MasukActivity;
 import com.example.temudarah.databinding.FragmentProfileBinding;
@@ -84,6 +86,17 @@ public class ProfileFragment extends Fragment {
             binding.tvAge.setText(calculateAge(user.getBirthDate()));
         } else {
             binding.tvAge.setText("-");
+        }
+
+        // --- BAGIAN BARU UNTUK MENAMPILKAN FOTO PROFIL ---
+        // Cek apakah ada URL gambar dan context tidak null
+        if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty() && getContext() != null) {
+            // Perintahkan "Kurir" Glide untuk bekerja
+            Glide.with(getContext()) // 1. Siapkan kurir di context ini
+                    .load(user.getProfileImageUrl()) // 2. Beri alamat gambar (URL dari Firestore)
+                    .placeholder(R.drawable.kuronuma) // 3. Gambar default saat sedang memuat
+                    .error(R.drawable.kuronuma) // 4. Gambar jika gagal memuat
+                    .into(binding.profileImage); // 5. Target ImageView untuk menampilkan gambar
         }
     }
 

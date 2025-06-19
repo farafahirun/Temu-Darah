@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#FFFFFF"
-    android:layout_marginBottom="60dp">
+    android:background="#FFFFFF">
 
     <!-- Toolbar -->
     <FrameLayout
@@ -40,6 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/divider"
+        android:fillViewport="true"
         android:background="#F9F9F9">
 
         <LinearLayout
@@ -78,15 +78,18 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem1"
+                        android:layout_marginEnd="12dp"
                         android:text="Apa itu aplikasi Temu Darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:justificationMode="inter_word"/>
 
                     <ImageView
                         android:id="@+id/arrowItem1"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -97,13 +100,14 @@
                     android:id="@+id/answerItem1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:layout_marginEnd="40dp"
                     android:padding="16dp"
                     android:paddingTop="0dp"
                     android:text="Temu Darah adalah aplikasi mobile yang dirancang untuk membantu pengguna dalam mengelola proses donor darah, termasuk memberikan pengingat jadwal donor darah, memverifikasi kelayakan, dan menghubungkan pengguna dengan rumah sakit atau lembaga donor darah."
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:justificationMode="inter_word"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -130,15 +134,18 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem2"
+                        android:layout_marginEnd="20dp"
                         android:text="Apa saja syarat untuk mendonorkan darah melalui Temu Darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:justificationMode="inter_word"/>
 
                     <ImageView
                         android:id="@+id/arrowItem2"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -149,13 +156,14 @@
                     android:id="@+id/answerItem2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:layout_marginEnd="40dp"
                     android:padding="16dp"
                     android:paddingTop="0dp"
                     android:text="Syarat untuk mendonorkan darah adalah sebagai berikut:\n• Berusia antara 17 hingga 65 tahun.\n• Berat badan minimal 45 kg.\n• Dalam kondisi sehat tanpa penyakit menular (seperti hepatitis, HIV, atau malaria).\n• Tidak sedang hamil atau menyusui.\n• Tidak mengonsumsi obat-obatan tertentu yang dapat mempengaruhi kelayakan donor darah."
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:justificationMode="inter_word" />
 
                 <View
                     android:layout_width="match_parent"
@@ -182,15 +190,18 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem3"
+                        android:layout_marginEnd="20dp"
                         android:text="Bagaimana cara mengetahui golongan darah saya?"
                         android:textColor="#000000"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:justificationMode="inter_word"/>
 
                     <ImageView
                         android:id="@+id/arrowItem3"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -201,13 +212,14 @@
                     android:id="@+id/answerItem3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:layout_marginEnd="40dp"
                     android:padding="16dp"
                     android:paddingTop="0dp"
                     android:text="Golongan darah Anda dapat diketahui melalui tes darah yang dapat dilakukan di rumah sakit atau pusat donor darah. Jika Anda sudah mengetahui golongan darah Anda, Anda dapat memasukkannya langsung di profil aplikasi Temu Darah."
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:justificationMode="inter_word"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -234,15 +246,18 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem4"
+                        android:layout_marginEnd="20dp"
                         android:text="Apa yang harus saya lakukan jika saya tidak menerima pengingat jadwal donor darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:justificationMode="inter_word"/>
 
                     <ImageView
                         android:id="@+id/arrowItem4"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -253,13 +268,14 @@
                     android:id="@+id/answerItem4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:layout_marginEnd="40dp"
                     android:padding="16dp"
                     android:paddingTop="0dp"
                     android:text="Pastikan Anda telah mengaktifkan pemberitahuan untuk aplikasi Temu Darah. Jika Anda tidak menerima pengingat, coba periksa pengaturan pemberitahuan pada perangkat Anda dan pastikan aplikasi Temu Darah memiliki izin untuk mengirim pemberitahuan."
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:justificationMode="inter_word"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -286,15 +302,18 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem5"
+                        android:layout_marginEnd="20dp"
                         android:text="Bagaimana cara melaporkan masalah atau bug dalam aplikasi?"
                         android:textColor="#000000"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:justificationMode="inter_word"/>
 
                     <ImageView
                         android:id="@+id/arrowItem5"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -305,13 +324,14 @@
                     android:id="@+id/answerItem5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:layout_marginEnd="40dp"
                     android:padding="16dp"
                     android:paddingTop="0dp"
                     android:text="Jika Anda menemukan masalah atau bug dalam aplikasi, Anda dapat melaporkannya melalui menu Bantuan &amp; Dukungan dalam aplikasi atau mengirimkan email ke support@temudarah.com. Tim kami akan segera menindaklanjuti laporan Anda."
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:justificationMode="inter_word"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -338,15 +358,18 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem6"
+                        android:layout_marginEnd="20dp"
                         android:text="Apa yang harus saya lakukan jika saya tidak menerima pengingat jadwal donor darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:justificationMode="inter_word"/>
 
                     <ImageView
                         android:id="@+id/arrowItem6"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -357,13 +380,14 @@
                     android:id="@+id/answerItem6"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:layout_marginEnd="40dp"
                     android:padding="16dp"
                     android:paddingTop="0dp"
                     android:text="Pastikan Anda telah mengaktifkan pemberitahuan untuk aplikasi Temu Darah. Jika Anda tidak menerima pengingat, coba periksa pengaturan pemberitahuan pada perangkat Anda dan pastikan aplikasi Temu Darah memiliki izin untuk mengirim pemberitahuan."
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:justificationMode="inter_word"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -390,15 +414,18 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem7"
+                        android:layout_marginEnd="20dp"
                         android:text="Apakah saya bisa mendonorkan darah lebih dari sekali?"
                         android:textColor="#000000"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:justificationMode="inter_word"/>
 
                     <ImageView
                         android:id="@+id/arrowItem7"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -409,13 +436,14 @@
                     android:id="@+id/answerItem7"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:layout_marginEnd="40dp"
                     android:padding="16dp"
                     android:paddingTop="0dp"
                     android:text="Ya, Anda dapat mendonorkan darah lebih dari sekali, tetapi dengan interval waktu yang sesuai dengan pedoman medis. Umumnya, donor darah lengkap dapat dilakukan setiap 3 bulan. Pastikan Anda dalam kondisi sehat dan memenuhi syarat sebelum mendonorkan darah lagi."
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:justificationMode="inter_word"/>
 
                 <View
                     android:layout_width="match_parent"
@@ -442,15 +470,18 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem8"
+                        android:layout_marginEnd="20dp"
                         android:text="Bagaimana cara mendaftar di aplikasi Temu Darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:justificationMode="inter_word"/>
 
                     <ImageView
                         android:id="@+id/arrowItem8"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -461,13 +492,14 @@
                     android:id="@+id/answerItem8"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#FFFFFF"
+                    android:layout_marginEnd="40dp"
                     android:padding="16dp"
                     android:paddingTop="0dp"
                     android:text="Untuk mendaftar di aplikasi Temu Darah, unduh aplikasi dari Play Store atau App Store, buka aplikasi dan pilih 'Daftar'. Isi formulir pendaftaran dengan data diri Anda termasuk nama, alamat email, dan nomor telepon. Verifikasi akun Anda melalui email atau SMS, dan akun Anda siap digunakan."
                     android:textColor="#000000"
                     android:textSize="14sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:justificationMode="inter_word" />
 
                 <View
                     android:layout_width="match_parent"
@@ -478,7 +510,7 @@
             <!-- Extra space at bottom -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="24dp"/>
+                android:layout_height="58dp"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
