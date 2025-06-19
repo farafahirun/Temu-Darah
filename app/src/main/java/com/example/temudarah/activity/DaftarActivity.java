@@ -230,6 +230,8 @@ public class DaftarActivity extends AppCompatActivity {
         String hasDonated = binding.spinnerDonorSebelumnya.getText().toString();
         int weight = TextUtils.isEmpty(binding.etWeight.getText().toString()) ? 0 : Integer.parseInt(binding.etWeight.getText().toString());
         int height = TextUtils.isEmpty(binding.etHeight.getText().toString()) ? 0 : Integer.parseInt(binding.etHeight.getText().toString());
+        String profileImageUrl = ""; // Placeholder, can be updated later
+
 
         if (firebaseUser != null) {
             User newUser = new User(
@@ -244,7 +246,8 @@ public class DaftarActivity extends AppCompatActivity {
                     bloodType,
                     hasDonated,
                     weight,
-                    height
+                    height,
+                    profileImageUrl
             );
 
             Log.d("DAFTAR_DEBUG", "Mencoba menyimpan data ke Firestore...");

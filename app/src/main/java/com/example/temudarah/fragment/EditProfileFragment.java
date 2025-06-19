@@ -1,38 +1,59 @@
 package com.example.temudarah.fragment;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.example.temudarah.R;
 import com.example.temudarah.databinding.FragmentEditProfileBinding;
 import com.example.temudarah.model.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 public class EditProfileFragment extends Fragment {
+
+    private static final int REQUEST_CAMERA = 1;
+    private static final int REQUEST_GALLERY = 2;
     private static final String TAG = "EditProfileFragment";
+
     private FragmentEditProfileBinding binding;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private String currentUserId;
+    private Uri imageUri;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -40,13 +61,10 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         currentUser = mAuth.getCurrentUser();
-
-        setupListeners();
-        setupDatePicker();
-        setupGenderRadioButtons();
 
         if (currentUser != null) {
             currentUserId = currentUser.getUid();
@@ -54,6 +72,13 @@ public class EditProfileFragment extends Fragment {
         } else {
             Toast.makeText(getContext(), "Pengguna tidak terautentikasi.", Toast.LENGTH_SHORT).show();
         }
+
+        setupListeners();
+        setupDatePicker();
+        setupGenderRadioButtons();
+
+        // Set up profile image click listener
+        binding.profileImage.setOnClickListener(v -> showImagePickerOptions());
     }
 
     private void setupListeners() {
@@ -100,8 +125,8 @@ public class EditProfileFragment extends Fragment {
     private void loadUserData() {
         if (currentUserId == null) return;
         Toast.makeText(getContext(), "Memuat data...", Toast.LENGTH_SHORT).show();
-        DocumentReference userRef = db.collection("users").document(currentUserId);
 
+        DocumentReference userRef = db.collection("users").document(currentUserId);
         userRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 User user = documentSnapshot.toObject(User.class);
@@ -132,6 +157,13 @@ public class EditProfileFragment extends Fragment {
             } else if (user.getGender().equalsIgnoreCase("Perempuan") || user.getGender().equalsIgnoreCase("Female")) {
                 binding.radioFemale.setChecked(true);
             }
+        }
+
+        // Display profile image if exists
+        if (user.getProfileImageUrl() != null) {
+            Glide.with(this)
+                    .load(user.getProfileImageUrl())  // URL gambar profil dari Firestore
+                    .into(binding.profileImage);  // Menampilkan gambar ke ImageView
         }
     }
 
@@ -186,6 +218,115 @@ public class EditProfileFragment extends Fragment {
         }).addOnFailureListener(e -> {
             Toast.makeText(getContext(), "Gagal memperbarui data", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void showImagePickerOptions() {
+        String[] options = {"Kamera", "Galeri"};
+        new AlertDialog.Builder(getContext())
+                .setTitle("Pilih Sumber Gambar")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        openCamera();
+                    } else {
+                        openGallery();
+                    }
+                })
+                .show();
+    }
+
+    private void openCamera() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivityForResult(cameraIntent, REQUEST_CAMERA);
+        } else {
+            Toast.makeText(getContext(), "Kamera tidak tersedia", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(galleryIntent, REQUEST_GALLERY);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_CAMERA) {
+                // Menangani hasil dari kamera
+                Bitmap photo = (Bitmap) data.getExtras().get("data");
+                binding.profileImage.setImageBitmap(photo);
+
+                imageUri = getImageUriFromBitmap(photo);
+                uploadImageToFirebase(imageUri);  // Upload gambar ke Firebase
+            } else if (requestCode == REQUEST_GALLERY) {
+                // Menangani hasil dari galeri
+                imageUri = data.getData();
+                binding.profileImage.setImageURI(imageUri);
+
+                uploadImageToFirebase(imageUri);  // Upload gambar ke Firebase
+            }
+        }
+    }
+
+    private Uri getImageUriFromBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes); // Pastikan mengonversi ke format JPEG
+        String path = MediaStore.Images.Media.insertImage(getActivity().getContentResolver(), bitmap, "TempImage", null);
+        return Uri.parse(path);
+    }
+
+    private void uploadImageToFirebase(Uri imageUri) {
+        if (imageUri != null) {
+            String fileExtension = getFileExtension(imageUri); // Menentukan ekstensi file
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+            StorageReference profileImageRef = storageRef.child("profileImages/" + currentUserId + "." + fileExtension);
+
+            // Upload file
+            profileImageRef.putFile(imageUri)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // Setelah upload sukses, dapatkan URL gambar yang baru
+                        profileImageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                            // Update URL gambar di Firestore
+                            updateProfileImageUrl(uri.toString());
+                        }).addOnFailureListener(e -> {
+                            Toast.makeText(getContext(), "Gagal mendapatkan URL gambar", Toast.LENGTH_SHORT).show();
+                        });
+                    })
+                    .addOnFailureListener(e -> {
+                        // Jika gagal upload
+                        Toast.makeText(getContext(), "Gagal meng-upload gambar", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Upload gagal: " + e.getMessage());
+                    });
+        }
+    }
+
+    private String getFileExtension(Uri uri) {
+        String extension = null;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            // Untuk file yang dipilih dari galeri
+            MimeTypeMap mime = MimeTypeMap.getSingleton();
+            extension = mime.getExtensionFromMimeType(getContext().getContentResolver().getType(uri));
+        } else {
+            // Untuk file yang dipilih dari kamera
+            extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
+        }
+        return extension != null ? extension : "jpg"; // default ke jpg jika tidak bisa mendapatkan ekstensi
+    }
+
+    private void updateProfileImageUrl(String imageUrl) {
+        DocumentReference userRef = db.collection("users").document(currentUserId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("profileImageUrl", imageUrl); // Menambahkan field profileImageUrl
+
+        userRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Gambar profil berhasil diperbarui", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Gagal memperbarui gambar profil", Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override
