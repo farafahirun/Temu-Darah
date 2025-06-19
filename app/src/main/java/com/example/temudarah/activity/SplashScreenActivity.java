@@ -12,7 +12,7 @@ import com.example.temudarah.databinding.ActivitySplashscreenBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class SplashscreenActivity extends AppCompatActivity {
+public class SplashScreenActivity extends AppCompatActivity {
     private ActivitySplashscreenBinding binding;
 
     @Override
@@ -27,9 +27,9 @@ public class SplashscreenActivity extends AppCompatActivity {
 
             Intent intent;
             if (currentUser != null) {
-                intent = new Intent(SplashscreenActivity.this, MainActivity.class);
+                intent = new Intent(SplashScreenActivity.this, MainActivity.class);
             } else {
-                intent = new Intent(SplashscreenActivity.this, LoadingPageActivity.class);
+                intent = new Intent(SplashScreenActivity.this, LoadingPageActivity.class);
             }
             startActivity(intent);
             finish();
