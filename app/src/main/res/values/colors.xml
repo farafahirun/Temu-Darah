@@ -10,4 +10,5 @@
     <color name="text_info">#670C0F14</color>
     <color name="sukses">#2E7D32</color>
     <color name="penerima">#F9A825</color>
+    <color name="fixed_black">#000000</color>
 </resources>
