@@ -115,7 +115,7 @@
                     android:id="@+id/et_phone_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="No. Telp/Email"
+                    android:hint="Email"
                     android:inputType="textEmailAddress"
                     android:textSize="16sp"
                     android:textColor="@color/fixed_black" />
