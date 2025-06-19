@@ -6,11 +6,14 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +25,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -33,11 +35,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -45,19 +45,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 public class EditProfileFragment extends Fragment {
-
     private static final String TAG = "EditProfileFragment";
-
     private FragmentEditProfileBinding binding;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
-    private Uri cameraImageUri;
-
-    private ActivityResultLauncher<Uri> cameraLauncher;
+    private ActivityResultLauncher<Intent> cameraLauncher;
     private ActivityResultLauncher<String> galleryLauncher;
     private ActivityResultLauncher<String> requestCameraPermissionLauncher;
     private ActivityResultLauncher<String> requestGalleryPermissionLauncher;
@@ -77,7 +72,6 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -96,26 +90,36 @@ public class EditProfileFragment extends Fragment {
     private void initializeLaunchers() {
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
             if (uri != null) {
-                uploadImageToFirebase(uri);
+                binding.profileImage.setImageURI(uri);
+                processImageUri(uri);
             }
         });
 
-        cameraLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(), success -> {
-            if (success && cameraImageUri != null) {
-                uploadImageToFirebase(cameraImageUri);
-            }
-        });
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        Bundle extras = result.getData().getExtras();
+                        if (extras != null && extras.get("data") != null) {
+                            Bitmap imageBitmap = (Bitmap) extras.get("data");
+                            binding.profileImage.setImageBitmap(imageBitmap);
+                            processBitmap(imageBitmap);
+                        }
+                    }
+                });
 
         requestCameraPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) openCamera();
-                    else Toast.makeText(getContext(), "Izin kamera diperlukan", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(getContext(), "Izin kamera diperlukan", Toast.LENGTH_SHORT).show();
                 });
 
         requestGalleryPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) openGallery();
-                    else Toast.makeText(getContext(), "Izin galeri diperlukan", Toast.LENGTH_SHORT).show();
+                    else
+                        Toast.makeText(getContext(), "Izin galeri diperlukan", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -127,7 +131,7 @@ public class EditProfileFragment extends Fragment {
             if (binding.imageUploadProgressBar.getVisibility() == View.GONE) {
                 showImagePickerOptions();
             } else {
-                Toast.makeText(getContext(), "Harap tunggu proses upload selesai.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Harap tunggu proses selesai.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -144,8 +148,12 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void setupGenderRadioButtons() {
-        binding.radioMale.setOnCheckedChangeListener((buttonView, isChecked) -> { if (isChecked) binding.radioFemale.setChecked(false); });
-        binding.radioFemale.setOnCheckedChangeListener((buttonView, isChecked) -> { if (isChecked) binding.radioMale.setChecked(false); });
+        binding.radioMale.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) binding.radioFemale.setChecked(false);
+        });
+        binding.radioFemale.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) binding.radioMale.setChecked(false);
+        });
     }
 
     private void showImagePickerOptions() {
@@ -168,13 +176,8 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void checkGalleryPermissionAndOpenGallery() {
-        String permission;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permission = Manifest.permission.READ_MEDIA_IMAGES;
-        } else {
-            permission = Manifest.permission.READ_EXTERNAL_STORAGE;
-        }
-
+        String permission = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) ?
+                Manifest.permission.READ_MEDIA_IMAGES : Manifest.permission.READ_EXTERNAL_STORAGE;
         if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
             openGallery();
         } else {
@@ -183,21 +186,8 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void openCamera() {
-        File imageFile;
-        try {
-            imageFile = File.createTempFile("temp_profile_image", ".jpg", requireContext().getExternalCacheDir());
-        } catch (IOException e) {
-            Log.e(TAG, "Gagal membuat file gambar sementara", e);
-            Toast.makeText(getContext(), "Gagal menyiapkan kamera", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        cameraImageUri = FileProvider.getUriForFile(
-                requireContext(),
-                "com.example.temudarah.provider",
-                imageFile
-        );
-        cameraLauncher.launch(cameraImageUri);
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraLauncher.launch(cameraIntent);
     }
 
     private void openGallery() {
@@ -206,19 +196,17 @@ public class EditProfileFragment extends Fragment {
 
     private void loadUserData() {
         if (currentUser == null) return;
-        binding.profileImage.setAlpha(0.5f); // Menandakan sedang loading
+        Toast.makeText(getContext(), "Memuat data...", Toast.LENGTH_SHORT).show();
         DocumentReference userRef = db.collection("users").document(currentUser.getUid());
         userRef.get().addOnSuccessListener(documentSnapshot -> {
-            binding.profileImage.setAlpha(1.0f);
             if (documentSnapshot.exists()) {
                 User user = documentSnapshot.toObject(User.class);
                 if (user != null) {
                     populateUi(user);
                 }
+            } else {
+                Toast.makeText(getContext(), "Data profil tidak ditemukan.", Toast.LENGTH_SHORT).show();
             }
-        }).addOnFailureListener(e -> {
-            binding.profileImage.setAlpha(1.0f);
-            Toast.makeText(getContext(), "Gagal mengambil data profil.", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -226,10 +214,8 @@ public class EditProfileFragment extends Fragment {
         binding.editFullName.setText(user.getFullName() != null ? user.getFullName() : "");
         binding.editDateOfBirth.setText(user.getBirthDate() != null ? user.getBirthDate() : "");
         binding.editBloodType.setText(user.getBloodType() != null ? user.getBloodType() : "");
-
         binding.editWeight.setText(user.getWeight() > 0 ? String.valueOf(user.getWeight()) : "");
         binding.editHeight.setText(user.getHeight() > 0 ? String.valueOf(user.getHeight()) : "");
-
         if (user.getGender() != null) {
             if (user.getGender().equalsIgnoreCase("Laki-laki") || user.getGender().equalsIgnoreCase("Male")) {
                 binding.radioMale.setChecked(true);
@@ -237,19 +223,23 @@ public class EditProfileFragment extends Fragment {
                 binding.radioFemale.setChecked(true);
             }
         }
-        if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty() && getContext() != null) {
-            Glide.with(requireContext())
-                    .load(user.getProfileImageUrl())
-                    .placeholder(R.drawable.logo_merah)
-                    .error(R.drawable.logo_merah)
-                    .into(binding.profileImage);
+
+        if (user.getProfileImageBase64() != null && !user.getProfileImageBase64().isEmpty() && getContext() != null) {
+            try {
+                byte[] imageBytes = Base64.decode(user.getProfileImageBase64(), Base64.DEFAULT);
+                Glide.with(requireContext()).asBitmap().load(imageBytes).placeholder(R.drawable.logo_merah).into(binding.profileImage);
+            } catch (Exception e) {
+                binding.profileImage.setImageResource(R.drawable.logo_merah);
+            }
+        } else {
+            binding.profileImage.setImageResource(R.drawable.logo_merah);
         }
     }
 
     private void saveUserData() {
         if (currentUser == null) return;
         if (!validateInput()) {
-            Toast.makeText(getContext(), "Silakan periksa kembali data yang Anda masukkan.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Silakan periksa kembali data Anda.", Toast.LENGTH_SHORT).show();
             return;
         }
         Toast.makeText(getContext(), "Menyimpan...", Toast.LENGTH_SHORT).show();
@@ -280,34 +270,10 @@ public class EditProfileFragment extends Fragment {
         db.collection("users").document(currentUser.getUid()).update(updates)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "Profil berhasil diperbarui", Toast.LENGTH_SHORT).show();
-                    if (getParentFragmentManager() != null) getParentFragmentManager().popBackStack();
+                    if (getParentFragmentManager() != null)
+                        getParentFragmentManager().popBackStack();
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Gagal memperbarui profil.", Toast.LENGTH_SHORT).show());
-    }
-
-    private void uploadImageToFirebase(Uri imageUri) {
-        if (imageUri == null || currentUser == null) return;
-        binding.imageUploadProgressBar.setVisibility(View.VISIBLE);
-        String fileName = "profile_images/" + currentUser.getUid();
-        StorageReference profileImageRef = FirebaseStorage.getInstance().getReference(fileName);
-
-        profileImageRef.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> profileImageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                    updateProfileImageUrlInFirestore(uri.toString());
-                }))
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Upload Gagal", e);
-                    Toast.makeText(getContext(), "Upload Gagal: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                })
-                .addOnCompleteListener(task -> binding.imageUploadProgressBar.setVisibility(View.GONE));
-    }
-
-    private void updateProfileImageUrlInFirestore(String imageUrl) {
-        if (currentUser == null) return;
-        db.collection("users").document(currentUser.getUid())
-                .update("profileImageUrl", imageUrl)
-                .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "Foto profil berhasil diperbarui.", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Gagal menyimpan link foto.", Toast.LENGTH_SHORT).show());
     }
 
     private boolean validateInput() {
@@ -352,6 +318,88 @@ public class EditProfileFragment extends Fragment {
             e.printStackTrace();
             return "-";
         }
+    }
+
+    private void processImageUri(Uri imageUri) {
+        binding.imageUploadProgressBar.setVisibility(View.VISIBLE);
+        new Thread(() -> {
+            String base64Image = convertImageUriToBase64(imageUri);
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    if (base64Image != null) {
+                        updateProfileImageInFirestore(base64Image);
+                    } else {
+                        Toast.makeText(getContext(), "Gagal memproses gambar.", Toast.LENGTH_SHORT).show();
+                        binding.imageUploadProgressBar.setVisibility(View.GONE);
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void processBitmap(Bitmap bitmap) {
+        binding.imageUploadProgressBar.setVisibility(View.VISIBLE);
+        new Thread(() -> {
+            String base64Image = convertBitmapToBase64(bitmap);
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    if (base64Image != null) {
+                        updateProfileImageInFirestore(base64Image);
+                    } else {
+                        Toast.makeText(getContext(), "Gagal memproses gambar.", Toast.LENGTH_SHORT).show();
+                        binding.imageUploadProgressBar.setVisibility(View.GONE);
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private String convertBitmapToBase64(Bitmap bitmap) {
+        try {
+            Bitmap resizedBitmap = resizeBitmap(bitmap, 400);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream.toByteArray();
+            return Base64.encodeToString(byteArray, Base64.DEFAULT);
+        } catch (Exception e) {
+            Log.e(TAG, "Gagal mengubah bitmap ke Base64", e);
+            return null;
+        }
+    }
+
+    private String convertImageUriToBase64(Uri imageUri) {
+        try (InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri)) {
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            return convertBitmapToBase64(bitmap);
+        } catch (Exception e) {
+            Log.e(TAG, "Gagal mengubah Uri ke Base64", e);
+            return null;
+        }
+    }
+
+    private Bitmap resizeBitmap(Bitmap bitmap, int maxSize) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        if (width <= maxSize && height <= maxSize) return bitmap;
+        float ratio = Math.min((float) maxSize / width, (float) maxSize / height);
+        int newWidth = Math.round(width * ratio);
+        int newHeight = Math.round(height * ratio);
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+    }
+
+    private void updateProfileImageInFirestore(String base64Image) {
+        if (currentUser == null) return;
+        Toast.makeText(getContext(), "Menyimpan foto profil...", Toast.LENGTH_SHORT).show();
+        db.collection("users").document(currentUser.getUid())
+                .update("profileImageBase64", base64Image)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "Foto profil berhasil diperbarui.", Toast.LENGTH_SHORT).show();
+                    binding.imageUploadProgressBar.setVisibility(View.GONE);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Gagal menyimpan foto: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    binding.imageUploadProgressBar.setVisibility(View.GONE);
+                });
     }
 
     @Override

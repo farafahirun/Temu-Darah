@@ -2,11 +2,13 @@ package com.example.temudarah.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -88,15 +91,22 @@ public class ProfileFragment extends Fragment {
             binding.tvAge.setText("-");
         }
 
-        // --- BAGIAN BARU UNTUK MENAMPILKAN FOTO PROFIL ---
-        // Cek apakah ada URL gambar dan context tidak null
-        if (user.getProfileImageUrl() != null && !user.getProfileImageUrl().isEmpty() && getContext() != null) {
-            // Perintahkan "Kurir" Glide untuk bekerja
-            Glide.with(getContext()) // 1. Siapkan kurir di context ini
-                    .load(user.getProfileImageUrl()) // 2. Beri alamat gambar (URL dari Firestore)
-                    .placeholder(R.drawable.kuronuma) // 3. Gambar default saat sedang memuat
-                    .error(R.drawable.kuronuma) // 4. Gambar jika gagal memuat
-                    .into(binding.profileImage); // 5. Target ImageView untuk menampilkan gambar
+        if (user.getProfileImageBase64() != null && !user.getProfileImageBase64().isEmpty() && getContext() != null) {
+            try {
+                byte[] imageBytes = Base64.decode(user.getProfileImageBase64(), Base64.DEFAULT);
+
+                Glide.with(requireContext())
+                        .asBitmap()
+                        .load(imageBytes)
+                        .placeholder(R.drawable.logo_merah)
+                        .error(R.drawable.logo_merah)
+                        .into(binding.profileImage);
+            } catch (Exception e) {
+                Log.e(TAG, "Gagal decode Base64", e);
+                binding.profileImage.setImageResource(R.drawable.logo_merah);
+            }
+        } else {
+            binding.profileImage.setImageResource(R.drawable.logo_merah);
         }
     }
 

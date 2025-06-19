@@ -13,11 +13,11 @@ public class User {
     private String hasDonatedBefore;
     private int weight;
     private int height;
-    private String profileImageUrl;
+    private String profileImageBase64;
 
     public User() {}
 
-    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageUrl) {
+    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageBase64) {
         this.uid = uid;
         this.email = email;
         this.username = username;
@@ -30,7 +30,7 @@ public class User {
         this.hasDonatedBefore = hasDonatedBefore;
         this.weight = weight;
         this.height = height;
-        this.profileImageUrl = profileImageUrl;
+        this.profileImageBase64 = profileImageBase64;
     }
 
     public String getUid() {
@@ -129,11 +129,11 @@ public class User {
         this.height = height;
     }
 
-    public String getProfileImageUrl() {
-        return profileImageUrl;
+    public String getProfileImageBase64() {
+        return profileImageBase64;
     }
 
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
+    public void setProfileImageBase64(String profileImageBase64) {
+        this.profileImageBase64 = profileImageBase64;
     }
 }
