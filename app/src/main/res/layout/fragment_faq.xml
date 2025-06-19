@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#FFFFFF"
-    android:layout_marginBottom="60dp">
+    android:background="#FFFFFF">
 
     <!-- Toolbar -->
     <FrameLayout
@@ -40,6 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/divider"
+        android:fillViewport="true"
         android:background="#F9F9F9">
 
         <LinearLayout
@@ -78,6 +78,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem1"
+                        android:layout_marginEnd="12dp"
                         android:text="Apa itu aplikasi Temu Darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
@@ -85,8 +86,9 @@
 
                     <ImageView
                         android:id="@+id/arrowItem1"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -130,6 +132,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem2"
+                        android:layout_marginEnd="12dp"
                         android:text="Apa saja syarat untuk mendonorkan darah melalui Temu Darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
@@ -137,8 +140,9 @@
 
                     <ImageView
                         android:id="@+id/arrowItem2"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -182,6 +186,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem3"
+                        android:layout_marginEnd="12dp"
                         android:text="Bagaimana cara mengetahui golongan darah saya?"
                         android:textColor="#000000"
                         android:textSize="16sp"
@@ -189,8 +194,9 @@
 
                     <ImageView
                         android:id="@+id/arrowItem3"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -234,6 +240,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem4"
+                        android:layout_marginEnd="12dp"
                         android:text="Apa yang harus saya lakukan jika saya tidak menerima pengingat jadwal donor darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
@@ -241,8 +248,9 @@
 
                     <ImageView
                         android:id="@+id/arrowItem4"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -286,6 +294,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem5"
+                        android:layout_marginEnd="12dp"
                         android:text="Bagaimana cara melaporkan masalah atau bug dalam aplikasi?"
                         android:textColor="#000000"
                         android:textSize="16sp"
@@ -293,8 +302,9 @@
 
                     <ImageView
                         android:id="@+id/arrowItem5"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -338,6 +348,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem6"
+                        android:layout_marginEnd="12dp"
                         android:text="Apa yang harus saya lakukan jika saya tidak menerima pengingat jadwal donor darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
@@ -345,8 +356,9 @@
 
                     <ImageView
                         android:id="@+id/arrowItem6"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -390,6 +402,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem7"
+                        android:layout_marginEnd="12dp"
                         android:text="Apakah saya bisa mendonorkan darah lebih dari sekali?"
                         android:textColor="#000000"
                         android:textSize="16sp"
@@ -397,8 +410,9 @@
 
                     <ImageView
                         android:id="@+id/arrowItem7"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -442,6 +456,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_toStartOf="@id/arrowItem8"
+                        android:layout_marginEnd="12dp"
                         android:text="Bagaimana cara mendaftar di aplikasi Temu Darah?"
                         android:textColor="#000000"
                         android:textSize="16sp"
@@ -449,8 +464,9 @@
 
                     <ImageView
                         android:id="@+id/arrowItem8"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginEnd="10dp"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:src="@drawable/panah_bawah" />
@@ -478,7 +494,7 @@
             <!-- Extra space at bottom -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="24dp"/>
+                android:layout_height="58dp"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
