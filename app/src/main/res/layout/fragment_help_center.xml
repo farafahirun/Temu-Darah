@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:layout_marginBottom="72dp">
+    android:background="@color/background">
 
     <LinearLayout
         android:id="@+id/navbar"
@@ -45,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_margin="16dp">
+            android:layout_margin="20dp">
 
             <!-- Logo -->
             <LinearLayout
@@ -72,331 +71,336 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <!-- Search Bar -->
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/searchBarContainer"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="45dp"
                 android:layout_marginBottom="24dp"
-                android:background="@drawable/search_bar_background"
-                android:elevation="2dp">
+                android:gravity="center_vertical"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/input_filter_date"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tvSearchBar"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_telusuri"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
                     android:layout_marginStart="16dp"
-                    android:text="Search"
-                    android:textColor="#A9A9A9"
+                    android:layout_weight="1"
+                    android:hint="Telusuri"
+                    android:textColorHint="@color/text_info"
+                    android:background="@android:color/transparent"
                     android:textSize="16sp" />
 
                 <ImageView
-                    android:id="@+id/ivSearch"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:id="@+id/telusuri"
+                    android:layout_width="17dp"
+                    android:layout_height="17dp"
                     android:layout_marginEnd="16dp"
                     android:src="@drawable/search"
                     app:tint="@color/abu_abu" />
-            </RelativeLayout>
+            </LinearLayout>
 
             <!-- Help Topics -->
             <TextView
                 android:id="@+id/tvHelpTopics"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
                 android:text="Help Topics"
-                android:textColor="#A9A9A9"
+                android:textColor="@color/text_utama"
                 android:textSize="14sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="10dp"
+                android:background="@color/text_info" />
 
             <!-- Menu Items -->
             <LinearLayout
                 android:id="@+id/llHelpItems"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp"
                 android:orientation="vertical">
 
-                <!-- Get Started -->
                 <LinearLayout
-                    android:id="@+id/llGetStarted"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/flag" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
                         android:text="Get Started"
-                        android:textColor="#484848"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Chats -->
                 <LinearLayout
-                    android:id="@+id/llChats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/chats" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
                         android:text="Chats"
-                        android:textColor="#484848"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- User Manual -->
                 <LinearLayout
-                    android:id="@+id/llUserManual"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/user_manual" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
                         android:text="User Manual"
-                        android:textColor="#484848"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Connect with Business -->
                 <LinearLayout
-                    android:id="@+id/llConnect"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/connect" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
-                        android:text="Connect with Business"
-                        android:textColor="#484848"
+                        android:text="Connect with Friends"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Voice and Video Calls -->
                 <LinearLayout
-                    android:id="@+id/llCalls"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/call" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
                         android:text="Voice and Video Calls"
-                        android:textColor="#484848"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Communities -->
                 <LinearLayout
-                    android:id="@+id/llCommunities"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/komunitas_help" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
                         android:text="Communities"
-                        android:textColor="#484848"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Privacy, Safety, and Security -->
                 <LinearLayout
-                    android:id="@+id/llPrivacy"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/privasi_help" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
                         android:text="Privacy, Safety, and Security"
-                        android:textColor="#484848"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Accounts and Account Bans -->
                 <LinearLayout
-                    android:id="@+id/llAccounts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/akun" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
-                        android:text="Accounts and Account Bans"
-                        android:textColor="#484848"
+                        android:text="Account and Account Bans"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Tutorial Video -->
                 <LinearLayout
-                    android:id="@+id/llTutorialVideo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/icTutorialVideo"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/video" />
 
                     <TextView
-                        android:id="@+id/tvTutorialVideo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
                         android:text="Tutorial Video"
-                        android:textColor="#484848"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Bug Report -->
                 <LinearLayout
-                    android:id="@+id/llBugReport"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="12dp">
+                    android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/icBugReport"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="Edit Profile"
                         android:src="@drawable/bug" />
 
                     <TextView
-                        android:id="@+id/tvBugReport"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="16dp"
                         android:text="Bug Report"
-                        android:textColor="#484848"
+                        android:textColor="@color/black"
                         android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Contact Us Button -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <RelativeLayout
         android:id="@+id/btnContactUs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="24dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/contact_button_background"
         android:clickable="true"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:focusable="true"
         android:paddingHorizontal="16dp"
         android:paddingVertical="8dp">
@@ -415,7 +419,8 @@
             android:layout_marginStart="8dp"
             android:layout_toEndOf="@id/icQuestion"
             android:text="Contact Us"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:textSize="16sp" />
     </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

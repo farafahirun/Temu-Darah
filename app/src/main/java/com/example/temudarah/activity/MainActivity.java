@@ -61,6 +61,16 @@ public class MainActivity extends AppCompatActivity {
 
             return true;
         });
+
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (currentFragment instanceof BerandaFragment ||
+                    currentFragment instanceof KegiatanFragment ||
+                    currentFragment instanceof RiwayatFragment ||
+                    currentFragment instanceof ProfileFragment) {
+                showBottomNav();
+            }
+        });
     }
 
     public void hideBottomNav() {
