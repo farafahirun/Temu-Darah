@@ -17,7 +17,7 @@ import com.bumptech.glide.Glide;
 import com.example.temudarah.R;
 import com.example.temudarah.activity.MasukActivity;
 import com.example.temudarah.databinding.FragmentProfileBinding;
-import com.example.temudarah.model.User;
+import com.example.temudarah.model.User; // Pastikan ini benar
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -60,6 +60,9 @@ public class ProfileFragment extends Fragment {
 
     private void loadUserProfileData() {
         binding.tvName.setText("Memuat...");
+        // Pastikan Anda memiliki tvLastDonation di layout FragmentProfileBinding
+        binding.tvLastDonation.setText("Memuat..."); // Inisialisasi teks
+
         String uid = currentUser.getUid();
         DocumentReference userDocRef = db.collection("users").document(uid);
 
@@ -68,6 +71,8 @@ public class ProfileFragment extends Fragment {
                 User user = documentSnapshot.toObject(User.class);
                 if (user != null) {
                     populateUi(user);
+                } else {
+                    Toast.makeText(getContext(), "Data profil tidak dapat di-parse.", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 Toast.makeText(getContext(), "Data profil tidak ditemukan.", Toast.LENGTH_SHORT).show();
@@ -75,6 +80,8 @@ public class ProfileFragment extends Fragment {
         }).addOnFailureListener(e -> {
             Log.e(TAG, "Gagal memuat data profil", e);
             Toast.makeText(getContext(), "Gagal memuat profil.", Toast.LENGTH_SHORT).show();
+            // Atur teks ke default jika gagal
+            binding.tvLastDonation.setText("Tidak tersedia");
         });
     }
 
@@ -90,6 +97,17 @@ public class ProfileFragment extends Fragment {
         } else {
             binding.tvAge.setText("-");
         }
+
+        // Tampilkan Tanggal Donor Terakhir
+        if (user.getHasDonatedBefore() != null && user.getHasDonatedBefore().equals("Ya") &&
+                user.getLastDonationDate() != null && !user.getLastDonationDate().isEmpty()) {
+            binding.tvLastDonation.setText("Terakhir Donor: " + user.getLastDonationDate());
+            binding.tvLastDonation.setVisibility(View.VISIBLE); // Pastikan ini terlihat
+        } else {
+            binding.tvLastDonation.setText("Belum Pernah Donor"); // Atau sembunyikan jika tidak ada data
+            binding.tvLastDonation.setVisibility(View.VISIBLE); // Tetap terlihat dengan teks status
+        }
+
 
         if (user.getProfileImageBase64() != null && !user.getProfileImageBase64().isEmpty() && getContext() != null) {
             try {

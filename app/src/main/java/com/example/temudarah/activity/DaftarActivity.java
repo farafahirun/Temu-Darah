@@ -17,7 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.temudarah.databinding.ActivityDaftarBinding;
-import com.example.temudarah.model.User;
+import com.example.temudarah.model.User; // Pastikan ini benar
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -139,8 +139,8 @@ public class DaftarActivity extends AppCompatActivity {
         String ktpNumber = binding.etKtpNumber.getText().toString().trim();
         String gender = binding.spinnerGender.getText().toString();
         String bloodType = binding.spinnerGolonganDarah.getText().toString();
-        String previousDonor = binding.spinnerDonorSebelumnya.getText().toString(); // Get from dropdown again
-        String lastDonationDate = binding.etLastDonationDate.getText().toString().trim(); // Get the new date
+        String previousDonor = binding.spinnerDonorSebelumnya.getText().toString();
+        String lastDonationDate = binding.etLastDonationDate.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
         String confirmPassword = binding.etKonfirmasiPassword.getText().toString().trim();
 
@@ -202,13 +202,11 @@ public class DaftarActivity extends AppCompatActivity {
             binding.spinnerGolonganDarah.requestFocus();
             return false;
         }
-        // Validate previous donor dropdown selection
         if (TextUtils.isEmpty(previousDonor)) {
             binding.spinnerDonorSebelumnya.setError("Opsi ini harus dipilih");
             binding.spinnerDonorSebelumnya.requestFocus();
             return false;
         }
-        // Validate last donation date ONLY if "Ya" is selected for previous donor
         if ("Ya".equals(previousDonor) && TextUtils.isEmpty(lastDonationDate)) {
             binding.etLastDonationDate.setError("Tanggal donor terakhir harus diisi jika sudah pernah donor");
             binding.etLastDonationDate.requestFocus();
@@ -269,8 +267,8 @@ public class DaftarActivity extends AppCompatActivity {
         String birthDate = binding.etBirthDate.getText().toString().trim();
         String gender = binding.spinnerGender.getText().toString();
         String bloodType = binding.spinnerGolonganDarah.getText().toString();
-        String hasDonated = binding.spinnerDonorSebelumnya.getText().toString(); // Get directly from spinner
-        String lastDonationDate = binding.etLastDonationDate.getText().toString().trim(); // Get the date
+        String hasDonated = binding.spinnerDonorSebelumnya.getText().toString();
+        String lastDonationDate = binding.etLastDonationDate.getText().toString().trim();
 
         int weight = TextUtils.isEmpty(binding.etWeight.getText().toString()) ? 0 : Integer.parseInt(binding.etWeight.getText().toString());
         int height = TextUtils.isEmpty(binding.etHeight.getText().toString()) ? 0 : Integer.parseInt(binding.etHeight.getText().toString());
@@ -278,13 +276,11 @@ public class DaftarActivity extends AppCompatActivity {
 
 
         if (firebaseUser != null) {
-            // If hasDonated is "Tidak", we should save lastDonationDate as empty/null.
-            // Assuming your User model has a constructor that takes all these fields.
-            // If it doesn't, you'll need to add a setter for lastDonationDate.
             if ("Tidak".equals(hasDonated)) {
-                lastDonationDate = ""; // Ensure it's empty if 'Tidak' was selected
+                lastDonationDate = ""; // Pastikan kosong jika 'Tidak' dipilih
             }
 
+            // Gunakan constructor baru yang menyertakan lastDonationDate
             User newUser = new User(
                     firebaseUser.getUid(),
                     firebaseUser.getEmail(),
@@ -298,12 +294,9 @@ public class DaftarActivity extends AppCompatActivity {
                     hasDonated,
                     weight,
                     height,
-                    profileImageUrl
+                    profileImageUrl,
+                    lastDonationDate // <-- LULUSKAN lastDonationDate DI SINI
             );
-            // Assuming you add a setter for lastDonationDate in your User.java
-            // Or extend your User constructor if possible
-            // newUser.setLastDonationDate(lastDonationDate);
-
 
             Log.d("DAFTAR_DEBUG", "Mencoba menyimpan data ke Firestore...");
             db.collection("users").document(firebaseUser.getUid())

@@ -14,10 +14,11 @@ public class User {
     private int weight;
     private int height;
     private String profileImageBase64;
+    private String lastDonationDate;
 
     public User() {}
 
-    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageBase64) {
+    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageBase64, String lastDonationDate) {
         this.uid = uid;
         this.email = email;
         this.username = username;
@@ -31,6 +32,7 @@ public class User {
         this.weight = weight;
         this.height = height;
         this.profileImageBase64 = profileImageBase64;
+        this.lastDonationDate = lastDonationDate;
     }
 
     public String getUid() {
@@ -109,9 +111,7 @@ public class User {
         return hasDonatedBefore;
     }
 
-    public void setHasDonatedBefore(String hasDonatedBefore) {
-        this.hasDonatedBefore = hasDonatedBefore;
-    }
+    public void setHasDonatedBefore(String hasDonatedBefore) { this.hasDonatedBefore = hasDonatedBefore; }
 
     public int getWeight() {
         return weight;
@@ -133,7 +133,9 @@ public class User {
         return profileImageBase64;
     }
 
-    public void setProfileImageBase64(String profileImageBase64) {
-        this.profileImageBase64 = profileImageBase64;
-    }
+    public void setProfileImageBase64(String profileImageBase64) { this.profileImageBase64 = profileImageBase64; }
+
+    public String getLastDonationDate() { return lastDonationDate; }
+
+    public void setLastDonationDate(String lastDonationDate) { this.lastDonationDate = lastDonationDate; }
 }
