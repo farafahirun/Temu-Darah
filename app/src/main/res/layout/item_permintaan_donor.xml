@@ -5,109 +5,171 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="5dp"
     app:strokeWidth="0dp">
 
     <RelativeLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="18dp">
 
+        <!-- Foto Profil dengan border -->
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/foto_profile_pembuat"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:contentDescription="Profile Photo"
-            android:src="@drawable/kuronuma" />
+            android:src="@drawable/kuronuma"
+            app:civ_border_color="#E53935"
+            app:civ_border_width="2dp" />
+
+        <!-- Badge golongan darah di atas foto profil -->
 
         <LinearLayout
             android:id="@+id/layoutInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="18dp"
             android:layout_toEndOf="@id/foto_profile_pembuat"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvNamaPasien"
-                android:layout_width="wrap_content"
+            <!-- Nama pasien dengan icon status -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                tools:text="Nama Pasien Panjang Sekali" />
-
-            <TextView
-                android:id="@+id/tvRumahSakit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:drawablePadding="4dp"
-                android:ellipsize="end"
                 android:gravity="center_vertical"
-                android:maxLines="1"
-                android:textColor="@color/text_utama"
-                android:textSize="14sp"
-                app:drawableTint="@color/text_info"
-                tools:text="RS. Harapan Bunda Sentosa" />
+                android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/tvNamaPasien"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="#212121"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="Andi Farah Nancy" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/status_badge"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:text="MENDESAK"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Rumah sakit dengan icon -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Hospital"
+                    android:src="@drawable/ic_hospital" />
+
+                <TextView
+                    android:id="@+id/tvRumahSakit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/text_utama"
+                    android:textSize="14sp"
+                    tools:text="RS. Harapan Bunda Sentosa" />
+            </LinearLayout>
+
+            <!-- Golongan darah yang lebih terlihat -->
             <TextView
                 android:id="@+id/tvGolonganDarah"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:textColor="@color/text_info"
-                android:textSize="18sp"
+                android:textColor="#E53935"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                tools:text="A+" />
+                tools:text="Golongan Darah A+" />
 
+            <!-- Divider yang lebih elegan -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="#F0F0F0" />
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/gradient_divider" />
 
+            <!-- Jumlah kantong dan jarak dengan icon -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tvJumlahKantong"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="4dp"
-                    android:gravity="center_vertical"
-                    android:textColor="@color/text_info"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    app:drawableTint="@color/utama"
-                    tools:text="2 Kantong" />
-
-                <TextView
-                    android:id="@+id/tvJarak"
+                <!-- Jumlah kantong dengan icon -->
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:drawablePadding="4dp"
-                    android:gravity="center_vertical|end"
-                    android:textColor="@color/text_info"
-                    android:textSize="12sp"
-                    app:drawableTint="@color/text_info"
-                    tools:text="~ 5.2 km" />
+                    android:gravity="center_vertical">
 
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="4dp"
+                        android:contentDescription="Blood Bags"
+                        android:src="@drawable/darah" />
+
+                    <TextView
+                        android:id="@+id/tvJumlahKantong"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/utama"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="2 Kantong" />
+                </LinearLayout>
+
+                <!-- Jarak dengan icon -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginEnd="4dp"
+                        android:contentDescription="Distance"
+                        android:src="@drawable/maps" />
+
+                    <TextView
+                        android:id="@+id/tvJarak"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/text_info"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="~ 5.2 km" />
+                </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
-
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>
