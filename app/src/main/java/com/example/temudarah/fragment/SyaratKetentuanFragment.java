@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.temudarah.R;
+import com.example.temudarah.activity.MainActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,10 +61,12 @@ public class SyaratKetentuanFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_syarat_ketentuan, container, false);
 
-        // Fungsi tombol back
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).hideBottomNav();
+        }
+
         View btnBack = view.findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override

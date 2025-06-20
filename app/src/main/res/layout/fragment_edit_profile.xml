@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="30dp"
     tools:context=".fragment.EditProfileFragment">
 
     <RelativeLayout
@@ -346,10 +345,6 @@
                     app:cornerRadius="8dp"
                     app:strokeColor="@color/utama"
                     app:strokeWidth="1dp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp" />
             </LinearLayout>
         </ScrollView>
     </RelativeLayout>

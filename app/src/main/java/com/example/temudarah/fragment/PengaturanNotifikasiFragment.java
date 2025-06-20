@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.widget.SwitchCompat;
+
+import com.example.temudarah.activity.MainActivity;
 import com.example.temudarah.databinding.FragmentPengaturanNotifikasiBinding;
 
 public class PengaturanNotifikasiFragment extends Fragment {
@@ -17,13 +19,14 @@ public class PengaturanNotifikasiFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         binding = FragmentPengaturanNotifikasiBinding.inflate(inflater, container, false);
 
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).hideBottomNav();
+        }
         binding.btnBack.setOnClickListener(v -> {getParentFragmentManager().popBackStack(); });
 
         sharedPreferences = getActivity().getSharedPreferences("AppSettings", getContext().MODE_PRIVATE);
-        // Mengakses SwitchCompat menggunakan binding
         SwitchCompat switchAllNotifications = binding.switchAllNotifications;
         SwitchCompat switchDonationSchedule = binding.switchDonationSchedule;
         SwitchCompat switch3DayReminder = binding.switch3DayReminder;

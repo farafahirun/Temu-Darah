@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.example.temudarah.R;
+import com.example.temudarah.activity.MainActivity;
 import com.example.temudarah.databinding.FragmentEditProfileBinding;
 import com.example.temudarah.model.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -66,6 +67,9 @@ public class EditProfileFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEditProfileBinding.inflate(inflater, container, false);
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).hideBottomNav();
+        }
         return binding.getRoot();
     }
 

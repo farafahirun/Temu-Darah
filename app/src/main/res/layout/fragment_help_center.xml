@@ -43,8 +43,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="20dp">
+            android:layout_margin="20dp"
+            android:orientation="vertical">
 
             <!-- Logo -->
             <LinearLayout
@@ -65,8 +65,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="10dp"
-                android:textAlignment="center"
                 android:text="Bagaimana kami dapat membantu?"
+                android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -75,10 +75,10 @@
                 android:id="@+id/searchBarContainer"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
-                android:layout_marginBottom="24dp"
-                android:gravity="center_vertical"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="24dp"
                 android:background="@drawable/input_filter_date"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -87,9 +87,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_weight="1"
+                    android:background="@android:color/transparent"
                     android:hint="Telusuri"
                     android:textColorHint="@color/text_info"
-                    android:background="@android:color/transparent"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -125,6 +125,7 @@
                 android:orientation="vertical">
 
                 <LinearLayout
+                    android:id="@+id/get_started"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -151,6 +152,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/chats"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -177,6 +179,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/user_manual"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -203,6 +206,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/connect_friends"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -229,6 +233,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/voice_video_calls"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -255,6 +260,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/communities"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -281,6 +287,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/privacy_safety_security"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -307,6 +314,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/account_bans"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -333,6 +341,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/tutorial_video"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -359,6 +368,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/bug_report"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
@@ -391,36 +401,36 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:id="@+id/btnContactUs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/contact_button_background"
-        android:clickable="true"
-        android:layout_marginBottom="60dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:focusable="true"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="8dp">
-
-        <ImageView
-            android:id="@+id/icQuestion"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/question" />
-
-        <TextView
+        <RelativeLayout
+            android:id="@+id/btnContactUs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="8dp"
-            android:layout_toEndOf="@id/icQuestion"
-            android:text="Contact Us"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-    </RelativeLayout>
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="60dp"
+            android:background="@drawable/contact_button_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/icQuestion"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/question" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_toEndOf="@id/icQuestion"
+                android:text="Contact Us"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>
