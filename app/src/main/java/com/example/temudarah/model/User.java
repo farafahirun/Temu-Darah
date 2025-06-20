@@ -1,5 +1,7 @@
 package com.example.temudarah.model;
 
+import com.google.firebase.firestore.GeoPoint;
+
 public class User {
     private String uid;
     private String email;
@@ -15,10 +17,13 @@ public class User {
     private int height;
     private String profileImageBase64;
     private String lastDonationDate;
+    private GeoPoint location; // Untuk menyimpan koordinat lat/lng
+    private String geohash;
+    private String fcmToken;
 
     public User() {}
 
-    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageBase64, String lastDonationDate) {
+    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageBase64, String lastDonationDate, GeoPoint location, String geohash, String fcmToken) {
         this.uid = uid;
         this.email = email;
         this.username = username;
@@ -33,6 +38,9 @@ public class User {
         this.height = height;
         this.profileImageBase64 = profileImageBase64;
         this.lastDonationDate = lastDonationDate;
+        this.location = location;
+        this.geohash = geohash;
+        this.fcmToken = fcmToken;
     }
 
     public String getUid() {
@@ -138,4 +146,28 @@ public class User {
     public String getLastDonationDate() { return lastDonationDate; }
 
     public void setLastDonationDate(String lastDonationDate) { this.lastDonationDate = lastDonationDate; }
+
+    public GeoPoint getLocation() {
+        return location;
+    }
+
+    public void setLocation(GeoPoint location) {
+        this.location = location;
+    }
+
+    public String getGeohash() {
+        return geohash;
+    }
+
+    public void setGeohash(String geohash) {
+        this.geohash = geohash;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
 }

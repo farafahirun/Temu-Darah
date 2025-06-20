@@ -1,182 +1,291 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F0F0F0"
     tools:context=".fragment.RiwayatFragment">
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/navbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#F0F0F0">
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="8dp"
+        android:background="@color/background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingTop="15dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="5dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="Logo"
+            android:src="@drawable/logo_merah" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/iv_notification"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:contentDescription="Notification"
+            android:src="@drawable/notifikasi_on"
+            app:tint="@color/utama" />
+    </LinearLayout>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardPenghargaan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/navbar"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardBackgroundColor="@color/utama"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="2dp">
 
         <LinearLayout
-            android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:background="@color/background"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="8dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
-            android:paddingBottom="5dp"
-            android:paddingTop="15dp"
-            android:paddingEnd="20dp">
+            android:padding="16dp">
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:contentDescription="Logo"
-                android:src="@drawable/logo_merah" />
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="Penghargaan"
+                android:src="@drawable/kegiatan_off"
+                app:tint="@color/white" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:id="@+id/iv_notification"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:contentDescription="Notification"
-                android:src="@drawable/notifikasi_on"
-                app:tint="@color/utama" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Lencana &amp; Penghargaan"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/linearLayout2"
-            android:fillViewport="true">
+    <LinearLayout
+        android:id="@+id/tabUtama"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cardPenghargaan"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp">
 
-            <!-- Carousel pic -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/tabKegiatan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
             <LinearLayout
+                android:id="@+id/layoutTabKegiatan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:background="@drawable/border_card_utama"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="12dp">
 
-                <!-- Tetap: Card Penghargaan -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:id="@+id/iconTabKegiatan"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/kegiatan_off"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:id="@+id/textTabKegiatan"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    app:cardBackgroundColor="@color/utama"
-                    app:cardCornerRadius="5dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_marginStart="24dp"
-                            android:contentDescription="Notification"
-                            android:src="@drawable/kegiatan_off"
-                            app:tint="@color/white" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="15dp"
-                            android:text="Penghargaan"
-                            android:textColor="@color/white"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Card Kegiatan & Donor Darah -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingBottom="15dp">
-
-                    <!-- Kegiatan -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginEnd="7dp"
-                        android:layout_weight="1"
-                        app:cardCornerRadius="5dp"
-                        app:cardElevation="2dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/border_card"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp">
-
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:contentDescription="Notification"
-                                android:src="@drawable/kegiatan_off"
-                                app:tint="@color/utama" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:text="Kegiatan"
-                                android:textColor="@color/utama"
-                                android:textSize="20sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                    <!-- Donor Darah -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="7dp"
-                        android:layout_marginEnd="15dp"
-                        android:layout_weight="1"
-                        app:cardCornerRadius="5dp"
-                        app:cardElevation="2dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/border_card"
-                            android:gravity="center"
-                            android:orientation="vertical"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp">
-
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:contentDescription="Notification"
-                                android:src="@drawable/darah"
-                                app:tint="@color/utama" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:text="Donor Darah"
-                                android:textColor="@color/utama"
-                                android:textSize="20sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
+                    android:layout_marginTop="10dp"
+                    android:text="Kegiatan"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
             </LinearLayout>
-        </ScrollView>
+        </androidx.cardview.widget.CardView>
 
-    </RelativeLayout>
-</FrameLayout>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/tabDonorDarah"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:id="@+id/layoutTabDonor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border_card_white"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="12dp">
+
+                <ImageView
+                    android:id="@+id/iconTabDonor"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/darah"
+                    app:tint="@color/utama" />
+
+                <TextView
+                    android:id="@+id/textTabDonor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Donor Darah"
+                    android:textColor="@color/utama"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/filterGroupKegiatan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tabUtama"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterKegiatanSemua"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/utama"
+            android:text="Semua"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/utama"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterKegiatanEdukasi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/background"
+            android:text="Pendonor"
+            android:textColor="@color/utama"
+            android:textSize="16sp"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/utama"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterKegiatanDonor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/background"
+            android:text="Penerima"
+            android:textColor="@color/utama"
+            android:textSize="16sp"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/utama"
+            app:strokeWidth="1dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/filterGroupDonorDarah"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tabUtama"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterDonorSemua"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/utama"
+            android:text="Semua"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/utama"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterDonorSebagaiPendonor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/background"
+            android:text="Pendonor"
+            android:textColor="@color/utama"
+            android:textSize="16sp"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/utama"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFilterDonorSebagaiPenerima"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/background"
+            android:text="Penerima"
+            android:textColor="@color/utama"
+            android:textSize="16sp"
+            app:cornerRadius="8dp"
+            app:strokeColor="@color/utama"
+            app:strokeWidth="1dp" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRiwayat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/filterGroupKegiatan"
+        android:padding="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_riwayat_kegiatan" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

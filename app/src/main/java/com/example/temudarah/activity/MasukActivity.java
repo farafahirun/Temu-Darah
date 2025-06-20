@@ -3,6 +3,7 @@ package com.example.temudarah.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -13,6 +14,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.temudarah.databinding.ActivityMasukBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
 
@@ -72,16 +75,35 @@ public class MasukActivity extends AppCompatActivity {
         String password = binding.etPassword.getText().toString().trim();
         Toast.makeText(this, "Mencoba masuk...", Toast.LENGTH_SHORT).show();
 
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(MasukActivity.this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MasukActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            } else {
-                Toast.makeText(MasukActivity.this, "Login Gagal: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Setelah login berhasil, dapatkan token terbaru dan simpan
+                        getAndStoreFcmToken();
+
+                        // Lanjutkan ke MainActivity
+                        Toast.makeText(MasukActivity.this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MasukActivity.this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(MasukActivity.this, "Login Gagal: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+    private void getAndStoreFcmToken() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
+                .addOnSuccessListener(token -> {
+                    if (token != null) {
+                        FirebaseFirestore.getInstance().collection("users").document(user.getUid())
+                                .update("fcmToken", token)
+                                .addOnSuccessListener(aVoid -> Log.d("MasukActivity", "FCM Token diupdate saat login."));
+                    }
+                });
     }
 }

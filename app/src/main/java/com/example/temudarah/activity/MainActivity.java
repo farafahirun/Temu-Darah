@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import com.example.temudarah.R;
 import com.example.temudarah.databinding.ActivityMainBinding;
 import com.example.temudarah.fragment.BerandaFragment;
+import com.example.temudarah.fragment.ChatsFragment;
 import com.example.temudarah.fragment.KegiatanFragment;
 import com.example.temudarah.fragment.ProfileFragment;
 import com.example.temudarah.fragment.RiwayatFragment;
@@ -44,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.beranda) {
                 selectedFragment = new BerandaFragment();
+            } else if (id == R.id.pesan) {
+                selectedFragment = new ChatsFragment();
             } else if (id == R.id.kegiatan) {
                 selectedFragment = new KegiatanFragment();
             } else if (id == R.id.riwayat) {
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().addOnBackStackChangedListener(() -> {
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (currentFragment instanceof BerandaFragment ||
+                    currentFragment instanceof ChatsFragment ||
                     currentFragment instanceof KegiatanFragment ||
                     currentFragment instanceof RiwayatFragment ||
                     currentFragment instanceof ProfileFragment) {

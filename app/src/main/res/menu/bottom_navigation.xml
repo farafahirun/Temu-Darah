@@ -5,6 +5,10 @@
         android:icon="@drawable/beranda_bottom"
         android:title="Beranda" />
     <item
+        android:id="@+id/pesan"
+        android:icon="@drawable/pesan_bottom"
+        android:title="Pesan" />
+    <item
         android:id="@+id/kegiatan"
         android:icon="@drawable/kegiatan_bottom"
         android:title="Kegiatan" />

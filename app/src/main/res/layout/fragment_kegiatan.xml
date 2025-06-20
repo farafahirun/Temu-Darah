@@ -209,7 +209,30 @@
                     android:paddingBottom="80dp"
                     android:scrollbarStyle="outsideOverlay"
                     android:scrollbars="vertical"
-                    tools:listitem="@layout/item_riwayat_kegiatan" />
+                    tools:listitem="@layout/item_kegiatan" />
+
+                <FrameLayout
+                    android:id="@+id/loadingOverlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#CCFFFFFF"
+                    android:visibility="gone">
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="@color/utama"/>
+
+                    <TextView
+                        android:id="@+id/tvEmptyState"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="Tidak ada kegiatan"
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        android:textColor="@color/utama"/>
+                </FrameLayout>
             </LinearLayout>
         </ScrollView>
     </RelativeLayout>

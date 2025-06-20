@@ -276,27 +276,26 @@ public class DaftarActivity extends AppCompatActivity {
 
 
         if (firebaseUser != null) {
-            if ("Tidak".equals(hasDonated)) {
-                lastDonationDate = ""; // Pastikan kosong jika 'Tidak' dipilih
-            }
 
-            // Gunakan constructor baru yang menyertakan lastDonationDate
-            User newUser = new User(
-                    firebaseUser.getUid(),
-                    firebaseUser.getEmail(),
-                    username,
-                    fullName,
-                    ktpNumber,
-                    address,
-                    birthDate,
-                    gender,
-                    bloodType,
-                    hasDonated,
-                    weight,
-                    height,
-                    profileImageUrl,
-                    lastDonationDate // <-- LULUSKAN lastDonationDate DI SINI
-            );
+            // --- PERBAIKAN UTAMA ADA DI SINI ---
+
+            // 1. Buat objek User kosong
+            User newUser = new User();
+
+            // 2. Isi datanya satu per satu menggunakan setter
+            // Ini jauh lebih mudah dibaca dan dirawat
+            newUser.setUid(firebaseUser.getUid());
+            newUser.setEmail(firebaseUser.getEmail());
+            newUser.setUsername(username);
+            newUser.setFullName(fullName);
+            newUser.setKtpNumber(ktpNumber);
+            newUser.setAddress(address);
+            newUser.setBirthDate(birthDate);
+            newUser.setGender(gender);
+            newUser.setBloodType(bloodType);
+            newUser.setHasDonatedBefore(hasDonated);
+            newUser.setWeight(weight);
+            newUser.setHeight(height);
 
             Log.d("DAFTAR_DEBUG", "Mencoba menyimpan data ke Firestore...");
             db.collection("users").document(firebaseUser.getUid())
