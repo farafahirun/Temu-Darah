@@ -53,6 +53,7 @@ public class EditProfileFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
+
     private ActivityResultLauncher<Intent> cameraLauncher;
     private ActivityResultLauncher<String> galleryLauncher;
     private ActivityResultLauncher<String> requestCameraPermissionLauncher;
@@ -84,11 +85,16 @@ public class EditProfileFragment extends Fragment {
         setupDatePicker();
         setupGenderRadioButtons();
 
-        if (currentUser != null) {
-            loadUserData();
-        } else {
-            Toast.makeText(getContext(), "Pengguna tidak terautentikasi.", Toast.LENGTH_SHORT).show();
-        }
+        showScreenLoading();
+
+        new android.os.Handler().postDelayed(() -> {
+            if (currentUser != null) {
+                loadUserData(); // load data setelah 2 detik
+            } else {
+                hideScreenLoading();
+                Toast.makeText(getContext(), "Pengguna tidak terautentikasi.", Toast.LENGTH_SHORT).show();
+            }
+        }, 2000);
     }
 
     private void initializeLaunchers() {
@@ -115,21 +121,20 @@ public class EditProfileFragment extends Fragment {
         requestCameraPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) openCamera();
-                    else
-                        Toast.makeText(getContext(), "Izin kamera diperlukan", Toast.LENGTH_SHORT).show();
+                    else Toast.makeText(getContext(), "Izin kamera diperlukan", Toast.LENGTH_SHORT).show();
                 });
 
         requestGalleryPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) openGallery();
-                    else
-                        Toast.makeText(getContext(), "Izin galeri diperlukan", Toast.LENGTH_SHORT).show();
+                    else Toast.makeText(getContext(), "Izin galeri diperlukan", Toast.LENGTH_SHORT).show();
                 });
     }
 
     private void setupListeners() {
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         binding.btnSave.setOnClickListener(v -> saveUserData());
+
         binding.profileImage.setOnClickListener(v -> {
             if (binding.imageUploadProgressBar.getVisibility() == View.GONE) {
                 showImagePickerOptions();
@@ -199,7 +204,6 @@ public class EditProfileFragment extends Fragment {
 
     private void loadUserData() {
         if (currentUser == null) return;
-        Toast.makeText(getContext(), "Memuat data...", Toast.LENGTH_SHORT).show();
         DocumentReference userRef = db.collection("users").document(currentUser.getUid());
         userRef.get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
@@ -210,6 +214,10 @@ public class EditProfileFragment extends Fragment {
             } else {
                 Toast.makeText(getContext(), "Data profil tidak ditemukan.", Toast.LENGTH_SHORT).show();
             }
+            hideScreenLoading();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(getContext(), "Gagal memuat data profil.", Toast.LENGTH_SHORT).show();
+            hideScreenLoading();
         });
     }
 
@@ -222,18 +230,16 @@ public class EditProfileFragment extends Fragment {
         binding.editHeight.setText(user.getHeight() > 0 ? String.valueOf(user.getHeight()) : "");
         binding.editNomorKTP.setText(user.getKtpNumber() != null ? user.getKtpNumber() : "");
         binding.editAlamatLengkap.setText(user.getAddress() != null ? user.getAddress() : "");
+
         if (user.getGender() != null) {
-            if (user.getGender().equalsIgnoreCase("Laki-laki") || user.getGender().equalsIgnoreCase("Male")) {
-                binding.radioMale.setChecked(true);
-            } else if (user.getGender().equalsIgnoreCase("Perempuan") || user.getGender().equalsIgnoreCase("Female")) {
-                binding.radioFemale.setChecked(true);
-            }
+            if (user.getGender().equalsIgnoreCase("Laki-laki")) binding.radioMale.setChecked(true);
+            else if (user.getGender().equalsIgnoreCase("Perempuan")) binding.radioFemale.setChecked(true);
         }
 
-        if (user.getProfileImageBase64() != null && !user.getProfileImageBase64().isEmpty() && getContext() != null) {
+        if (user.getProfileImageBase64() != null && !user.getProfileImageBase64().isEmpty()) {
             try {
                 byte[] imageBytes = Base64.decode(user.getProfileImageBase64(), Base64.DEFAULT);
-                Glide.with(requireContext()).asBitmap().load(imageBytes).placeholder(R.drawable.logo_merah).into(binding.profileImage);
+                Glide.with(requireContext()).asBitmap().load(imageBytes).into(binding.profileImage);
             } catch (Exception e) {
                 binding.profileImage.setImageResource(R.drawable.logo_merah);
             }
@@ -244,126 +250,97 @@ public class EditProfileFragment extends Fragment {
 
     private void saveUserData() {
         if (currentUser == null) return;
-        if (!validateInput()) {
-            Toast.makeText(getContext(), "Silakan periksa kembali data Anda.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Toast.makeText(getContext(), "Menyimpan...", Toast.LENGTH_SHORT).show();
+        if (!validateInput()) return;
 
-        String namaPengguna = binding.editNamaPengguna.getText().toString().trim();
+        showScreenLoading();
+
+        String username = binding.editNamaPengguna.getText().toString().trim();
         String fullName = binding.editFullName.getText().toString().trim();
-        String dateOfBirth = binding.editDateOfBirth.getText().toString().trim();
-        String bloodType = binding.editBloodType.getText().toString().trim();
+        String birthDate = binding.editDateOfBirth.getText().toString().trim();
         String gender = binding.radioMale.isChecked() ? "Laki-laki" : "Perempuan";
-        String age = calculateAge(dateOfBirth);
-        int weight = 0;
-        if (!binding.editWeight.getText().toString().trim().isEmpty()) {
-            weight = Integer.parseInt(binding.editWeight.getText().toString().trim());
-        }
-        int height = 0;
-        if (!binding.editHeight.getText().toString().trim().isEmpty()) {
-            height = Integer.parseInt(binding.editHeight.getText().toString().trim());
-        }
-        String address = binding.editAlamatLengkap.getText().toString().trim();
+        String bloodType = binding.editBloodType.getText().toString().trim();
         String ktpNumber = binding.editNomorKTP.getText().toString().trim();
+        String address = binding.editAlamatLengkap.getText().toString().trim();
+        String age = calculateAge(birthDate);
+
+        int weight = Integer.parseInt(binding.editWeight.getText().toString().trim());
+        int height = Integer.parseInt(binding.editHeight.getText().toString().trim());
 
         Map<String, Object> updates = new HashMap<>();
-        updates.put("username", namaPengguna);
+        updates.put("username", username);
         updates.put("fullName", fullName);
-        updates.put("birthDate", dateOfBirth);
+        updates.put("birthDate", birthDate);
         updates.put("gender", gender);
         updates.put("bloodType", bloodType);
         updates.put("weight", weight);
         updates.put("height", height);
         updates.put("age", age);
-        updates.put("address", address);
         updates.put("ktpNumber", ktpNumber);
+        updates.put("address", address);
 
         db.collection("users").document(currentUser.getUid()).update(updates)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "Profil berhasil diperbarui", Toast.LENGTH_SHORT).show();
-                    if (getParentFragmentManager() != null)
-                        getParentFragmentManager().popBackStack();
+                    hideScreenLoading();
+                    getParentFragmentManager().popBackStack();
                 })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Gagal memperbarui profil.", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Gagal memperbarui profil.", Toast.LENGTH_SHORT).show();
+                    hideScreenLoading();
+                });
     }
 
     private boolean validateInput() {
         if (TextUtils.isEmpty(binding.editNamaPengguna.getText().toString().trim())) {
             binding.editNamaPengguna.setError("Nama Pengguna tidak boleh kosong");
-            binding.editNamaPengguna.requestFocus();
             return false;
         }
         if (TextUtils.isEmpty(binding.editFullName.getText().toString().trim())) {
             binding.editFullName.setError("Nama Lengkap tidak boleh kosong");
-            binding.editFullName.requestFocus();
             return false;
         }
         if (TextUtils.isEmpty(binding.editAlamatLengkap.getText().toString().trim())) {
             binding.editAlamatLengkap.setError("Alamat tidak boleh kosong");
-            binding.editAlamatLengkap.requestFocus();
             return false;
         }
-        String ktpNumber = binding.editNomorKTP.getText().toString().trim();
-        if (TextUtils.isEmpty(ktpNumber)) {
+        if (TextUtils.isEmpty(binding.editNomorKTP.getText().toString().trim())) {
             binding.editNomorKTP.setError("Nomor KTP tidak boleh kosong");
-            binding.editNomorKTP.requestFocus();
             return false;
-        } else if (ktpNumber.length() != 16) {
+        } else if (binding.editNomorKTP.getText().toString().length() != 16) {
             binding.editNomorKTP.setError("Nomor KTP harus 16 digit");
-            binding.editNomorKTP.requestFocus();
             return false;
         }
         if (!binding.radioMale.isChecked() && !binding.radioFemale.isChecked()) {
             Toast.makeText(getContext(), "Silakan pilih jenis kelamin", Toast.LENGTH_SHORT).show();
             return false;
         }
-        try {
-            if (!TextUtils.isEmpty(binding.editWeight.getText().toString())) {
-                Integer.parseInt(binding.editWeight.getText().toString().trim());
-            }
-            if (!TextUtils.isEmpty(binding.editHeight.getText().toString())) {
-                Integer.parseInt(binding.editHeight.getText().toString().trim());
-            }
-        } catch (NumberFormatException e) {
-            Toast.makeText(getContext(), "Format berat atau tinggi badan harus berupa angka", Toast.LENGTH_SHORT).show();
-            return false;
-        }
         return true;
     }
 
     private String calculateAge(String birthDateStr) {
-        if (birthDateStr == null || birthDateStr.isEmpty()) return "-";
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             Date birthDate = sdf.parse(birthDateStr);
             if (birthDate == null) return "-";
-            Calendar birthCal = Calendar.getInstance();
-            birthCal.setTime(birthDate);
-            Calendar todayCal = Calendar.getInstance();
-            int age = todayCal.get(Calendar.YEAR) - birthCal.get(Calendar.YEAR);
-            if (todayCal.get(Calendar.DAY_OF_YEAR) < birthCal.get(Calendar.DAY_OF_YEAR)) {
-                age--;
-            }
+            Calendar today = Calendar.getInstance();
+            Calendar dob = Calendar.getInstance();
+            dob.setTime(birthDate);
+            int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
+            if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) age--;
             return String.valueOf(age);
         } catch (ParseException e) {
-            e.printStackTrace();
             return "-";
         }
     }
 
-    private void processImageUri(Uri imageUri) {
+    private void processImageUri(Uri uri) {
         binding.imageUploadProgressBar.setVisibility(View.VISIBLE);
         new Thread(() -> {
-            String base64Image = convertImageUriToBase64(imageUri);
+            String base64 = convertImageUriToBase64(uri);
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
-                    if (base64Image != null) {
-                        updateProfileImageInFirestore(base64Image);
-                    } else {
-                        Toast.makeText(getContext(), "Gagal memproses gambar.", Toast.LENGTH_SHORT).show();
-                        binding.imageUploadProgressBar.setVisibility(View.GONE);
-                    }
+                    if (base64 != null) updateProfileImageInFirestore(base64);
+                    else binding.imageUploadProgressBar.setVisibility(View.GONE);
                 });
             }
         }).start();
@@ -372,66 +349,53 @@ public class EditProfileFragment extends Fragment {
     private void processBitmap(Bitmap bitmap) {
         binding.imageUploadProgressBar.setVisibility(View.VISIBLE);
         new Thread(() -> {
-            String base64Image = convertBitmapToBase64(bitmap);
+            String base64 = convertBitmapToBase64(bitmap);
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
-                    if (base64Image != null) {
-                        updateProfileImageInFirestore(base64Image);
-                    } else {
-                        Toast.makeText(getContext(), "Gagal memproses gambar.", Toast.LENGTH_SHORT).show();
-                        binding.imageUploadProgressBar.setVisibility(View.GONE);
-                    }
+                    if (base64 != null) updateProfileImageInFirestore(base64);
+                    else binding.imageUploadProgressBar.setVisibility(View.GONE);
                 });
             }
         }).start();
     }
 
     private String convertBitmapToBase64(Bitmap bitmap) {
-        try {
-            Bitmap resizedBitmap = resizeBitmap(bitmap, 400);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
-            byte[] byteArray = byteArrayOutputStream.toByteArray();
-            return Base64.encodeToString(byteArray, Base64.DEFAULT);
-        } catch (Exception e) {
-            Log.e(TAG, "Gagal mengubah bitmap ke Base64", e);
-            return null;
-        }
+        Bitmap resized = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        resized.compress(Bitmap.CompressFormat.JPEG, 60, output);
+        return Base64.encodeToString(output.toByteArray(), Base64.DEFAULT);
     }
 
-    private String convertImageUriToBase64(Uri imageUri) {
-        try (InputStream inputStream = requireContext().getContentResolver().openInputStream(imageUri)) {
+    private String convertImageUriToBase64(Uri uri) {
+        try (InputStream inputStream = requireContext().getContentResolver().openInputStream(uri)) {
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             return convertBitmapToBase64(bitmap);
         } catch (Exception e) {
-            Log.e(TAG, "Gagal mengubah Uri ke Base64", e);
             return null;
         }
     }
 
-    private Bitmap resizeBitmap(Bitmap bitmap, int maxSize) {
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        if (width <= maxSize && height <= maxSize) return bitmap;
-        float ratio = Math.min((float) maxSize / width, (float) maxSize / height);
-        int newWidth = Math.round(width * ratio);
-        int newHeight = Math.round(height * ratio);
-        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
-    }
-
     private void updateProfileImageInFirestore(String base64Image) {
-        if (currentUser == null) return;
-        Toast.makeText(getContext(), "Menyimpan foto profil...", Toast.LENGTH_SHORT).show();
         db.collection("users").document(currentUser.getUid())
                 .update("profileImageBase64", base64Image)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Foto profil berhasil diperbarui.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Foto profil berhasil diperbarui", Toast.LENGTH_SHORT).show();
                     binding.imageUploadProgressBar.setVisibility(View.GONE);
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Gagal menyimpan foto: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Gagal memperbarui foto", Toast.LENGTH_SHORT).show();
                     binding.imageUploadProgressBar.setVisibility(View.GONE);
                 });
+    }
+
+    private void showScreenLoading() {
+        binding.loadingOverlay.setVisibility(View.VISIBLE);
+        binding.scrollView.setVisibility(View.GONE); // sesuaikan ID ScrollView jika berbeda
+    }
+
+    private void hideScreenLoading() {
+        binding.loadingOverlay.setVisibility(View.GONE);
+        binding.scrollView.setVisibility(View.VISIBLE);
     }
 
     @Override
