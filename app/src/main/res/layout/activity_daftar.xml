@@ -9,7 +9,6 @@
     android:id="@+id/main"
     tools:context=".activity.DaftarActivity">
 
-    <!-- Back Button -->
     <ImageView
         android:id="@+id/iv_back"
         android:layout_width="24dp"
@@ -19,7 +18,6 @@
         android:contentDescription="Back"
         android:src="@drawable/kembali" />
 
-    <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -33,7 +31,6 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Title -->
             <TextView
                 android:id="@+id/tv_title"
                 android:layout_width="wrap_content"
@@ -44,7 +41,6 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <!-- Subtitle -->
             <TextView
                 android:id="@+id/tv_subtitle"
                 android:layout_width="wrap_content"
@@ -55,7 +51,6 @@
                 android:textColor="#666666"
                 android:textSize="14sp" />
 
-            <!-- Username -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,7 +72,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Nama Lengkap -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -99,7 +93,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- No. Telp/Email -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -121,7 +114,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Alamat Lengkap -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -144,7 +136,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Tanggal Lahir -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -168,7 +159,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Berat Badan -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -190,7 +180,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Tinggi Badan -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -212,7 +201,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Nomor KTP -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -231,11 +219,10 @@
                     android:hint="Nomor KTP"
                     android:inputType="number"
                     android:maxLength="16"
-                    android:textSize="16sp"
-                    android:textColor="@color/fixed_black" />
+                    android:textColor="@color/fixed_black"
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Jenis Kelamin Dropdown -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
@@ -258,7 +245,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Golongan Darah Dropdown -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
@@ -281,7 +267,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Donor Sebelumnya Dropdown -->
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
@@ -304,7 +289,31 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Password -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_last_donation_date"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="#C11E3B"
+                app:hintTextColor="#C11E3B">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLastDonationDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tanggal Donor Terakhir (DD/MM/YYYY)"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:inputType="none"
+                    android:textSize="16sp"
+                    android:textColor="@color/fixed_black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -327,7 +336,6 @@
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Konfir Password -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -363,7 +371,6 @@
                 app:cornerRadius="10dp"
                 app:strokeColor="@color/utama" />
 
-            <!-- Footer Text -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -371,7 +378,6 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <!-- Text "Sudah Punya Akun?" -->
                 <TextView
                     android:id="@+id/tv_adaAkun"
                     android:layout_width="wrap_content"
@@ -381,7 +387,6 @@
                     android:textColor="@color/black"
                     android:textSize="14sp" />
 
-                <!-- Text "Masuk" -->
                 <TextView
                     android:id="@+id/tv_masuk"
                     android:layout_width="wrap_content"

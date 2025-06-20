@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.View; // Import View for visibility
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -50,7 +51,6 @@ public class DaftarActivity extends AppCompatActivity {
         setupDatePicker();
     }
 
-    // cek123testesommit
     private void setupListeners() {
         binding.btnDaftar.setOnClickListener(v -> {
             if (validateInput()) {
@@ -77,6 +77,21 @@ public class DaftarActivity extends AppCompatActivity {
         String[] donorOptions = {"Ya", "Tidak"};
         ArrayAdapter<String> donorAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, donorOptions);
         binding.spinnerDonorSebelumnya.setAdapter(donorAdapter);
+
+        // Add listener for the donor option spinner to control visibility of date field
+        binding.spinnerDonorSebelumnya.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedOption = (String) parent.getItemAtPosition(position);
+            if ("Ya".equals(selectedOption)) {
+                binding.tilLastDonationDate.setVisibility(View.VISIBLE); // Show the TextInputLayout
+                // Optionally, open date picker immediately if 'Ya' is selected for the first time
+                if (TextUtils.isEmpty(binding.etLastDonationDate.getText())) {
+                    showLastDonationDatePicker();
+                }
+            } else {
+                binding.tilLastDonationDate.setVisibility(View.GONE); // Hide the TextInputLayout
+                binding.etLastDonationDate.setText(""); // Clear the text when hidden
+            }
+        });
     }
 
     private void setupDatePicker() {
@@ -93,6 +108,24 @@ public class DaftarActivity extends AppCompatActivity {
                     year, month, day);
             datePickerDialog.show();
         });
+
+        // Add listener for the etLastDonationDate EditText to open date picker when clicked
+        binding.etLastDonationDate.setOnClickListener(v -> showLastDonationDatePicker());
+    }
+
+    private void showLastDonationDatePicker() {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                DaftarActivity.this,
+                (view, year1, monthOfYear, dayOfMonth) ->
+                        // Set the text of the new EditText
+                        binding.etLastDonationDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year1),
+                year, month, day);
+        datePickerDialog.show();
     }
 
     private boolean validateInput() {
@@ -106,7 +139,8 @@ public class DaftarActivity extends AppCompatActivity {
         String ktpNumber = binding.etKtpNumber.getText().toString().trim();
         String gender = binding.spinnerGender.getText().toString();
         String bloodType = binding.spinnerGolonganDarah.getText().toString();
-        String previousDonor = binding.spinnerDonorSebelumnya.getText().toString();
+        String previousDonor = binding.spinnerDonorSebelumnya.getText().toString(); // Get from dropdown again
+        String lastDonationDate = binding.etLastDonationDate.getText().toString().trim(); // Get the new date
         String password = binding.etPassword.getText().toString().trim();
         String confirmPassword = binding.etKonfirmasiPassword.getText().toString().trim();
 
@@ -168,11 +202,19 @@ public class DaftarActivity extends AppCompatActivity {
             binding.spinnerGolonganDarah.requestFocus();
             return false;
         }
+        // Validate previous donor dropdown selection
         if (TextUtils.isEmpty(previousDonor)) {
             binding.spinnerDonorSebelumnya.setError("Opsi ini harus dipilih");
             binding.spinnerDonorSebelumnya.requestFocus();
             return false;
         }
+        // Validate last donation date ONLY if "Ya" is selected for previous donor
+        if ("Ya".equals(previousDonor) && TextUtils.isEmpty(lastDonationDate)) {
+            binding.etLastDonationDate.setError("Tanggal donor terakhir harus diisi jika sudah pernah donor");
+            binding.etLastDonationDate.requestFocus();
+            return false;
+        }
+
         if (TextUtils.isEmpty(password)) {
             binding.etPassword.setError("Password tidak boleh kosong");
             binding.etPassword.requestFocus();
@@ -227,13 +269,22 @@ public class DaftarActivity extends AppCompatActivity {
         String birthDate = binding.etBirthDate.getText().toString().trim();
         String gender = binding.spinnerGender.getText().toString();
         String bloodType = binding.spinnerGolonganDarah.getText().toString();
-        String hasDonated = binding.spinnerDonorSebelumnya.getText().toString();
+        String hasDonated = binding.spinnerDonorSebelumnya.getText().toString(); // Get directly from spinner
+        String lastDonationDate = binding.etLastDonationDate.getText().toString().trim(); // Get the date
+
         int weight = TextUtils.isEmpty(binding.etWeight.getText().toString()) ? 0 : Integer.parseInt(binding.etWeight.getText().toString());
         int height = TextUtils.isEmpty(binding.etHeight.getText().toString()) ? 0 : Integer.parseInt(binding.etHeight.getText().toString());
         String profileImageUrl = ""; // Placeholder, can be updated later
 
 
         if (firebaseUser != null) {
+            // If hasDonated is "Tidak", we should save lastDonationDate as empty/null.
+            // Assuming your User model has a constructor that takes all these fields.
+            // If it doesn't, you'll need to add a setter for lastDonationDate.
+            if ("Tidak".equals(hasDonated)) {
+                lastDonationDate = ""; // Ensure it's empty if 'Tidak' was selected
+            }
+
             User newUser = new User(
                     firebaseUser.getUid(),
                     firebaseUser.getEmail(),
@@ -249,6 +300,10 @@ public class DaftarActivity extends AppCompatActivity {
                     height,
                     profileImageUrl
             );
+            // Assuming you add a setter for lastDonationDate in your User.java
+            // Or extend your User constructor if possible
+            // newUser.setLastDonationDate(lastDonationDate);
+
 
             Log.d("DAFTAR_DEBUG", "Mencoba menyimpan data ke Firestore...");
             db.collection("users").document(firebaseUser.getUid())
