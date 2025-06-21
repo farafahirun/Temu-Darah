@@ -1,6 +1,8 @@
 package com.example.temudarah.fragment;
 
 import android.annotation.SuppressLint;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -22,7 +24,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class EditPermintaanFragment extends Fragment {
@@ -122,7 +127,128 @@ public class EditPermintaanFragment extends Fragment {
             lastKnownLocation = new Location("");
             lastKnownLocation.setLatitude(gp.getLatitude());
             lastKnownLocation.setLongitude(gp.getLongitude());
+
+            // Tampilkan koordinat terlebih dahulu (agar UI responsif)
             binding.tvLokasiTerpilih.setText(String.format("Lokasi tersimpan: Lat %.4f, Lng %.4f", gp.getLatitude(), gp.getLongitude()));
+
+            // Ambil alamat lengkap dari koordinat (asinkronus)
+            getAddressFromLocation(lastKnownLocation);
+        }
+    }
+
+    /**
+     * Mengambil alamat lengkap dari koordinat lokasi
+     */
+    private void getAddressFromLocation(Location location) {
+        try {
+            Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
+
+            // Langsung tampilkan pesan bahwa sistem sedang mencari alamat
+            binding.tvLokasiTerpilih.setText(String.format("Lokasi: Lat %.4f, Lng %.4f\nMencari alamat lengkap...",
+                location.getLatitude(), location.getLongitude()));
+
+            // Pendekatan yang berfungsi di semua versi Android
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                // Untuk Android 13 (API 33) ke atas menggunakan callback
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1, addresses -> {
+                    if (getContext() != null) {  // Pastikan fragment masih attached
+                        processAddressResult(addresses, location);
+                    }
+                });
+            } else {
+                // Untuk Android 12 (API 32) ke bawah menggunakan metode sinkronus
+                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                processAddressResult(addresses, location);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting address: ", e);
+            // Tampilkan pesan error tetapi tetap pertahankan informasi koordinat yang sudah ada
+            binding.tvLokasiTerpilih.setText(String.format("Lokasi: Lat %.4f, Lng %.4f\nGagal mendapatkan alamat lengkap",
+                location.getLatitude(), location.getLongitude()));
+        }
+    }
+
+    /**
+     * Memproses hasil dari Geocoder dan menampilkan alamat lengkap
+     */
+    private void processAddressResult(List<Address> addresses, Location location) {
+        try {
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                StringBuilder addressText = new StringBuilder();
+
+                // Get the complete address line
+                if (address.getMaxAddressLineIndex() >= 0) {
+                    for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                        String addressLine = address.getAddressLine(i);
+                        if (addressLine != null) {
+                            addressText.append(addressLine);
+                            if (i < address.getMaxAddressLineIndex()) {
+                                addressText.append(", ");
+                            }
+                        }
+                    }
+                } else {
+                    // Jika tidak ada address line, coba dapatkan komponen alamat lainnya
+                    if (address.getLocality() != null) addressText.append(address.getLocality()).append(", ");
+                    if (address.getSubAdminArea() != null) addressText.append(address.getSubAdminArea()).append(", ");
+                    if (address.getAdminArea() != null) addressText.append(address.getAdminArea()).append(", ");
+                    if (address.getCountryName() != null) addressText.append(address.getCountryName());
+                }
+
+                // Display both the coordinates and the address
+                final String finalAddressText = addressText.toString();
+                if (!TextUtils.isEmpty(finalAddressText)) {
+                    final String locationText = String.format("Lokasi: Lat %.4f, Lng %.4f\nAlamat: %s",
+                            location.getLatitude(), location.getLongitude(), finalAddressText);
+
+                    // Memastikan update UI dilakukan di thread utama
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            if (binding != null) {
+                                binding.tvLokasiTerpilih.setText(locationText);
+                            }
+                        });
+                    }
+
+                    // Log untuk debugging
+                    Log.d(TAG, "Address found: " + finalAddressText);
+                } else {
+                    final String locationText = String.format("Lokasi: Lat %.4f, Lng %.4f\nAlamat tidak tersedia",
+                            location.getLatitude(), location.getLongitude());
+
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> {
+                            if (binding != null) {
+                                binding.tvLokasiTerpilih.setText(locationText);
+                            }
+                        });
+                    }
+                }
+            } else {
+                final String locationText = String.format("Lokasi: Lat %.4f, Lng %.4f\nAlamat tidak ditemukan",
+                        location.getLatitude(), location.getLongitude());
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        if (binding != null) {
+                            binding.tvLokasiTerpilih.setText(locationText);
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error processing address: ", e);
+            final String errorText = String.format("Lokasi: Lat %.4f, Lng %.4f\nError: %s",
+                    location.getLatitude(), location.getLongitude(), e.getMessage());
+
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    if (binding != null) {
+                        binding.tvLokasiTerpilih.setText(errorText);
+                    }
+                });
+            }
         }
     }
 

@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
-    tools:context=".fragment.PermintaanSayaFragment">
+    tools:context=".fragment.PermintaanSayaFragment"
+    android:layout_marginBottom="60dp">
 
     <LinearLayout
         android:id="@+id/navbar"

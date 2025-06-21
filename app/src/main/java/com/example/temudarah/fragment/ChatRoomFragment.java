@@ -1,5 +1,6 @@
 package com.example.temudarah.fragment;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -16,11 +17,15 @@ import com.example.temudarah.activity.MainActivity;
 import com.example.temudarah.adapter.PesanAdapter;
 import com.example.temudarah.databinding.FragmentChatRoomBinding;
 import com.example.temudarah.model.Pesan;
+import com.example.temudarah.model.ProsesDonor;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.WriteBatch;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,8 +80,19 @@ public class ChatRoomFragment extends Fragment {
         binding.tvToolbarTitle.setText(otherUserName);
         binding.toolbarChat.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
 
+        // Add cancel button to the toolbar's menu
+        binding.toolbarChat.inflateMenu(com.example.temudarah.R.menu.chat_menu);
+        binding.toolbarChat.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == com.example.temudarah.R.id.action_cancel) {
+                showCancellationConfirmationDialog();
+                return true;
+            }
+            return false;
+        });
+
         setupRecyclerView();
         listenForMessages();
+        loadDonationProcess(); // Load process info to check who's the requester/donor
 
         binding.btnSendMessage.setOnClickListener(v -> sendMessage());
     }
@@ -147,5 +163,56 @@ public class ChatRoomFragment extends Fragment {
                 .update("lastMessage", message, "lastMessageTimestamp", timestamp)
                 .addOnSuccessListener(aVoid -> Log.d(TAG, "Last message updated successfully."))
                 .addOnFailureListener(e -> Log.e(TAG, "Error updating last message", e));
+    }
+
+    private void showCancellationConfirmationDialog() {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Konfirmasi Pembatalan")
+                .setMessage("Apakah Anda yakin ingin membatalkan proses ini?")
+                .setPositiveButton("Ya", (dialog, which) -> cancelDonationProcess())
+                .setNegativeButton("Tidak", null)
+                .show();
+    }
+
+    private void cancelDonationProcess() {
+        if (currentUser == null || chatRoomId == null) return;
+
+        // Hapus dokumen dari koleksi active_donations
+        db.collection("active_donations").document(chatRoomId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Proses donor berhasil dibatalkan.");
+                    Toast.makeText(getContext(), "Proses donor berhasil dibatalkan.", Toast.LENGTH_SHORT).show();
+                    // Kembali ke halaman sebelumnya setelah membatalkan
+                    getParentFragmentManager().popBackStack();
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error canceling donation process", e));
+    }
+
+    private void loadDonationProcess() {
+        if (chatRoomId == null) return;
+
+        db.collection("active_donations").document(chatRoomId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        ProsesDonor prosesDonor = documentSnapshot.toObject(ProsesDonor.class);
+                        if (prosesDonor != null) {
+                            // Cek apakah pengguna saat ini adalah requester atau donor
+                            boolean isRequester = currentUser.getUid().equals(prosesDonor.getRequesterId());
+                            boolean isDonor = currentUser.getUid().equals(prosesDonor.getDonorId());
+
+                            // Tampilkan peran pengguna dalam proses donor (dihapus referensi ke tvRole)
+                            if (isRequester) {
+                                Log.d(TAG, "User is a Requester");
+                                // Disini bisa ditambahkan logika khusus untuk requester jika dibutuhkan
+                            } else if (isDonor) {
+                                Log.d(TAG, "User is a Donor");
+                                // Disini bisa ditambahkan logika khusus untuk donor jika dibutuhkan
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Error loading donation process", e));
     }
 }

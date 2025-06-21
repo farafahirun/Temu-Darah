@@ -4,6 +4,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog; // Import DatePickerDialog
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -34,6 +36,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.Calendar; // Import Calendar
+import java.util.List; // Import List
 import java.util.Locale; // Import Locale
 import java.text.SimpleDateFormat; // Import SimpleDateFormat
 
@@ -148,14 +151,65 @@ public class BuatPermintaanFragment extends Fragment {
         fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
             if (location != null) {
                 lastKnownLocation = location;
-                binding.tvLokasiTerpilih.setText(String.format("Lokasi didapat: Lat %.4f, Lng %.4f", location.getLatitude(), location.getLongitude()));
-                Toast.makeText(getContext(), "Lokasi berhasil didapatkan!", Toast.LENGTH_SHORT).show();
+                // Use Geocoder to get address from coordinates
+                getAddressFromLocation(location);
             } else {
                 Toast.makeText(getContext(), "Gagal mendapatkan lokasi. Pastikan GPS aktif.", Toast.LENGTH_LONG).show();
+                binding.btnGunakanLokasi.setEnabled(true);
+                binding.btnGunakanLokasi.setText("Gunakan Lokasi Saat Ini (GPS)");
             }
+        });
+    }
+
+    private void getAddressFromLocation(Location location) {
+        try {
+            Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
+
+            // Pendekatan yang berfungsi di semua versi Android
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                // Untuk Android 13 (API 33) ke atas menggunakan callback
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1, addresses -> {
+                    processAddressResult(addresses, location);
+                });
+            } else {
+                // Untuk Android 12 (API 32) ke bawah menggunakan metode sinkronus
+                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                processAddressResult(addresses, location);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting address: ", e);
+            binding.tvLokasiTerpilih.setText(String.format("Lokasi didapat: Lat %.4f, Lng %.4f\nGagal mendapatkan alamat",
+                    location.getLatitude(), location.getLongitude()));
             binding.btnGunakanLokasi.setEnabled(true);
             binding.btnGunakanLokasi.setText("Gunakan Lokasi Saat Ini (GPS)");
-        });
+        }
+    }
+
+    private void processAddressResult(List<Address> addresses, Location location) {
+        if (addresses != null && addresses.size() > 0) {
+            Address address = addresses.get(0);
+            StringBuilder addressText = new StringBuilder();
+
+            // Get the complete address line
+            for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
+                addressText.append(address.getAddressLine(i));
+                if (i < address.getMaxAddressLineIndex()) {
+                    addressText.append(", ");
+                }
+            }
+
+            // Display both the coordinates and the address
+            String locationText = String.format("Lokasi: Lat %.4f, Lng %.4f\nAlamat: %s",
+                    location.getLatitude(), location.getLongitude(), addressText.toString());
+            binding.tvLokasiTerpilih.setText(locationText);
+        } else {
+            binding.tvLokasiTerpilih.setText(String.format("Lokasi didapat: Lat %.4f, Lng %.4f\nAlamat tidak ditemukan",
+                    location.getLatitude(), location.getLongitude()));
+        }
+
+        Toast.makeText(getContext(), "Lokasi berhasil didapatkan!", Toast.LENGTH_SHORT).show();
+        binding.btnGunakanLokasi.setEnabled(true);
+        binding.btnGunakanLokasi.setText("Gunakan Lokasi Saat Ini (GPS)");
     }
 
     private void saveDonationRequest() {
