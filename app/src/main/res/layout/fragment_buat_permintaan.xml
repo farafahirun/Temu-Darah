@@ -13,12 +13,15 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:paddingHorizontal="20dp"
-        android:paddingVertical="25dp">
+        android:paddingVertical="20dp"
+        android:elevation="2dp"
+        android:background="@color/white">
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:padding="2dp"
             android:src="@drawable/kembali" />
 
         <TextView
@@ -30,12 +33,18 @@
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
+
+        <!-- Placeholder untuk mempertahankan centering -->
+        <View
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
     </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/navbar">
+        android:layout_below="@id/navbar"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,24 +52,46 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+            <!-- Nama Pasien -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nama Pasien*"
-                android:textStyle="bold"/>
-            <EditText
-                android:id="@+id/editNamaPasien"
                 android:textColor="@color/fixed_black"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Masukkan nama pasien"/>
+                android:layout_marginTop="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
+                app:hintTextColor="@drawable/text_input_hint_color_selector"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editNamaPasien"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Masukkan nama pasien"
+                    android:textSize="16sp"
+                    android:textColor="@color/fixed_black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Jenis Kelamin -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Jenis Kelamin*"
+                android:textColor="@color/fixed_black"
+                android:textSize="16sp"
                 android:textStyle="bold"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
@@ -72,7 +103,7 @@
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
                 app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
-                app:hintTextColor="@drawable/text_input_hint_color_selector">
+                app:hintEnabled="false">
 
                 <AutoCompleteTextView
                     android:id="@+id/dropdownJenisKelamin"
@@ -80,16 +111,21 @@
                     android:layout_height="wrap_content"
                     android:hint="Pilih Jenis Kelamin"
                     android:inputType="none"
+                    android:padding="16dp"
                     android:textSize="16sp"
                     android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Golongan Darah -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Golongan Darah Dibutuhkan*"
+                android:textColor="@color/fixed_black"
+                android:textSize="16sp"
                 android:textStyle="bold"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
@@ -101,7 +137,7 @@
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
                 app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
-                app:hintTextColor="@drawable/text_input_hint_color_selector">
+                app:hintEnabled="false">
 
                 <AutoCompleteTextView
                     android:id="@+id/dropdownGolonganDarah"
@@ -109,40 +145,66 @@
                     android:layout_height="wrap_content"
                     android:hint="Pilih Golongan Darah"
                     android:inputType="none"
+                    android:padding="16dp"
                     android:textSize="16sp"
                     android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Jumlah Kantong -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Jumlah Kantong*"
-                android:textStyle="bold"/>
-            <EditText
-                android:id="@+id/editJumlahKantong"
                 android:textColor="@color/fixed_black"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number"
-                android:hint="Contoh: 2"/>
+                android:layout_marginTop="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
+                app:hintTextColor="@drawable/text_input_hint_color_selector"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editJumlahKantong"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Contoh: 2"
+                    android:inputType="number"
+                    android:textSize="16sp"
+                    android:textColor="@color/fixed_black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Tanggal Pengumuman - Corrected spelling from "Penguguman" -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Tanggal Penguguman*"
+                android:text="Tanggal Pengumuman*"
+                android:textColor="@color/fixed_black"
+                android:textSize="16sp"
                 android:textStyle="bold"/>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 app:boxCornerRadiusBottomEnd="8dp"
                 app:boxCornerRadiusBottomStart="8dp"
                 app:boxCornerRadiusTopEnd="8dp"
                 app:boxCornerRadiusTopStart="8dp"
-                app:boxStrokeColor="#C11E3B"
-                app:hintTextColor="#C11E3B">
+                app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
+                app:hintTextColor="@drawable/text_input_hint_color_selector"
+                app:startIconTint="@color/utama"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etTanggalPengumuman"
@@ -150,64 +212,114 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="false"
-                    android:hint="Tanggal Lahir"
-                    android:inputType="date"
+                    android:hint="Pilih tanggal"
+                    android:inputType="none"
                     android:textSize="16sp"
                     android:textColor="@color/fixed_black" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Lokasi Rumah Sakit -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Lokasi Rumah Sakit*"/>
-            <EditText
-                android:id="@+id/editNamaRs"
+                android:text="Lokasi Rumah Sakit*"
                 android:textColor="@color/fixed_black"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Masukkan nama &amp; alamat RS"/>
+                android:layout_marginTop="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
+                app:hintTextColor="@drawable/text_input_hint_color_selector"
+                app:startIconTint="@color/utama"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-            <Button
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editNamaRs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Masukkan nama &amp; alamat RS"
+                    android:textSize="16sp"
+                    android:textColor="@color/fixed_black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGunakanLokasi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:backgroundTint="@color/utama"
                 android:textColor="@color/white"
-                android:text="Gunakan Lokasi Saat Ini (GPS)"/>
+                android:text="Gunakan Lokasi Saat Ini (GPS)"
+                app:cornerRadius="8dp"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="16dp"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"/>
+
             <TextView
                 android:id="@+id/tvLokasiTerpilih"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Lokasi belum ditentukan"
-                android:textSize="12sp"/>
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="4dp"/>
 
+            <!-- Catatan Tambahan -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Catatan Tambahan"
+                android:textColor="@color/fixed_black"
+                android:textSize="16sp"
                 android:textStyle="bold"/>
-            <EditText
-                android:id="@+id/editCatatan"
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/fixed_black"
-                android:gravity="top"
-                android:minLines="3"
-                android:hint="Contoh: Butuh cepat untuk operasi"/>
+                android:layout_marginTop="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
+                app:hintTextColor="@drawable/text_input_hint_color_selector"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-            <Button
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editCatatan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:hint="Contoh: Butuh cepat untuk operasi"
+                    android:inputType="textMultiLine"
+                    android:minLines="4"
+                    android:textSize="16sp"
+                    android:textColor="@color/fixed_black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Tombol Submit -->
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnKirimPermintaan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/utama_dark"
                 android:layout_marginTop="24dp"
-                android:textColor="@color/white"
                 android:layout_marginBottom="60dp"
-                android:text="Kirim Permintaan"/>
-
+                android:textColor="@color/white"
+                android:text="Kirim Permintaan"
+                android:padding="14dp"
+                android:textSize="16sp"
+                app:cornerRadius="8dp"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
