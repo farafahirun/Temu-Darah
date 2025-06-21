@@ -14,7 +14,6 @@ import com.example.temudarah.R;
 import com.example.temudarah.databinding.ActivityMainBinding;
 import com.example.temudarah.fragment.BerandaFragment;
 import com.example.temudarah.fragment.ChatsFragment;
-import com.example.temudarah.fragment.KegiatanFragment;
 import com.example.temudarah.fragment.ProfileFragment;
 import com.example.temudarah.fragment.RiwayatFragment;
 
@@ -67,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (currentFragment instanceof BerandaFragment ||
                     currentFragment instanceof ChatsFragment ||
-                    currentFragment instanceof KegiatanFragment ||
                     currentFragment instanceof RiwayatFragment ||
                     currentFragment instanceof ProfileFragment) {
                 showBottomNav();

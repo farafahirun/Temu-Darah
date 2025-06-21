@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="#F5F5F5"
     tools:context=".fragment.PermintaanSayaFragment">
 
     <LinearLayout
@@ -11,18 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="25dp">
-
+        android:padding="16dp"
+        android:background="@color/white">
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/kembali"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"/>
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -32,7 +30,7 @@
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
-        <View android:layout_width="20dp" android:layout_height="20dp"/>
+        <View android:layout_width="24dp" android:layout_height="24dp"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -48,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Anda belum membuat permintaan apapun."
+        android:text="Anda belum membuat permintaan aktif."
         android:visibility="gone" />
 
     <ProgressBar
@@ -56,6 +54,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone" />
-
+        android:visibility="gone"/>
 </RelativeLayout>

@@ -3,176 +3,69 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    app:strokeColor="#EAEAEA"
-    app:strokeWidth="1dp">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Header with status indicator -->
-        <RelativeLayout
+        <TextView
+            android:id="@+id/tvItemNamaPasien"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:padding="16dp">
+            android:text="Pasien: Budi Santoso"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
+        <TextView
+            android:id="@+id/tvItemGolDarah"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Butuh Golongan: A+"
+            android:layout_marginTop="4dp" />
+        <TextView
+            android:id="@+id/tvItemWaktu"
+            android:text="Dibuat: 21 Juni 2025"
+            android:textSize="12sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"/>
 
-            <TextView
-                android:id="@+id/tvItemStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
-                android:text="Aktif"
-                android:textColor="@color/sukses"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="#EEEEEE" />
 
-            <TextView
-                android:id="@+id/tvItemWaktu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="21 Juni 2025"
-                android:textColor="#000000"
-                android:textSize="12sp"
-                android:alpha="0.9" />
-        </RelativeLayout>
-
-        <!-- Main content -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@color/white"
-            android:padding="16dp">
-
-            <!-- Blood Group Indicator -->
-            <FrameLayout
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_gravity="center_vertical">
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:cardCornerRadius="35dp"
-                    app:cardBackgroundColor="#F8F8F8"
-                    app:cardElevation="0dp">
-
-                    <TextView
-                        android:id="@+id/tvBloodType"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:text="A+"
-                        android:textColor="#E53935"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-                </com.google.android.material.card.MaterialCardView>
-            </FrameLayout>
-
-            <!-- Patient Information -->
-            <LinearLayout
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/tvItemStatus"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginStart="16dp">
+                android:text="Status: Aktif"
+                android:textStyle="bold"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pasien"
-                    android:textSize="14sp"
-                    android:textColor="#757575"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/tvItemNamaPasien"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Budi Santoso"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121" />
-
-                <TextView
-                    android:id="@+id/tvItemGolDarah"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Membutuhkan donor darah golongan A+"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp"
-                    android:textColor="#424242" />
-
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Hospital & Details Section -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="8dp">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#F1F1F1"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:id="@+id/tvItemCatatan"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btnEdit"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pasien membutuhkan donor segera untuk operasi jantung yang dijadwalkan pada 25 Juni 2025."
-                android:textSize="14sp"
-                android:textColor="#616161"
-                android:lineSpacingExtra="4dp"
-                android:layout_marginBottom="16dp" />
+                android:text="Edit"
+                android:layout_marginEnd="8dp"
+                style="@style/Widget.MaterialComponents.Button.TextButton"/>
 
-            <!-- Action Buttons -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btnUbahStatus"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="end">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnHubungi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hubungi"
-                    app:iconGravity="textStart"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_marginEnd="8dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnEdit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Edit"
-                    app:iconGravity="textStart"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_marginEnd="8dp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnUbahStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Batalkan"
-                    app:cornerRadius="20dp"
-                    android:textColor="#FFFFFF"
-                    android:backgroundTint="#E53935" />
-            </LinearLayout>
+                android:text="Batalkan"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
