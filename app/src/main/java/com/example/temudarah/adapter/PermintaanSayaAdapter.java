@@ -21,6 +21,7 @@ public class PermintaanSayaAdapter extends RecyclerView.Adapter<PermintaanSayaAd
     public interface OnItemActionClickListener {
         void onStatusChangeClick(PermintaanDonor permintaan);
         void onEditClick(PermintaanDonor permintaan);
+        void onContactClick(PermintaanDonor permintaan); // Metode baru untuk tombol "Hubungi"
     }
 
     public PermintaanSayaAdapter(List<PermintaanDonor> permintaanList, OnItemActionClickListener listener) {
@@ -56,28 +57,53 @@ public class PermintaanSayaAdapter extends RecyclerView.Adapter<PermintaanSayaAd
         void bind(final PermintaanDonor permintaan, final OnItemActionClickListener listener) {
             binding.tvItemNamaPasien.setText("Pasien: " + permintaan.getNamaPasien());
             binding.tvItemGolDarah.setText("Butuh Gol. " + permintaan.getGolonganDarahDibutuhkan());
+            binding.tvBloodType.setText(permintaan.getGolonganDarahDibutuhkan());
+            binding.tvItemCatatan.setText("Catatan: " + (permintaan.getCatatan() != null ? permintaan.getCatatan() : "-"));
 
             if (permintaan.getWaktuDibuat() != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMMMyyyy, HH:mm", Locale.getDefault());
                 binding.tvItemWaktu.setText("Dibuat: " + sdf.format(permintaan.getWaktuDibuat().toDate()));
+            } else {
+                binding.tvItemWaktu.setText("Dibuat: -");
             }
 
             // Mengatur tampilan berdasarkan status
+            // Hanya mengubah warna teks untuk tvItemStatus
             if ("Aktif".equals(permintaan.getStatus())) {
                 binding.tvItemStatus.setText("Status: Aktif");
-                binding.tvItemStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.sukses)); // Anda perlu warna green
-                binding.btnUbahStatus.setText("Tandai Selesai");
+                binding.tvItemStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.sukses));
+                binding.btnUbahStatus.setText("Batalkan");
                 binding.btnUbahStatus.setVisibility(View.VISIBLE);
                 binding.btnEdit.setVisibility(View.VISIBLE);
-            } else {
+                binding.btnHubungi.setVisibility(View.GONE); // Sembunyikan Hubungi jika masih Aktif
+            } else if ("Dalam Proses".equals(permintaan.getStatus())) {
+                binding.tvItemStatus.setText("Status: Dalam Proses");
+                binding.tvItemStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.penerima));
+                binding.btnUbahStatus.setText("Selesai");
+                binding.btnUbahStatus.setVisibility(View.VISIBLE);
+                binding.btnEdit.setVisibility(View.GONE); // Edit tidak bisa saat Dalam Proses
+                binding.btnHubungi.setVisibility(View.VISIBLE); // Tampilkan Hubungi jika Dalam Proses
+            } else if ("Selesai".equals(permintaan.getStatus()) || "Dibatalkan".equals(permintaan.getStatus())) {
                 binding.tvItemStatus.setText("Status: " + permintaan.getStatus());
                 binding.tvItemStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.text_info));
                 binding.btnUbahStatus.setVisibility(View.GONE);
-                binding.btnEdit.setVisibility(View.GONE); // Tombol edit juga hilang jika sudah tidak aktif
+                binding.btnEdit.setVisibility(View.GONE);
+                binding.btnHubungi.setVisibility(View.GONE);
+            } else {
+                // Status tidak dikenal atau default
+                binding.tvItemStatus.setText("Status: " + permintaan.getStatus());
+                binding.tvItemStatus.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.text_info));
+                binding.btnUbahStatus.setVisibility(View.GONE);
+                binding.btnEdit.setVisibility(View.GONE);
+                binding.btnHubungi.setVisibility(View.GONE);
             }
 
-            binding.btnEdit.setOnClickListener(v -> listener.onEditClick(permintaan));
-            binding.btnUbahStatus.setOnClickListener(v -> listener.onStatusChangeClick(permintaan));
+            // Set listeners untuk tombol aksi
+            if (listener != null) {
+                binding.btnEdit.setOnClickListener(v -> listener.onEditClick(permintaan));
+                binding.btnUbahStatus.setOnClickListener(v -> listener.onStatusChangeClick(permintaan));
+                binding.btnHubungi.setOnClickListener(v -> listener.onContactClick(permintaan)); // Atur listener untuk tombol Hubungi
+            }
         }
     }
 }

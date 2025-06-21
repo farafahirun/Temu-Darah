@@ -50,20 +50,27 @@ public class RiwayatDonasiAdapter extends RecyclerView.Adapter<RiwayatDonasiAdap
             binding.tvPeran.setText(riwayat.getPeranSaya());
             binding.tvJudulTampilan.setText(riwayat.getJudulTampilan());
             binding.tvNamaPasien.setText("Untuk pasien: " + riwayat.getNamaPasien());
-            binding.tvStatusProses.setText(riwayat.getStatusProses());
+            binding.tvStatusProses.setText("Status: " + riwayat.getStatusProses()); // Tambah "Status: "
 
             if (riwayat.getTanggal() != null) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("id-ID"));
+                // Pastikan Locale yang digunakan benar untuk format tanggal yang diinginkan
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID")); // Gunakan Locale Indonesia
                 binding.tvTanggal.setText(sdf.format(riwayat.getTanggal().toDate()));
+            } else {
+                binding.tvTanggal.setText("-");
             }
 
-            int colorRes = R.color.text_info;
-            if ("Selesai".equals(riwayat.getStatusProses())) colorRes = R.color.sukses;
-            else if ("Dibatalkan".equals(riwayat.getStatusProses())) colorRes = R.color.utama;
-            else if ("Berlangsung".equals(riwayat.getStatusProses())) colorRes = R.color.penerima;
+            int statusColorRes = R.color.text_info; // Default abu-abu
+            if ("Selesai".equals(riwayat.getStatusProses())) {
+                statusColorRes = R.color.sukses; // Hijau
+            } else if ("Dibatalkan".equals(riwayat.getStatusProses())) {
+                statusColorRes = R.color.utama_dark; // Merah
+            } else if ("Berlangsung".equals(riwayat.getStatusProses())) {
+                statusColorRes = R.color.penerima; // Kuning/Oranye
+            }
 
-            binding.tvPeran.setTextColor(ContextCompat.getColor(itemView.getContext(), colorRes));
-            binding.tvStatusProses.setBackgroundColor(ContextCompat.getColor(itemView.getContext(), colorRes));
+            binding.tvStatusProses.setTextColor(ContextCompat.getColor(itemView.getContext(), statusColorRes));
+            binding.tvPeran.setTextColor(ContextCompat.getColor(itemView.getContext(), statusColorRes)); // Asumsi peran juga mengikuti warna status
 
             itemView.setOnClickListener(v -> listener.onItemClick(riwayat));
         }
