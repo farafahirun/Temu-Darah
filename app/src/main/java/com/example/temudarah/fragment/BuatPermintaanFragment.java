@@ -85,6 +85,9 @@ public class BuatPermintaanFragment extends Fragment {
         // Setup Blood Type Dropdown
         ArrayAdapter<String> bloodTypeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, bloodTypes);
         binding.dropdownGolonganDarah.setAdapter(bloodTypeAdapter);
+        binding.dropdownGolonganDarah.setText(""); // agar hint muncul
+        binding.dropdownGolonganDarah.setOnClickListener(v -> binding.dropdownGolonganDarah.showDropDown());
+        binding.dropdownGolonganDarah.setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) binding.dropdownGolonganDarah.showDropDown(); });
         binding.dropdownGolonganDarah.setOnItemClickListener((parent, view, position, id) -> {
             selectedBloodType = (String) parent.getItemAtPosition(position);
         });
@@ -92,6 +95,9 @@ public class BuatPermintaanFragment extends Fragment {
         // Setup Gender Dropdown
         ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, genderTypes);
         binding.dropdownJenisKelamin.setAdapter(genderAdapter);
+        binding.dropdownJenisKelamin.setText(""); // agar hint muncul
+        binding.dropdownJenisKelamin.setOnClickListener(v -> binding.dropdownJenisKelamin.showDropDown());
+        binding.dropdownJenisKelamin.setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) binding.dropdownJenisKelamin.showDropDown(); });
         binding.dropdownJenisKelamin.setOnItemClickListener((parent, view, position, id) -> {
             selectedGender = (String) parent.getItemAtPosition(position);
         });
@@ -189,7 +195,15 @@ public class BuatPermintaanFragment extends Fragment {
         String namaPasien = binding.editNamaPasien.getText().toString().trim();
         String jenisKelamin = (selectedGender != null && !selectedGender.isEmpty()) ? selectedGender : binding.dropdownJenisKelamin.getText().toString().trim();
         String golDarah = (selectedBloodType != null && !selectedBloodType.isEmpty()) ? selectedBloodType : binding.dropdownGolonganDarah.getText().toString().trim();
-        int jumlahKantong = Integer.parseInt(binding.editJumlahKantong.getText().toString().trim());
+        int jumlahKantong = 0;
+        try {
+            jumlahKantong = Integer.parseInt(binding.editJumlahKantong.getText().toString().trim());
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "Jumlah kantong harus berupa angka.", Toast.LENGTH_SHORT).show();
+            binding.btnKirimPermintaan.setEnabled(true);
+            binding.btnKirimPermintaan.setText("Kirim Permintaan");
+            return;
+        }
         String namaRs = binding.editNamaRs.getText().toString().trim();
         String catatan = binding.editCatatan.getText().toString().trim();
         String tanggalPengumuman = binding.etTanggalPengumuman.getText().toString().trim(); // Get the announcement date

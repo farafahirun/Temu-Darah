@@ -100,29 +100,16 @@ public class BerandaFragment extends Fragment {
         String[] genderOptions = {"Semua Gender", "Laki-laki", "Perempuan"};
         ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, genderOptions);
         binding.autoCompleteGender.setAdapter(genderAdapter);
-        binding.autoCompleteGender.setText(genderOptions[0], false);
-        // Add listener for gender filter
-        binding.autoCompleteGender.setOnItemClickListener((parent, view, position, id) -> {
-            if (lastKnownLocation != null) {
-                loadDonationRequests(lastKnownLocation); // Reload data when gender filter changes
-            } else {
-                checkLocationPermissionAndLoadData();
-            }
-        });
-
+        binding.autoCompleteGender.setText(""); // Kosongkan agar hint muncul
+        binding.autoCompleteGender.setOnClickListener(v -> binding.autoCompleteGender.showDropDown());
+        binding.autoCompleteGender.setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) binding.autoCompleteGender.showDropDown(); });
 
         String[] goldarOptions = {"Semua Gol. Darah", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Rh-null"};
         ArrayAdapter<String> goldarAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, goldarOptions);
         binding.autoCompleteGolonganDarah.setAdapter(goldarAdapter);
-        binding.autoCompleteGolonganDarah.setText(goldarOptions[0], false);
-        // Add listener for blood type filter
-        binding.autoCompleteGolonganDarah.setOnItemClickListener((parent, view, position, id) -> {
-            if (lastKnownLocation != null) {
-                loadDonationRequests(lastKnownLocation); // Reload data when blood type filter changes
-            } else {
-                checkLocationPermissionAndLoadData();
-            }
-        });
+        binding.autoCompleteGolonganDarah.setText(""); // Kosongkan agar hint muncul
+        binding.autoCompleteGolonganDarah.setOnClickListener(v -> binding.autoCompleteGolonganDarah.showDropDown());
+        binding.autoCompleteGolonganDarah.setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) binding.autoCompleteGolonganDarah.showDropDown(); });
     }
 
     private void setupListeners() {
@@ -244,7 +231,7 @@ public class BerandaFragment extends Fragment {
 
             // 2. Filter by Blood Type (applied to the already gender-filtered list)
             List<PermintaanDonor> finalFilteredList = new ArrayList<>();
-            if ("Semua Gol. Darah".equals(selectedBloodTypeFilter)) {
+            if ("Gol.Darah".equals(selectedBloodTypeFilter)) {
                 finalFilteredList.addAll(interimFilteredList);
             } else {
                 for (PermintaanDonor p : interimFilteredList) {

@@ -11,25 +11,26 @@
         android:layout_height="match_parent"
         android:background="#F0F0F0">
 
+        <!-- Header Bar -->
         <LinearLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:background="@color/background"
             android:layout_alignParentEnd="true"
-            android:layout_marginBottom="8dp"
+            android:background="@color/background"
+            android:elevation="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="20dp"
-            android:paddingBottom="5dp"
-            android:paddingTop="15dp"
-            android:paddingEnd="20dp">
+            android:paddingTop="16dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="16dp">
 
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:contentDescription="Logo"
                 android:src="@drawable/logo_merah" />
 
@@ -40,9 +41,10 @@
 
             <ImageView
                 android:id="@+id/iv_notification"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:contentDescription="Notification"
+                android:padding="2dp"
                 android:src="@drawable/notifikasi_on"
                 app:tint="@color/utama" />
         </LinearLayout>
@@ -52,178 +54,248 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/linearLayout2"
-            android:fillViewport="true">
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:paddingBottom="16dp"
+            android:scrollbarStyle="outsideOverlay">
 
-            <!--  Carousel pic  -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/imageCarousel"
-                    android:layout_width="350dp"
-                    android:layout_height="200dp"
-                    android:layout_margin="20dp"
-                    android:contentDescription="Main Image"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/carousel" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnBuatPermintaan"
+                <!-- Carousel Image -->
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:backgroundTint="@color/utama"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="Buat Permintaan"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    app:cornerRadius="8dp"
-                    app:strokeColor="@color/utama"
-                    app:strokeWidth="1dp" />
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnPermintaanSaya"
+                    <ImageView
+                        android:id="@+id/imageCarousel"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:contentDescription="Main Image"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/carousel" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- Button Section -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:textColor="@color/white"
-                    android:text="Lihat Permintaan Saya"
-                    android:backgroundTint="@color/utama_dark"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBuatPermintaan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/utama"
+                        android:paddingVertical="12dp"
+                        android:text="Buat Permintaan"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        app:cornerRadius="8dp"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:iconTint="@color/white" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnPermintaanSaya"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:paddingVertical="12dp"
+                        android:text="Lihat Permintaan Saya"
+                        android:textColor="@color/utama_dark"
+                        android:textSize="16sp"
+                        app:cornerRadius="8dp"
+                        app:iconGravity="textStart"
+                        app:iconPadding="8dp"
+                        app:iconTint="@color/utama_dark"
+                        app:strokeColor="@color/utama_dark"
+                        app:strokeWidth="1dp" />
+                </LinearLayout>
 
                 <!-- CardView untuk pendonor -->
                 <androidx.cardview.widget.CardView
                     android:id="@+id/listPendonorCard"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
                     app:cardBackgroundColor="@color/background"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
-                    app:cardUseCompatPadding="true">
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_margin="15dp"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Butuh Pendonor saat ini"
                             android:textColor="@color/text_utama"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:textStyle="bold" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="1dp"
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="12dp"
                             android:background="@color/text_info" />
 
-                        <!-- Filter Buttons -->
+                        <!-- Filter Section -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp"
+                            android:layout_marginTop="16dp"
                             android:gravity="center_vertical"
-                            android:layout_marginTop="10dp"
                             android:orientation="horizontal">
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/filter_gender"
                                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="6dp"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="3dp"
-                                app:boxStrokeColor="#C11E3B"
-                                app:hintTextColor="#C11E3B"
-                                android:hint="Pilih Gender">
+                                android:hint="Pilih Gender"
+                                app:boxCornerRadiusBottomEnd="8dp"
+                                app:boxCornerRadiusBottomStart="8dp"
+                                app:boxCornerRadiusTopEnd="8dp"
+                                app:boxCornerRadiusTopStart="8dp"
+                                app:boxStrokeColor="@color/utama"
+                                app:hintTextColor="@color/utama">
 
                                 <AutoCompleteTextView
                                     android:id="@+id/autoCompleteGender"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:inputType="none"
+                                    android:paddingVertical="12dp"
                                     android:textColor="@color/fixed_black"
-                                    android:textSize="12dp"
-                                    android:inputType="none" />
+                                    android:textSize="14sp" />
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/filter_golongandarah"
                                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginStart="3dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
                                 android:layout_weight="1"
-                                app:boxStrokeColor="#C11E3B"
-                                app:hintTextColor="#C11E3B"
-                                android:hint="Golongan Darah">
+                                android:hint="Gol. Darah"
+                                app:boxCornerRadiusBottomEnd="8dp"
+                                app:boxCornerRadiusBottomStart="8dp"
+                                app:boxCornerRadiusTopEnd="8dp"
+                                app:boxCornerRadiusTopStart="8dp"
+                                app:boxStrokeColor="@color/utama"
+                                app:hintTextColor="@color/utama">
 
                                 <AutoCompleteTextView
                                     android:id="@+id/autoCompleteGolonganDarah"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:inputType="none"
-                                    android:textSize="12dp"
-                                    android:textColor="@color/fixed_black" />
-                        </com.google.android.material.textfield.TextInputLayout>
+                                    android:paddingVertical="12dp"
+                                    android:textColor="@color/fixed_black"
+                                    android:textSize="14sp" />
+                            </com.google.android.material.textfield.TextInputLayout>
 
-                            <androidx.cardview.widget.CardView
+                            <com.google.android.material.card.MaterialCardView
                                 android:id="@+id/filter_beranda"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_width="42dp"
+                                android:layout_height="42dp"
                                 android:layout_marginStart="8dp"
                                 app:cardBackgroundColor="@color/utama"
-                                app:cardCornerRadius="5dp">
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="2dp">
 
                                 <ImageView
-                                    android:layout_width="36dp"
-                                    android:layout_height="36dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
                                     android:padding="10dp"
-                                    android:src="@drawable/search" />
-                            </androidx.cardview.widget.CardView>
+                                    android:src="@drawable/search"
+                                    app:tint="@color/white" />
+                            </com.google.android.material.card.MaterialCardView>
                         </LinearLayout>
 
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rv_pendonor"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:clipToPadding="false"
-                            android:fadeScrollbars="true"
-                            android:paddingBottom="60dp"
-                            android:scrollbarStyle="outsideOverlay"
-                            android:scrollbars="vertical"
-                            tools:listitem="@layout/item_pendonor" />
-
-                        <TextView
-                            android:id="@+id/tvNoData"
+                        <!-- Recycler View dan Empty State -->
+                        <FrameLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Butuh Pendonor saat ini"
-                            android:textColor="@color/text_utama"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
+                            android:layout_marginTop="16dp">
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rv_pendonor"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:clipToPadding="false"
+                                android:fadeScrollbars="true"
+                                android:paddingBottom="16dp"
+                                android:scrollbarStyle="outsideOverlay"
+                                android:scrollbars="vertical"
+                                tools:listitem="@layout/item_pendonor" />
+
+                            <LinearLayout
+                                android:id="@+id/emptyStateContainer"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginTop="32dp"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <ImageView
+                                    android:layout_width="80dp"
+                                    android:layout_height="80dp"
+                                    android:contentDescription="No data"
+                                    app:tint="@color/text_info" />
+
+                                <TextView
+                                    android:id="@+id/tvNoData"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="16dp"
+                                    android:text="Tidak ada permintaan saat ini"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/text_info"
+                                    android:textSize="16sp" />
+                            </LinearLayout>
+                        </FrameLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>
         </ScrollView>
+
+        <!-- Loading Overlay -->
         <FrameLayout
             android:id="@+id/loadingOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#CCFFFFFF"
             android:visibility="gone">
-            <ProgressBar
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/progressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:indeterminateTint="@color/utama"/>
+                android:indeterminate="true"
+                app:indicatorColor="@color/utama"
+                app:indicatorSize="48dp"
+                app:trackCornerRadius="4dp" />
         </FrameLayout>
     </RelativeLayout>
 </FrameLayout>
