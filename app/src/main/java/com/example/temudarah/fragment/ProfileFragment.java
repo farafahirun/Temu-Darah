@@ -213,7 +213,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private void logoutUser() {
-        mAuth.signOut();
         if (getActivity() != null) {
             Toast.makeText(getContext(), "Anda telah logout.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getActivity(), MasukActivity.class);

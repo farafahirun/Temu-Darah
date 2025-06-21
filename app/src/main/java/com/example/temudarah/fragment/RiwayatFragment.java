@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button; // Import Button
 import android.widget.LinearLayout; // Import LinearLayout
 import android.widget.TextView; // Import TextView
 import androidx.annotation.NonNull;
@@ -59,24 +58,19 @@ public class RiwayatFragment extends Fragment {
 
         setupRecyclerView();
 
-        // Tangani pemilihan filter untuk Donor Darah
-        // Karena hanya ada satu tab, kita langsung atur listenernya
-        binding.filterBtnSemuaDonor.setOnClickListener(v -> {
-            loadMyDonationHistory("Semua");
-//            updateFilterButtonStates(binding.filterBtnSemuaDonor);
-        });
-        binding.filterBtnSebagaiPendonor.setOnClickListener(v -> {
-            loadMyDonationHistory("Sebagai Pendonor");
-//            updateFilterButtonStates(binding.filterBtnSebagaiPendonor);
-        });
-        binding.filterBtnSebagaiPenerima.setOnClickListener(v -> {
-            loadMyDonationHistory("Sebagai Penerima");
-//            updateFilterButtonStates(binding.filterBtnSebagaiPenerima);
+        // Listener untuk filter menggunakan ChipGroup
+        binding.chipGroupFilter.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == binding.filterChipSemua.getId()) {
+                loadMyDonationHistory("Semua");
+            } else if (checkedId == binding.filterChipPendonor.getId()) {
+                loadMyDonationHistory("Sebagai Pendonor");
+            } else if (checkedId == binding.filterChipPenerima.getId()) {
+                loadMyDonationHistory("Sebagai Penerima");
+            }
         });
 
         // Muat riwayat donasi darah secara default (filter "Semua")
         loadMyDonationHistory("Semua");
-//        updateFilterButtonStates(binding.filterBtnSemuaDonor); // Atur tombol filter default
     }
 
     private void setupRecyclerView() {
@@ -86,32 +80,16 @@ public class RiwayatFragment extends Fragment {
         binding.rvRiwayat.setAdapter(donasiAdapter);
     }
 
-//    private void updateFilterButtonStates(View selectedButton) {
-//        // Reset semua tombol filter Donor Darah ke gaya default (outline)
-//        binding.filterBtnSemuaDonor.setBackgroundResource(R.drawable.rounded_button_outline);
-//        binding.filterBtnSemuaDonor.setTextColor(ContextCompat.getColor(requireContext(), R.color.utama_red));
-//        binding.filterBtnSebagaiPendonor.setBackgroundResource(R.drawable.rounded_button_outline);
-//        binding.filterBtnSebagaiPendonor.setTextColor(ContextCompat.getColor(requireContext(), R.color.utama_red));
-//        binding.filterBtnSebagaiPenerima.setBackgroundResource(R.drawable.rounded_button_outline);
-//        binding.filterBtnSebagaiPenerima.setTextColor(ContextCompat.getColor(requireContext(), R.color.utama_red));
-//
-//        // Set tombol yang dipilih ke gaya terpilih (filled)
-//        selectedButton.setBackgroundResource(R.drawable.rounded_button_filled);
-//        if (selectedButton instanceof Button) { // Gunakan Button, bukan android.widget.Button
-//            ((Button) selectedButton).setTextColor(ContextCompat.getColor(requireContext(), R.color.text_white));
-//        }
-//    }
-
     private void loadMyDonationHistory(String peranFilter) {
         if (currentUser == null) {
             binding.progressBar.setVisibility(View.GONE);
-            binding.tvEmptyStateRiwayat.setText("Anda perlu login untuk melihat riwayat donasi.");
-            binding.tvEmptyStateRiwayat.setVisibility(View.VISIBLE);
+            binding.emptyStateContainer.setVisibility(View.VISIBLE);
+            // Jika ada TextView di emptyStateContainer, bisa diatur pesannya di sini
             return;
         }
 
         binding.progressBar.setVisibility(View.VISIBLE);
-        binding.tvEmptyStateRiwayat.setVisibility(View.GONE);
+        binding.emptyStateContainer.setVisibility(View.GONE);
         riwayatDonasiTampilList.clear();
         donasiAdapter.notifyDataSetChanged();
 
