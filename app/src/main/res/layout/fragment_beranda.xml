@@ -89,6 +89,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="16dp"
+                    android:textColor="@color/white"
                     android:text="Lihat Permintaan Saya"
                     android:backgroundTint="@color/utama_dark"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
@@ -139,12 +140,15 @@
                                 android:layout_height="40dp"
                                 android:layout_weight="1"
                                 android:layout_marginEnd="3dp"
+                                app:boxStrokeColor="#C11E3B"
+                                app:hintTextColor="#C11E3B"
                                 android:hint="Pilih Gender">
 
                                 <AutoCompleteTextView
                                     android:id="@+id/autoCompleteGender"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
+                                    android:textColor="@color/fixed_black"
                                     android:inputType="none" />
                             </com.google.android.material.textfield.TextInputLayout>
 
@@ -155,6 +159,8 @@
                                 android:layout_height="40dp"
                                 android:layout_marginStart="3dp"
                                 android:layout_weight="1"
+                                app:boxStrokeColor="#C11E3B"
+                                app:hintTextColor="#C11E3B"
                                 android:hint="Golongan Darah">
 
                                 <AutoCompleteTextView

@@ -49,6 +49,7 @@
                 android:textStyle="bold"/>
             <EditText
                 android:id="@+id/editNamaPasien"
+                android:textColor="@color/fixed_black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Masukkan nama pasien"/>
@@ -61,6 +62,7 @@
                 android:textStyle="bold"/>
             <AutoCompleteTextView
                 android:id="@+id/dropdownGolonganDarah"
+                android:textColor="@color/fixed_black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Pilih golongan darah"/>
@@ -73,6 +75,7 @@
                 android:textStyle="bold"/>
             <EditText
                 android:id="@+id/editJumlahKantong"
+                android:textColor="@color/fixed_black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
@@ -85,6 +88,7 @@
                 android:text="Lokasi Rumah Sakit*"/>
             <EditText
                 android:id="@+id/editNamaRs"
+                android:textColor="@color/fixed_black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Masukkan nama &amp; alamat RS"/>
@@ -94,6 +98,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:backgroundTint="@color/utama"
+                android:textColor="@color/white"
                 android:text="Gunakan Lokasi Saat Ini (GPS)"/>
             <TextView
                 android:id="@+id/tvLokasiTerpilih"
@@ -112,6 +118,7 @@
                 android:id="@+id/editCatatan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/fixed_black"
                 android:gravity="top"
                 android:minLines="3"
                 android:hint="Contoh: Butuh cepat untuk operasi"/>
@@ -120,7 +127,9 @@
                 android:id="@+id/btnKirimPermintaan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/utama_dark"
                 android:layout_marginTop="24dp"
+                android:textColor="@color/white"
                 android:text="Kirim Permintaan"/>
 
         </LinearLayout>

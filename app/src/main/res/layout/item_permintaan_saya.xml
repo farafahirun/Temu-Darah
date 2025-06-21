@@ -18,6 +18,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             android:padding="16dp">
 
             <TextView
@@ -47,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="@color/white"
             android:padding="16dp">
 
             <!-- Blood Group Indicator -->
@@ -116,6 +118,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
             android:paddingBottom="8dp">

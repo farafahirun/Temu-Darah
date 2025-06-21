@@ -55,29 +55,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"> <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:background="@color/white"
+                android:padding="16dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/ivPembuatFoto"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:src="@drawable/logo_merah" />
+
+                <TextView
+                    android:id="@+id/tvNamaPembuat"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:padding="16dp">
-
-                    <de.hdodenhof.circleimageview.CircleImageView
-                        android:id="@+id/ivPembuatFoto"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
-                        android:src="@drawable/logo_merah" />
-
-                    <TextView
-                        android:id="@+id/tvNamaPembuat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        tools:text="Diposting oleh: Elysa Jane" />
-                </LinearLayout>
+                    android:layout_marginStart="16dp"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    tools:text="Diposting oleh: Elysa Jane" />
+            </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
@@ -85,74 +85,89 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"> <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:padding="16dp">
 
-                <LinearLayout
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:text="BUTUH GOLONGAN DARAH" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="BUTUH GOLONGAN DARAH" />
+                <TextView
+                    android:id="@+id/tvDetailGolDarah"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    tools:text="A+" />
 
-                    <TextView
-                        android:id="@+id/tvDetailGolDarah"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:text="A+" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:text="NAMA PASIEN" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="NAMA PASIEN" />
+                <TextView
+                    android:id="@+id/tvDetailNamaPasien"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    tools:text="Bapak Budi Santoso" />
 
-                    <TextView
-                        android:id="@+id/tvDetailNamaPasien"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:text="Bapak Budi Santoso" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:text="LOKASI RUMAH SAKIT" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="LOKASI RUMAH SAKIT" />
+                <TextView
+                    android:id="@+id/tvDetailNamaRs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    tools:text="RS. Harapan Bunda Sentosa, Jl. Pahlawan No. 123" />
 
-                    <TextView
-                        android:id="@+id/tvDetailNamaRs"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:text="RS. Harapan Bunda Sentosa, Jl. Pahlawan No. 123" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:text="JUMLAH KANTONG" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="JUMLAH KANTONG" />
+                <TextView
+                    android:id="@+id/tvDetailJumlah"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    tools:text="2 Kantong" />
 
-                    <TextView
-                        android:id="@+id/tvDetailJumlah"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:text="2 Kantong" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:text="CATATAN" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="CATATAN" />
+                <TextView
+                    android:id="@+id/tvDetailCatatan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#212121"
+                    tools:text="Kondisi darurat untuk operasi caesar. Mohon bantuannya segera, terima kasih banyak." />
 
-                    <TextView
-                        android:id="@+id/tvDetailCatatan"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:text="Kondisi darurat untuk operasi caesar. Mohon bantuannya segera, terima kasih banyak." />
-
-                </LinearLayout>
+            </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
@@ -160,9 +175,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
+                android:backgroundTint="@color/utama"
                 android:paddingVertical="12dp"
                 android:layout_marginTop="10dp"
                 android:text="Beri Bantuan"
+                android:textColor="@color/white"
                 app:cornerRadius="8dp" />
         </LinearLayout>
     </ScrollView>
