@@ -9,10 +9,6 @@
         android:icon="@drawable/pesan_bottom"
         android:title="Pesan" />
     <item
-        android:id="@+id/kegiatan"
-        android:icon="@drawable/kegiatan_bottom"
-        android:title="Kegiatan" />
-    <item
         android:id="@+id/riwayat"
         android:icon="@drawable/riwayat_bottom"
         android:title="Riwayat" />

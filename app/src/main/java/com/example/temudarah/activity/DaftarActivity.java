@@ -296,6 +296,7 @@ public class DaftarActivity extends AppCompatActivity {
             newUser.setHasDonatedBefore(hasDonated);
             newUser.setWeight(weight);
             newUser.setHeight(height);
+            newUser.setLastDonationDate(lastDonationDate);
 
             Log.d("DAFTAR_DEBUG", "Mencoba menyimpan data ke Firestore...");
             db.collection("users").document(firebaseUser.getUid())

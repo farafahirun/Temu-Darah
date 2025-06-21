@@ -63,6 +63,7 @@ public class PermintaanDonorAdapter extends RecyclerView.Adapter<PermintaanDonor
         void bind(final PermintaanDonor permintaan, Location currentUserLocation, final OnItemClickListener listener) {
             binding.tvNamaPasien.setText(permintaan.getNamaPasien());
             binding.tvRumahSakit.setText(permintaan.getNamaRumahSakit());
+            binding.tvJenisKelamin.setText(permintaan.getJenisKelamin());
             binding.tvGolonganDarah.setText("Butuh Gol. " + permintaan.getGolonganDarahDibutuhkan());
             binding.tvJumlahKantong.setText(String.format(Locale.getDefault(), "%d Kantong", permintaan.getJumlahKantong()));
 

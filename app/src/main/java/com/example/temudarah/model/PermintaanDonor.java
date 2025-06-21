@@ -10,6 +10,8 @@ public class PermintaanDonor {
     private String golonganDarahDibutuhkan;
     private int jumlahKantong;
     private String catatan;
+    private String jenisKelamin;
+    private String tanggalPenguguman;
 
     private String namaRumahSakit;
     private GeoPoint lokasiRs;
@@ -128,5 +130,21 @@ public class PermintaanDonor {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    public String getJenisKelamin() {
+        return jenisKelamin;
+    }
+
+    public void setJenisKelamin(String jenisKelamin) {
+        this.jenisKelamin = jenisKelamin;
+    }
+
+    public String getTanggalPenguguman() {
+        return tanggalPenguguman;
+    }
+
+    public void setTanggalPenguguman(String tanggalPenguguman) {
+        this.tanggalPenguguman = tanggalPenguguman;
     }
 }

@@ -101,11 +101,28 @@ public class BerandaFragment extends Fragment {
         ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, genderOptions);
         binding.autoCompleteGender.setAdapter(genderAdapter);
         binding.autoCompleteGender.setText(genderOptions[0], false);
+        // Add listener for gender filter
+        binding.autoCompleteGender.setOnItemClickListener((parent, view, position, id) -> {
+            if (lastKnownLocation != null) {
+                loadDonationRequests(lastKnownLocation); // Reload data when gender filter changes
+            } else {
+                checkLocationPermissionAndLoadData();
+            }
+        });
+
 
         String[] goldarOptions = {"Semua Gol. Darah", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Rh-null"};
         ArrayAdapter<String> goldarAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, goldarOptions);
         binding.autoCompleteGolonganDarah.setAdapter(goldarAdapter);
         binding.autoCompleteGolonganDarah.setText(goldarOptions[0], false);
+        // Add listener for blood type filter
+        binding.autoCompleteGolonganDarah.setOnItemClickListener((parent, view, position, id) -> {
+            if (lastKnownLocation != null) {
+                loadDonationRequests(lastKnownLocation); // Reload data when blood type filter changes
+            } else {
+                checkLocationPermissionAndLoadData();
+            }
+        });
     }
 
     private void setupListeners() {
@@ -152,8 +169,6 @@ public class BerandaFragment extends Fragment {
         });
     }
 
-    // Di dalam class BerandaFragment.java
-
     private void loadDonationRequests(final Location location) {
         showLoading(true);
         if (currentUser == null) {
@@ -162,8 +177,9 @@ public class BerandaFragment extends Fragment {
             return;
         }
 
-        String genderFilter = binding.autoCompleteGender.getText().toString();
-        String bloodTypeFilter = binding.autoCompleteGolonganDarah.getText().toString();
+        String selectedGenderFilter = binding.autoCompleteGender.getText().toString();
+        String selectedBloodTypeFilter = binding.autoCompleteGolonganDarah.getText().toString();
+
         final GeoLocation center = new GeoLocation(location.getLatitude(), location.getLongitude());
         final double radiusInM = 50 * 1000;
 
@@ -171,41 +187,37 @@ public class BerandaFragment extends Fragment {
         final List<Task<QuerySnapshot>> tasks = new ArrayList<>();
 
         for (GeoQueryBounds b : bounds) {
+            // The Firestore query will now only filter by 'status' and geo-hash bounds.
+            // Gender and Blood Type will be filtered client-side.
             Query q = db.collection("donation_requests")
                     .whereEqualTo("status", "Aktif")
-                    // --- BARIS whereNotEqualTo DIHAPUS DARI SINI ---
                     .orderBy("geohash")
                     .startAt(b.startHash)
                     .endAt(b.endHash);
 
-            if (!"Semua Gender".equals(genderFilter)) {
-                // Asumsi field gender pasien ada di PermintaanDonor
-                // q = q.whereEqualTo("genderPasien", genderFilter);
-            }
-            if (!"Semua Gol. Darah".equals(bloodTypeFilter)) {
-                q = q.whereEqualTo("golonganDarahDibutuhkan", bloodTypeFilter);
-            }
+            // Removed Firestore filtering for blood type here
+            // if (!"Semua Gol. Darah".equals(selectedBloodTypeFilter)) {
+            //     q = q.whereEqualTo("golonganDarahDibutuhkan", selectedBloodTypeFilter);
+            // }
             tasks.add(q.get());
         }
 
         Tasks.whenAllComplete(tasks).addOnCompleteListener(t -> {
-            List<PermintaanDonor> matchingDocs = new ArrayList<>();
+            List<PermintaanDonor> allFetchedDocs = new ArrayList<>(); // To store docs after initial Firestore query (status, geo-distance, not self-posted)
             for (Task<QuerySnapshot> task : tasks) {
                 if (task.isSuccessful()) {
                     for (DocumentSnapshot doc : task.getResult()) {
                         PermintaanDonor permintaan = doc.toObject(PermintaanDonor.class);
                         if (permintaan != null) {
-                            // --- FILTER MANUAL DILAKUKAN DI SINI ---
-                            // Cek apakah UID pembuat TIDAK SAMA dengan UID pengguna saat ini
+                            // Filter by current user's UID and geo-distance first
                             if (!permintaan.getPembuatUid().equals(currentUser.getUid())) {
-                                // Jika bukan postingan sendiri, baru lakukan pengecekan jarak
                                 GeoPoint geoPoint = doc.getGeoPoint("lokasiRs");
                                 if (geoPoint != null) {
                                     GeoLocation docLocation = new GeoLocation(geoPoint.getLatitude(), geoPoint.getLongitude());
                                     double distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center);
                                     if (distanceInM <= radiusInM) {
                                         permintaan.setRequestId(doc.getId());
-                                        matchingDocs.add(permintaan);
+                                        allFetchedDocs.add(permintaan);
                                     }
                                 }
                             }
@@ -216,9 +228,37 @@ public class BerandaFragment extends Fragment {
                 }
             }
 
+            // --- CLIENT-SIDE FILTERING CHAIN ---
+            List<PermintaanDonor> interimFilteredList = new ArrayList<>();
+
+            // 1. Filter by Gender
+            if ("Semua Gender".equals(selectedGenderFilter)) {
+                interimFilteredList.addAll(allFetchedDocs);
+            } else {
+                for (PermintaanDonor p : allFetchedDocs) {
+                    if (p.getJenisKelamin() != null && p.getJenisKelamin().equalsIgnoreCase(selectedGenderFilter)) {
+                        interimFilteredList.add(p);
+                    }
+                }
+            }
+
+            // 2. Filter by Blood Type (applied to the already gender-filtered list)
+            List<PermintaanDonor> finalFilteredList = new ArrayList<>();
+            if ("Semua Gol. Darah".equals(selectedBloodTypeFilter)) {
+                finalFilteredList.addAll(interimFilteredList);
+            } else {
+                for (PermintaanDonor p : interimFilteredList) {
+                    if (p.getGolonganDarahDibutuhkan() != null && p.getGolonganDarahDibutuhkan().equalsIgnoreCase(selectedBloodTypeFilter)) {
+                        finalFilteredList.add(p);
+                    }
+                }
+            }
+            // --- END CLIENT-SIDE FILTERING CHAIN ---
+
+
             showLoading(false);
             permintaanList.clear();
-            permintaanList.addAll(matchingDocs);
+            permintaanList.addAll(finalFilteredList); // Use the final filtered list
             adapter.notifyDataSetChanged();
             updateEmptyState();
         });

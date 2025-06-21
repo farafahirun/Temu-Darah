@@ -149,6 +149,7 @@
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:textColor="@color/fixed_black"
+                                    android:textSize="12dp"
                                     android:inputType="none" />
                             </com.google.android.material.textfield.TextInputLayout>
 
@@ -167,8 +168,10 @@
                                     android:id="@+id/autoCompleteGolonganDarah"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:inputType="none" />
-                            </com.google.android.material.textfield.TextInputLayout>
+                                    android:inputType="none"
+                                    android:textSize="12dp"
+                                    android:textColor="@color/fixed_black" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
                             <androidx.cardview.widget.CardView
                                 android:id="@+id/filter_beranda"

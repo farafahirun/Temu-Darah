@@ -2,6 +2,7 @@ package com.example.temudarah.fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog; // Import DatePickerDialog
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -32,6 +33,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.util.Calendar; // Import Calendar
+import java.util.Locale; // Import Locale
+import java.text.SimpleDateFormat; // Import SimpleDateFormat
+
 public class BuatPermintaanFragment extends Fragment {
 
     private static final String TAG = "BuatPermintaanFragment";
@@ -42,6 +47,12 @@ public class BuatPermintaanFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private Location lastKnownLocation;
+
+    private String selectedBloodType; // To store selected blood type
+    private String selectedGender; // To store selected gender
+
+    private String[] bloodTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
+    private String[] genderTypes = {"Laki-laki", "Perempuan"}; // Updated: Removed "Semua jenis"
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,14 +76,25 @@ public class BuatPermintaanFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-        setupDropdown();
+        setupDropdowns();
         setupListeners();
+        setupDatePicker(); // Call the new setupDatePicker method
     }
 
-    private void setupDropdown() {
-        String[] bloodTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, bloodTypes);
-        binding.dropdownGolonganDarah.setAdapter(adapter);
+    private void setupDropdowns() {
+        // Setup Blood Type Dropdown
+        ArrayAdapter<String> bloodTypeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, bloodTypes);
+        binding.dropdownGolonganDarah.setAdapter(bloodTypeAdapter);
+        binding.dropdownGolonganDarah.setOnItemClickListener((parent, view, position, id) -> {
+            selectedBloodType = (String) parent.getItemAtPosition(position);
+        });
+
+        // Setup Gender Dropdown
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, genderTypes);
+        binding.dropdownJenisKelamin.setAdapter(genderAdapter);
+        binding.dropdownJenisKelamin.setOnItemClickListener((parent, view, position, id) -> {
+            selectedGender = (String) parent.getItemAtPosition(position);
+        });
     }
 
     private void setupListeners() {
@@ -80,6 +102,30 @@ public class BuatPermintaanFragment extends Fragment {
         binding.btnGunakanLokasi.setOnClickListener(v -> checkLocationPermissionAndGetData());
         binding.btnKirimPermintaan.setOnClickListener(v -> saveDonationRequest());
     }
+
+    // New method to set up the DatePicker
+    private void setupDatePicker() {
+        // Ensure the TextInputEditText is clickable but not focusable for manual input
+        binding.etTanggalPengumuman.setFocusable(false);
+        binding.etTanggalPengumuman.setClickable(true);
+
+        // Set OnClickListener to show DatePickerDialog
+        binding.etTanggalPengumuman.setOnClickListener(v -> {
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
+                    (view, selectedYear, selectedMonth, selectedDay) -> {
+                        // Format the selected date and set it to the EditText
+                        String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear);
+                        binding.etTanggalPengumuman.setText(formattedDate);
+                    }, year, month, day);
+            datePickerDialog.show();
+        });
+    }
+
 
     private void checkLocationPermissionAndGetData() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -126,19 +172,31 @@ public class BuatPermintaanFragment extends Fragment {
                     binding.btnKirimPermintaan.setEnabled(true);
                     binding.btnKirimPermintaan.setText("Kirim Permintaan");
                 }
+            } else {
+                Toast.makeText(getContext(), "Profil pengguna tidak ditemukan.", Toast.LENGTH_SHORT).show();
+                binding.btnKirimPermintaan.setEnabled(true);
+                binding.btnKirimPermintaan.setText("Kirim Permintaan");
             }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(getContext(), "Kesalahan saat memuat profil.", Toast.LENGTH_SHORT).show();
+            binding.btnKirimPermintaan.setEnabled(true);
+            binding.btnKirimPermintaan.setText("Kirim Permintaan");
+            Log.e(TAG, "Error fetching user profile", e);
         });
     }
 
     private void createRequestObject(User pembuat) {
         String namaPasien = binding.editNamaPasien.getText().toString().trim();
-        String golDarah = binding.dropdownGolonganDarah.getText().toString().trim();
+        String jenisKelamin = (selectedGender != null && !selectedGender.isEmpty()) ? selectedGender : binding.dropdownJenisKelamin.getText().toString().trim();
+        String golDarah = (selectedBloodType != null && !selectedBloodType.isEmpty()) ? selectedBloodType : binding.dropdownGolonganDarah.getText().toString().trim();
         int jumlahKantong = Integer.parseInt(binding.editJumlahKantong.getText().toString().trim());
         String namaRs = binding.editNamaRs.getText().toString().trim();
         String catatan = binding.editCatatan.getText().toString().trim();
+        String tanggalPengumuman = binding.etTanggalPengumuman.getText().toString().trim(); // Get the announcement date
 
         PermintaanDonor permintaan = new PermintaanDonor();
         permintaan.setNamaPasien(namaPasien);
+        permintaan.setJenisKelamin(jenisKelamin);
         permintaan.setGolonganDarahDibutuhkan(golDarah);
         permintaan.setJumlahKantong(jumlahKantong);
         permintaan.setNamaRumahSakit(namaRs);
@@ -146,6 +204,7 @@ public class BuatPermintaanFragment extends Fragment {
         permintaan.setPembuatUid(pembuat.getUid());
         permintaan.setNamaPembuat(pembuat.getFullName());
         permintaan.setFotoPembuatBase64(pembuat.getProfileImageBase64());
+        permintaan.setTanggalPenguguman(tanggalPengumuman); // Set the announcement date
         GeoPoint lokasi = new GeoPoint(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
         permintaan.setLokasiRs(lokasi);
         String geohash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(lokasi.getLatitude(), lokasi.getLongitude()));
@@ -162,13 +221,81 @@ public class BuatPermintaanFragment extends Fragment {
                     Toast.makeText(getContext(), "Gagal membuat permintaan.", Toast.LENGTH_SHORT).show();
                     binding.btnKirimPermintaan.setEnabled(true);
                     binding.btnKirimPermintaan.setText("Kirim Permintaan");
+                    Log.e(TAG, "Error creating donation request", e);
                 });
     }
 
     private boolean validateInput() {
-        if (TextUtils.isEmpty(binding.editNamaPasien.getText())) { /*...*/ return false; }
-        if (TextUtils.isEmpty(binding.dropdownGolonganDarah.getText())) { /*...*/ return false; }
-        if (TextUtils.isEmpty(binding.editJumlahKantong.getText())) { /*...*/ return false; }
+        if (TextUtils.isEmpty(binding.editNamaPasien.getText().toString().trim())) {
+            binding.editNamaPasien.setError("Nama pasien tidak boleh kosong");
+            return false;
+        }
+
+        // Validate Jenis Kelamin
+        String enteredGender = binding.dropdownJenisKelamin.getText().toString().trim();
+        boolean isValidGender = false;
+        if (!TextUtils.isEmpty(enteredGender)) {
+            for (String type : genderTypes) { // Check against the updated genderTypes array
+                if (type.equalsIgnoreCase(enteredGender)) {
+                    isValidGender = true;
+                    selectedGender = type;
+                    break;
+                }
+            }
+        }
+        if (!isValidGender) {
+            binding.dropdownJenisKelamin.setError("Silakan pilih jenis kelamin yang valid");
+            Toast.makeText(getContext(), "Silakan pilih jenis kelamin yang valid.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        // Validate Golongan Darah
+        String enteredBloodType = binding.dropdownGolonganDarah.getText().toString().trim();
+        boolean isValidBloodType = false;
+        if (!TextUtils.isEmpty(enteredBloodType)) {
+            for (String type : bloodTypes) {
+                if (type.equalsIgnoreCase(enteredBloodType)) {
+                    isValidBloodType = true;
+                    selectedBloodType = type;
+                    break;
+                }
+            }
+        }
+        if (!isValidBloodType) {
+            binding.dropdownGolonganDarah.setError("Silakan pilih golongan darah yang valid");
+            Toast.makeText(getContext(), "Silakan pilih golongan darah yang valid.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(binding.editJumlahKantong.getText().toString().trim())) {
+            binding.editJumlahKantong.setError("Jumlah kantong tidak boleh kosong");
+            return false;
+        } else {
+            try {
+                int jumlah = Integer.parseInt(binding.editJumlahKantong.getText().toString().trim());
+                if (jumlah <= 0) {
+                    binding.editJumlahKantong.setError("Jumlah kantong harus lebih dari 0");
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                binding.editJumlahKantong.setError("Masukkan jumlah kantong yang valid");
+                return false;
+            }
+        }
+
+        if (TextUtils.isEmpty(binding.editNamaRs.getText().toString().trim())) {
+            binding.editNamaRs.setError("Nama rumah sakit tidak boleh kosong");
+            return false;
+        }
+
+        // Validate Tanggal Pengumuman
+        if (TextUtils.isEmpty(binding.etTanggalPengumuman.getText().toString().trim())) {
+            binding.etTanggalPengumuman.setError("Tanggal Pengumuman tidak boleh kosong");
+            Toast.makeText(getContext(), "Silakan pilih tanggal pengumuman.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+
         if (lastKnownLocation == null) {
             Toast.makeText(getContext(), "Harap tentukan lokasi RS dengan menekan tombol GPS.", Toast.LENGTH_LONG).show();
             return false;

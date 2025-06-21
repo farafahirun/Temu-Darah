@@ -125,11 +125,13 @@ public class DetailPermintaanFragment extends Fragment {
         }
 
         // Mengisi detail permintaan
-        binding.tvDetailGolDarah.setText(permintaan.getGolonganDarahDibutuhkan());
         binding.tvDetailNamaPasien.setText(permintaan.getNamaPasien());
-        binding.tvDetailNamaRs.setText(permintaan.getNamaRumahSakit());
+        binding.tvDetailJenisKelamin.setText(permintaan.getJenisKelamin() != null ? permintaan.getJenisKelamin() : "-"); // Set Jenis Kelamin
+        binding.tvDetailGolDarah.setText(permintaan.getGolonganDarahDibutuhkan());
         binding.tvDetailJumlah.setText(String.format(Locale.getDefault(), "%d Kantong", permintaan.getJumlahKantong()));
+        binding.tvDetailNamaRs.setText(permintaan.getNamaRumahSakit());
         binding.tvDetailCatatan.setText(permintaan.getCatatan());
+        binding.tvDetailTanggalPenguguman.setText(permintaan.getTanggalPenguguman() != null && !permintaan.getTanggalPenguguman().isEmpty() ? permintaan.getTanggalPenguguman() : "-");
     }
 
     /**
@@ -172,12 +174,11 @@ public class DetailPermintaanFragment extends Fragment {
         batch.commit().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Anda telah menawarkan bantuan! Membuka chat...", Toast.LENGTH_LONG).show();
 
-            // GANTI TODO DENGAN INI:
             if (getParentFragmentManager() != null) {
                 Fragment chatFragment = ChatRoomFragment.newInstance(chatRoomId, currentPermintaan.getNamaPembuat());
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container, chatFragment)
-                        .addToBackStack(null) // Agar bisa kembali ke halaman detail
+                        .addToBackStack(null)
                         .commit();
             }
         }).addOnFailureListener(e -> {

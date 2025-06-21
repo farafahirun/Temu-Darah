@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/background"
     tools:context=".fragment.BuatPermintaanFragment">
 
@@ -58,14 +59,59 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Golongan Darah Dibutuhkan*"
+                android:text="Jenis Kelamin*"
                 android:textStyle="bold"/>
-            <AutoCompleteTextView
-                android:id="@+id/dropdownGolonganDarah"
-                android:textColor="@color/fixed_black"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Pilih golongan darah"/>
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
+                app:hintTextColor="@drawable/text_input_hint_color_selector">
+
+                <AutoCompleteTextView
+                    android:id="@+id/dropdownJenisKelamin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Pilih Jenis Kelamin"
+                    android:inputType="none"
+                    android:textSize="16sp"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Golongan Darah Dibutuhkan*"
+                android:textStyle="bold"/>
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
+                app:hintTextColor="@drawable/text_input_hint_color_selector">
+
+                <AutoCompleteTextView
+                    android:id="@+id/dropdownGolonganDarah"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Pilih Golongan Darah"
+                    android:inputType="none"
+                    android:textSize="16sp"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -80,6 +126,35 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:hint="Contoh: 2"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Tanggal Penguguman*"
+                android:textStyle="bold"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="#C11E3B"
+                app:hintTextColor="#C11E3B">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etTanggalPengumuman"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:hint="Tanggal Lahir"
+                    android:inputType="date"
+                    android:textSize="16sp"
+                    android:textColor="@color/fixed_black" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:layout_width="wrap_content"

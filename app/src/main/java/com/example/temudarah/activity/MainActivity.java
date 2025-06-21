@@ -47,8 +47,6 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new BerandaFragment();
             } else if (id == R.id.pesan) {
                 selectedFragment = new ChatsFragment();
-            } else if (id == R.id.kegiatan) {
-                selectedFragment = new KegiatanFragment();
             } else if (id == R.id.riwayat) {
                 selectedFragment = new RiwayatFragment();
             }
