@@ -10,6 +10,7 @@ import com.example.temudarah.R;
 import com.example.temudarah.model.Pesan;
 import com.google.firebase.auth.FirebaseAuth;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -62,10 +63,43 @@ public class PesanAdapter extends RecyclerView.Adapter<PesanAdapter.ViewHolder> 
         Pesan pesan = pesanList.get(position);
         holder.tvMessage.setText(pesan.getText());
 
-        // Format dan tampilkan timestamp
+        // Set nama pengirim
+        if (getItemViewType(position) == VIEW_TYPE_DITERIMA) {
+            // Jika ini pesan yang diterima, tampilkan nama pengirimnya
+            if (pesan.getSenderName() != null && !pesan.getSenderName().isEmpty()) {
+                holder.tvSenderName.setText(pesan.getSenderName());
+            } else {
+                holder.tvSenderName.setText("Pengirim");
+            }
+        } else {
+            // Jika ini pesan yang dikirim oleh user, bisa tetap "Anda" seperti di layout
+            // atau bisa kosongkan jika tidak ingin menampilkan teks "Anda"
+            // holder.tvSenderName.setVisibility(View.GONE); // Jika tidak ingin menampilkan "Anda"
+        }
+
+        // Format dan tampilkan timestamp dengan lengkap (jam dan tanggal)
         if (pesan.getTimestamp() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            holder.tvTimestamp.setText(sdf.format(pesan.getTimestamp().toDate()));
+            Date messageDate = pesan.getTimestamp().toDate();
+
+            // Format waktu (jam:menit)
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            String timeStr = timeFormat.format(messageDate);
+
+            // Format tanggal (jika perlu)
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
+            String dateStr = dateFormat.format(messageDate);
+
+            // Bandingkan tanggal pesan dengan hari ini
+            Date today = new Date();
+            SimpleDateFormat compareFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+            boolean isToday = compareFormat.format(messageDate).equals(compareFormat.format(today));
+
+            // Tampilkan waktu saja jika hari ini, atau tanggal + waktu jika bukan hari ini
+            if (isToday) {
+                holder.tvTimestamp.setText(timeStr);
+            } else {
+                holder.tvTimestamp.setText(dateStr + " " + timeStr);
+            }
         }
     }
 
@@ -75,17 +109,18 @@ public class PesanAdapter extends RecyclerView.Adapter<PesanAdapter.ViewHolder> 
     }
 
     /**
-     * ViewHolder ini cukup satu, karena kedua layout item kita
-     * memiliki ID komponen yang sama (tvMessage dan tvTimestamp).
+     * ViewHolder ini untuk kedua layout, karena memiliki ID komponen yang sama.
      */
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
         TextView tvTimestamp;
+        TextView tvSenderName;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tvMessage);
             tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
+            tvSenderName = itemView.findViewById(R.id.tvSenderName);
         }
     }
 }
