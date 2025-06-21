@@ -246,6 +246,7 @@ public class ProfileFragment extends Fragment {
         super.onDestroyView();
         if (executorService != null) {
             executorService.shutdownNow();
+            executorService = null;
         }
         binding = null;
     }

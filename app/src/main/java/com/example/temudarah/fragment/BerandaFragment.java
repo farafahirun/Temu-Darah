@@ -271,6 +271,7 @@ public class BerandaFragment extends Fragment {
     }
 
     private void updateEmptyState() {
+        if (binding == null) return;
         if (permintaanList.isEmpty()) {
             binding.tvNoData.setVisibility(View.VISIBLE);
             binding.rvPendonor.setVisibility(View.GONE);
