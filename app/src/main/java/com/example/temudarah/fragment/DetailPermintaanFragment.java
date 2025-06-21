@@ -137,14 +137,16 @@ public class DetailPermintaanFragment extends Fragment {
     /**
      * FUNGSI LENGKAP: Logika untuk tombol "Beri Bantuan".
      */
+    // Di dalam class DetailPermintaanFragment.java
+
     private void offerHelp() {
         FirebaseUser donorUser = mAuth.getCurrentUser();
 
+        // Pengecekan awal (tidak berubah)
         if (donorUser == null || currentPermintaan == null) {
             Toast.makeText(getContext(), "Gagal, data tidak lengkap atau Anda belum login.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         if (donorUser.getUid().equals(currentPermintaan.getPembuatUid())) {
             Toast.makeText(getContext(), "Anda tidak bisa membantu permintaan Anda sendiri.", Toast.LENGTH_SHORT).show();
             return;
@@ -153,39 +155,60 @@ public class DetailPermintaanFragment extends Fragment {
         binding.btnBeriBantuan.setEnabled(false);
         binding.btnBeriBantuan.setText("Memproses...");
 
+        // Buat ID ruang chat yang konsisten
         String chatRoomId = createChatRoomId(donorUser.getUid(), currentPermintaan.getPembuatUid());
 
+        // --- PERBAIKAN UTAMA: Pastikan SEMUA data untuk ProsesDonor diisi ---
+        ProsesDonor newProcess = new ProsesDonor();
+        newProcess.setRequestId(requestId); // ID dari permintaan donor aslinya
+        newProcess.setChatRoomId(chatRoomId);
+        newProcess.setParticipants(Arrays.asList(currentPermintaan.getPembuatUid(), donorUser.getUid()));
+        newProcess.setStatusProses("Berlangsung");
+        newProcess.setTimestamp(Timestamp.now());
+        // Tambahkan ID peminta dan pendonor secara eksplisit
+        newProcess.setRequesterId(currentPermintaan.getPembuatUid());
+        newProcess.setDonorId(donorUser.getUid());
+        // Inisialisasi pesan terakhir agar tidak null
+        newProcess.setLastMessage("Ketuk untuk memulai percakapan");
+        newProcess.setLastMessageTimestamp(Timestamp.now());
+
+
+        // --- Transaksi Aman dengan WriteBatch (Tidak berubah) ---
         WriteBatch batch = db.batch();
 
         // Operasi 1: Update status di 'donation_requests'
         DocumentReference requestRef = db.collection("donation_requests").document(requestId);
         batch.update(requestRef, "status", "Dalam Proses");
 
-        // Operasi 2: Buat dokumen baru di 'active_donations'
+        // Operasi 2: Buat dokumen "jabat tangan" baru di 'active_donations'
         DocumentReference donationProcessRef = db.collection("active_donations").document(chatRoomId);
-        ProsesDonor newProcess = new ProsesDonor();
-        newProcess.setRequestId(requestId);
-        newProcess.setChatRoomId(chatRoomId);
-        newProcess.setParticipants(Arrays.asList(currentPermintaan.getPembuatUid(), donorUser.getUid()));
-        newProcess.setStatusProses("Berlangsung");
-        newProcess.setTimestamp(Timestamp.now());
-        batch.set(donationProcessRef, newProcess);
+        batch.set(donationProcessRef, newProcess); // Gunakan objek newProcess yang sudah lengkap
 
+        // Jalankan kedua operasi
         batch.commit().addOnSuccessListener(aVoid -> {
-            Toast.makeText(getContext(), "Anda telah menawarkan bantuan! Membuka chat...", Toast.LENGTH_LONG).show();
-
-            if (getParentFragmentManager() != null) {
-                Fragment chatFragment = ChatRoomFragment.newInstance(chatRoomId, currentPermintaan.getNamaPembuat());
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, chatFragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
+            Toast.makeText(getContext(), "Anda telah menawarkan bantuan! Silakan mulai percakapan.", Toast.LENGTH_LONG).show();
+            navigateToChatRoom(chatRoomId, currentPermintaan.getNamaPembuat());
         }).addOnFailureListener(e -> {
             Toast.makeText(getContext(), "Gagal menawarkan bantuan: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             binding.btnBeriBantuan.setEnabled(true);
             binding.btnBeriBantuan.setText("Beri Bantuan");
         });
+    }
+
+    private void navigateToChatRoom(String chatRoomId, String otherUserName) {
+        // Pengecekan keamanan untuk memastikan fragment masih "hidup"
+        if (getParentFragmentManager() == null || getContext() == null) {
+            return;
+        }
+
+        // Buat instance baru dari ChatRoomFragment dengan membawa data yang diperlukan
+        Fragment chatFragment = ChatRoomFragment.newInstance(chatRoomId, otherUserName);
+
+        // Lakukan transaksi untuk mengganti fragment saat ini dengan fragment chat
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, chatFragment)
+                .addToBackStack(null) // Penting! Agar pengguna bisa menekan tombol back untuk kembali ke halaman detail ini
+                .commit();
     }
 
     private String createChatRoomId(String uid1, String uid2) {
