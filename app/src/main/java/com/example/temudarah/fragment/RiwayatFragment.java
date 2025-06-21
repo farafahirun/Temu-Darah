@@ -1,17 +1,20 @@
 package com.example.temudarah.fragment;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout; // Import LinearLayout
-import android.widget.TextView; // Import TextView
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.example.temudarah.R;
 import com.example.temudarah.adapter.RiwayatDonasiAdapter;
 import com.example.temudarah.databinding.FragmentRiwayatBinding;
@@ -27,12 +30,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RiwayatFragment extends Fragment {
 
@@ -43,6 +46,9 @@ public class RiwayatFragment extends Fragment {
 
     private RiwayatDonasiAdapter donasiAdapter;
     private List<RiwayatDonasiTampil> riwayatDonasiTampilList;
+    private String currentFilter = "Semua";
+
+    private enum UiState { LOADING, HAS_DATA, EMPTY }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,170 +63,207 @@ public class RiwayatFragment extends Fragment {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         setupRecyclerView();
+        setupFilterListeners();
 
-        // Listener untuk filter menggunakan ChipGroup
-        binding.chipGroupFilter.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == binding.filterChipSemua.getId()) {
-                loadMyDonationHistory("Semua");
-            } else if (checkedId == binding.filterChipPendonor.getId()) {
-                loadMyDonationHistory("Sebagai Pendonor");
-            } else if (checkedId == binding.filterChipPenerima.getId()) {
-                loadMyDonationHistory("Sebagai Penerima");
-            }
-        });
-
-        // Muat riwayat donasi darah secara default (filter "Semua")
-        loadMyDonationHistory("Semua");
+        if (currentUser != null) {
+            updateButtonStyles(currentFilter);
+            loadMyDonationHistory(currentFilter);
+        } else {
+            updateUiState(UiState.EMPTY, "Anda perlu login untuk melihat riwayat.");
+        }
     }
 
     private void setupRecyclerView() {
         binding.rvRiwayat.setLayoutManager(new LinearLayoutManager(getContext()));
         riwayatDonasiTampilList = new ArrayList<>();
-        donasiAdapter = new RiwayatDonasiAdapter(riwayatDonasiTampilList, riwayat -> {});
+        donasiAdapter = new RiwayatDonasiAdapter(riwayatDonasiTampilList, riwayat -> {
+            // TODO: Aksi saat item riwayat diklik (misal: buka detail chat)
+            Toast.makeText(getContext(), "Detail untuk: " + riwayat.getNamaPasien(), Toast.LENGTH_SHORT).show();
+        });
         binding.rvRiwayat.setAdapter(donasiAdapter);
     }
 
-    private void loadMyDonationHistory(String peranFilter) {
-        if (currentUser == null) {
-            binding.progressBar.setVisibility(View.GONE);
-            binding.emptyStateContainer.setVisibility(View.VISIBLE);
-            // Jika ada TextView di emptyStateContainer, bisa diatur pesannya di sini
-            return;
+    private void setupFilterListeners() {
+        binding.semua.setOnClickListener(v -> applyFilter("Semua"));
+        binding.filterPendonor.setOnClickListener(v -> applyFilter("Sebagai Pendonor"));
+        binding.filterPenerima.setOnClickListener(v -> applyFilter("Sebagai Penerima"));
+    }
+
+    private void applyFilter(String filter) {
+        currentFilter = filter;
+        updateButtonStyles(currentFilter);
+        loadMyDonationHistory(currentFilter);
+    }
+
+    private void updateButtonStyles(String activeFilter) {
+        if (getContext() == null) return;
+
+        int activeBgColor = ContextCompat.getColor(requireContext(), R.color.utama);
+        int inactiveBgColor = ContextCompat.getColor(requireContext(), R.color.background);
+        int activeTextColor = Color.WHITE;
+        int inactiveTextColor = ContextCompat.getColor(requireContext(), R.color.utama);
+
+        binding.semua.setBackgroundTintList(ColorStateList.valueOf(inactiveBgColor));
+        binding.semua.setTextColor(inactiveTextColor);
+        binding.filterPendonor.setBackgroundTintList(ColorStateList.valueOf(inactiveBgColor));
+        binding.filterPendonor.setTextColor(inactiveTextColor);
+        binding.filterPenerima.setBackgroundTintList(ColorStateList.valueOf(inactiveBgColor));
+        binding.filterPenerima.setTextColor(inactiveTextColor);
+
+        if ("Semua".equals(activeFilter)) {
+            binding.semua.setBackgroundTintList(ColorStateList.valueOf(activeBgColor));
+            binding.semua.setTextColor(activeTextColor);
+        } else if ("Sebagai Pendonor".equals(activeFilter)) {
+            binding.filterPendonor.setBackgroundTintList(ColorStateList.valueOf(activeBgColor));
+            binding.filterPendonor.setTextColor(activeTextColor);
+        } else if ("Sebagai Penerima".equals(activeFilter)) {
+            binding.filterPenerima.setBackgroundTintList(ColorStateList.valueOf(activeBgColor));
+            binding.filterPenerima.setTextColor(activeTextColor);
         }
+    }
 
-        binding.progressBar.setVisibility(View.VISIBLE);
-        binding.emptyStateContainer.setVisibility(View.GONE);
-        riwayatDonasiTampilList.clear();
-        donasiAdapter.notifyDataSetChanged();
+    // Di dalam class RiwayatFragment.java
 
-        String currentUserId = currentUser.getUid();
+    private void loadMyDonationHistory(String peranFilter) {
+        if (currentUser == null) return;
+        updateUiState(UiState.LOADING, null);
 
-        // Task 1: Ambil permintaan donor di mana pengguna saat ini adalah "pembuatUid"
-        Task<QuerySnapshot> requestsAsRequesterTask = db.collection("donation_requests")
-                .whereEqualTo("pembuatUid", currentUserId)
-                .whereIn("status", Arrays.asList("Selesai", "Dibatalkan"))
-                .get();
-
-        // Task 2: Ambil proses donasi yang melibatkan pengguna saat ini (sebagai pembuat atau pendonor)
-        Task<QuerySnapshot> activeDonationsTask = db.collection("active_donations")
-                .whereArrayContains("participants", currentUserId)
-                .get();
-
-        Tasks.whenAllSuccess(requestsAsRequesterTask, activeDonationsTask)
-                .addOnSuccessListener(results -> {
-                    List<RiwayatDonasiTampil> tempList = new ArrayList<>();
-                    List<String> processedRequestIds = new ArrayList<>();
-
-                    // Proses permintaan di mana pengguna saat ini adalah pembuat permintaan (penerima)
-                    QuerySnapshot requestsAsRequesterSnapshot = (QuerySnapshot) results.get(0);
-                    for (DocumentSnapshot doc : requestsAsRequesterSnapshot.getDocuments()) {
-                        PermintaanDonor permintaan = doc.toObject(PermintaanDonor.class);
-                        if (permintaan != null) {
-                            permintaan.setRequestId(doc.getId());
-                            if ("Selesai".equals(permintaan.getStatus()) || "Dibatalkan".equals(permintaan.getStatus())) {
-                                if ("Semua".equals(peranFilter) || "Sebagai Penerima".equals(peranFilter)) {
-                                    RiwayatDonasiTampil item = new RiwayatDonasiTampil();
-                                    item.setTanggal(permintaan.getWaktuDibuat());
-                                    item.setStatusProses(permintaan.getStatus());
-                                    item.setNamaPasien(permintaan.getNamaPasien());
-                                    item.setPeranSaya("Anda Penerima");
-                                    item.setJudulTampilan("Permintaan Anda untuk " + permintaan.getNamaPasien());
-                                    tempList.add(item);
-                                    processedRequestIds.add(permintaan.getRequestId());
-                                }
-                            }
-                        }
+        db.collection("active_donations")
+                .whereArrayContains("participants", currentUser.getUid())
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(prosesSnapshots -> {
+                    if (!isAdded() || getContext() == null) return;
+                    if (prosesSnapshots.isEmpty()) {
+                        updateUiState(UiState.EMPTY, "Belum ada riwayat donasi.");
+                        return;
                     }
 
-                    // Proses active_donations untuk menemukan peran pendonor dan potensi permintaan "Selesai"
-                    QuerySnapshot activeDonationsSnapshot = (QuerySnapshot) results.get(1);
-                    List<Task<DocumentSnapshot>> userAndRequestTasks = new ArrayList<>();
-                    List<ProsesDonor> processesToFetchDetailsFor = new ArrayList<>();
-
-                    for (DocumentSnapshot prosesDoc : activeDonationsSnapshot.getDocuments()) {
+                    List<Task<?>> detailTasks = new ArrayList<>();
+                    List<ProsesDonor> processes = new ArrayList<>();
+                    for (DocumentSnapshot prosesDoc : prosesSnapshots.getDocuments()) {
                         ProsesDonor proses = prosesDoc.toObject(ProsesDonor.class);
                         if (proses != null && proses.getParticipants() != null && proses.getRequestId() != null) {
-                            if (!processedRequestIds.contains(proses.getRequestId()) || currentUserId.equals(proses.getDonorId())) {
-                                String otherUserId = null;
-                                // Identifikasi UID pengguna lain
-                                for (String participantId : proses.getParticipants()) {
-                                    if (!participantId.equals(currentUserId)) {
-                                        otherUserId = participantId;
-                                        break;
-                                    }
-                                }
-
-                                if (otherUserId != null) {
-                                    processesToFetchDetailsFor.add(proses);
-                                    userAndRequestTasks.add(db.collection("users").document(otherUserId).get());
-                                    userAndRequestTasks.add(db.collection("donation_requests").document(proses.getRequestId()).get());
-                                }
+                            processes.add(proses);
+                            String otherUserId = Objects.equals(proses.getRequesterId(), currentUser.getUid()) ? proses.getDonorId() : proses.getRequesterId();
+                            if(otherUserId != null && !otherUserId.isEmpty()) {
+                                detailTasks.add(db.collection("users").document(otherUserId).get());
+                                detailTasks.add(db.collection("donation_requests").document(proses.getRequestId()).get());
                             }
                         }
                     }
 
-                    Tasks.whenAllSuccess(userAndRequestTasks).addOnSuccessListener(innerResults -> {
-                        for (int i = 0; i < processesToFetchDetailsFor.size(); i++) {
-                            ProsesDonor proses = processesToFetchDetailsFor.get(i);
-                            DocumentSnapshot userDoc = (DocumentSnapshot) innerResults.get(i * 2);
-                            DocumentSnapshot requestDoc = (DocumentSnapshot) innerResults.get(i * 2 + 1);
+                    if (detailTasks.isEmpty()) {
+                        updateUiState(UiState.EMPTY, "Data riwayat tidak lengkap.");
+                        return;
+                    }
 
-                            User otherUser = userDoc.toObject(User.class);
-                            PermintaanDonor permintaan = requestDoc.toObject(PermintaanDonor.class);
+                    Tasks.whenAllComplete(detailTasks).addOnCompleteListener(task -> {
+                        if (!isAdded() || getContext() == null) return;
+                        List<RiwayatDonasiTampil> tempList = new ArrayList<>();
+                        List<Task<?>> completedTasks = task.getResult();
 
-                            if (otherUser != null && permintaan != null) {
-                                boolean sayaPendonor = currentUserId.equals(proses.getDonorId());
-                                boolean sayaPenerima = currentUserId.equals(proses.getRequesterId());
+                        for (int i = 0; i < processes.size(); i++) {
+                            int userTaskIndex = i * 2;
+                            int requestTaskIndex = i * 2 + 1;
+                            if (requestTaskIndex >= completedTasks.size()) continue;
 
-                                if ("Selesai".equals(permintaan.getStatus()) || "Dibatalkan".equals(permintaan.getStatus())) {
-                                    if ("Semua".equals(peranFilter) ||
-                                            ("Sebagai Pendonor".equals(peranFilter) && sayaPendonor) ||
-                                            ("Sebagai Penerima".equals(peranFilter) && sayaPenerima)) {
+                            Task<?> userTask = completedTasks.get(userTaskIndex);
+                            Task<?> requestTask = completedTasks.get(requestTaskIndex);
 
-                                        if (sayaPenerima && processedRequestIds.contains(permintaan.getRequestId())) {
-                                            continue;
+                            if (userTask.isSuccessful() && requestTask.isSuccessful()) {
+                                DocumentSnapshot userDoc = (DocumentSnapshot) userTask.getResult();
+                                DocumentSnapshot requestDoc = (DocumentSnapshot) requestTask.getResult();
+
+                                if (userDoc != null && userDoc.exists() && requestDoc != null && requestDoc.exists()) {
+                                    User otherUser = userDoc.toObject(User.class);
+                                    PermintaanDonor permintaan = requestDoc.toObject(PermintaanDonor.class);
+
+                                    if (otherUser != null && permintaan != null) {
+                                        ProsesDonor proses = processes.get(i);
+                                        boolean sayaPendonor = currentUser.getUid().equals(proses.getDonorId());
+
+                                        if ("Semua".equals(peranFilter) ||
+                                                ("Sebagai Pendonor".equals(peranFilter) && sayaPendonor) ||
+                                                ("Sebagai Penerima".equals(peranFilter) && !sayaPendonor)) {
+
+                                            // --- BLOK KODE YANG HILANG SEBELUMNYA ---
+                                            // 1. Buat instance baru dari RiwayatDonasiTampil
+                                            RiwayatDonasiTampil item = new RiwayatDonasiTampil();
+
+                                            // 2. Isi semua datanya menggunakan setter
+                                            item.setTanggal(proses.getTimestamp());
+                                            item.setStatusProses(proses.getStatusProses());
+                                            item.setNamaPasien(permintaan.getNamaPasien());
+                                            item.setPeranSaya(sayaPendonor ? "Anda Membantu" : "Anda Dibantu oleh");
+                                            item.setJudulTampilan(sayaPendonor ? "Permintaan dari " + otherUser.getFullName() : "Bantuan dari " + otherUser.getFullName());
+
+                                            // 3. Baru tambahkan ke daftar sementara
+                                            tempList.add(item);
+                                            // --- AKHIR BLOK PERBAIKAN ---
                                         }
-
-                                        RiwayatDonasiTampil item = new RiwayatDonasiTampil();
-                                        item.setTanggal(proses.getTimestamp());
-                                        item.setStatusProses(permintaan.getStatus());
-                                        item.setNamaPasien(permintaan.getNamaPasien());
-                                        item.setPeranSaya(sayaPendonor ? "Anda Membantu" : "Anda Dibantu oleh");
-                                        item.setJudulTampilan(sayaPendonor ? "Donasi untuk " + otherUser.getFullName() : "Bantuan dari " + otherUser.getFullName());
-                                        tempList.add(item);
                                     }
                                 }
                             }
                         }
-                        Collections.sort(tempList, (o1, o2) -> {
-                            if (o1.getTanggal() == null || o2.getTanggal() == null) return 0;
-                            return o2.getTanggal().compareTo(o1.getTanggal());
-                        });
 
-                        riwayatDonasiTampilList.clear();
-                        riwayatDonasiTampilList.addAll(tempList);
-                        donasiAdapter.notifyDataSetChanged();
-                        binding.progressBar.setVisibility(View.GONE);
-                        updateEmptyStateDonasi();
-                    }).addOnFailureListener(e -> {
-                        Log.e(TAG, "Error fetching user/request details for active donations: ", e);
-                        binding.progressBar.setVisibility(View.GONE);
-                        updateEmptyStateDonasi();
+                        updateFinalList(tempList); // Panggil fungsi helper baru
                     });
-
                 })
                 .addOnFailureListener(e -> {
-                    binding.progressBar.setVisibility(View.GONE);
-                    Log.e(TAG, "Error loading donation history: ", e);
-                    updateEmptyStateDonasi();
+                    if (!isAdded()) return;
+                    updateUiState(UiState.EMPTY, "Gagal memuat riwayat.");
+                    Log.e(TAG, "Gagal memuat riwayat donasi", e);
                 });
     }
 
-    private void updateEmptyStateDonasi() {
-        binding.tvEmptyStateRiwayat.setVisibility(riwayatDonasiTampilList.isEmpty() ? View.VISIBLE : View.GONE);
-        binding.rvRiwayat.setVisibility(riwayatDonasiTampilList.isEmpty() ? View.GONE : View.VISIBLE);
-        if (riwayatDonasiTampilList.isEmpty()) {
-            binding.tvEmptyStateRiwayat.setText("Belum ada riwayat donasi.");
+    /**
+     * Fungsi baru untuk mengurutkan dan mengupdate UI.
+     * Dibuat terpisah agar lebih rapi.
+     */
+    private void updateFinalList(List<RiwayatDonasiTampil> listToShow) {
+        // Urutkan berdasarkan tanggal, dari yang terbaru
+        Collections.sort(listToShow, (o1, o2) -> {
+            if (o1.getTanggal() == null || o2.getTanggal() == null) return 0;
+            return o2.getTanggal().compareTo(o1.getTanggal());
+        });
+
+        riwayatDonasiTampilList.clear();
+        riwayatDonasiTampilList.addAll(listToShow);
+        donasiAdapter.notifyDataSetChanged();
+        updateUiState(riwayatDonasiTampilList.isEmpty() ? UiState.EMPTY : UiState.HAS_DATA, "Tidak ada riwayat untuk filter ini.");
+    }
+
+    private void updateFinalList(List<RiwayatDonasiTampil> tempList, String peranFilter) {
+        List<RiwayatDonasiTampil> filteredList = new ArrayList<>();
+        if ("Semua".equals(peranFilter)) {
+            filteredList.addAll(tempList);
+        } else {
+            for (RiwayatDonasiTampil item : tempList) {
+                boolean sayaPendonor = "Anda Membantu".equals(item.getPeranSaya());
+                if (("Sebagai Pendonor".equals(peranFilter) && sayaPendonor) ||
+                        ("Sebagai Penerima".equals(peranFilter) && !sayaPendonor)) {
+                    filteredList.add(item);
+                }
+            }
+        }
+
+        Collections.sort(filteredList, (o1, o2) -> o2.getTanggal().compareTo(o1.getTanggal()));
+
+        riwayatDonasiTampilList.clear();
+        riwayatDonasiTampilList.addAll(filteredList);
+        donasiAdapter.notifyDataSetChanged();
+        updateUiState(riwayatDonasiTampilList.isEmpty() ? UiState.EMPTY : UiState.HAS_DATA, "Tidak ada riwayat untuk filter ini.");
+    }
+
+    private void updateUiState(UiState state, String emptyMessage) {
+        if (binding == null) return;
+        binding.progressBar.setVisibility(state == UiState.LOADING ? View.VISIBLE : View.GONE);
+        binding.rvRiwayat.setVisibility(state == UiState.HAS_DATA ? View.VISIBLE : View.GONE);
+        binding.stateContainer.setVisibility(state == UiState.EMPTY || state == UiState.LOADING ? View.VISIBLE : View.GONE);
+        binding.tvEmptyState.setVisibility(state == UiState.EMPTY ? View.VISIBLE : View.GONE);
+        if (state == UiState.EMPTY && emptyMessage != null) {
+            binding.tvEmptyState.setText(emptyMessage);
         }
     }
 

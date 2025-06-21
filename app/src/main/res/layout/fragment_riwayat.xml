@@ -1,12 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/white"
     tools:context=".fragment.RiwayatFragment">
 
+    <!-- Navbar -->
+    <LinearLayout
+        android:id="@+id/navbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingTop="15dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="5dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="Logo"
+            android:src="@drawable/logo_merah" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/iv_notification"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:contentDescription="Notification"
+            android:src="@drawable/notifikasi_on"
+            app:tint="@color/utama" />
+    </LinearLayout>
+
+    <!-- Title -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
@@ -16,14 +52,14 @@
         android:textStyle="bold"
         android:textColor="@color/fixed_black"
         android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"/>
+        android:layout_marginStart="16dp" />
 
+    <!-- Filter group (dari versi lokal) -->
     <LinearLayout
         android:id="@+id/filterGroupDonorDarah"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/tvTitle"
         android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
@@ -35,7 +71,7 @@
             android:text="Filter:"
             android:textColor="@color/fixed_black"
             android:textSize="14sp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp" />
 
         <HorizontalScrollView
             android:layout_width="0dp"
@@ -58,7 +94,7 @@
                     android:background="@drawable/border_card_utama"
                     android:textColor="@color/white"
                     android:layout_marginEnd="8dp"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false" />
 
                 <Button
                     android:id="@+id/filterBtnSebagaiPendonor"
@@ -70,7 +106,7 @@
                     android:background="@drawable/border_card_utama"
                     android:textColor="@color/white"
                     android:layout_marginEnd="8dp"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false" />
 
                 <Button
                     android:id="@+id/filterBtnSebagaiPenerima"
@@ -81,37 +117,92 @@
                     android:paddingHorizontal="16dp"
                     android:background="@drawable/border_card_utama"
                     android:textColor="@color/white"
-                    android:textAllCaps="false"/>
+                    android:textAllCaps="false" />
 
             </LinearLayout>
         </HorizontalScrollView>
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvRiwayat"
+    <!-- Filter group (dari versi GitHub) -->
+    <LinearLayout
+        android:id="@+id/filter_riwayat"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/filterGroupDonorDarah"
-        android:layout_marginTop="8dp"
-        android:padding="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_riwayat_donasi" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginVertical="10dp"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tvEmptyStateRiwayat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Belum ada riwayat donasi."
-        android:textColor="@color/fixed_black"
-        android:textSize="16sp"
-        android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/semua"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/utama"
+            android:text="Semua"
+            android:textColor="@color/white"
+            app:cornerRadius="8dp" />
 
-</RelativeLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/filter_pendonor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/white"
+            android:text="Pendonor"
+            android:textColor="@color/utama"
+            app:strokeColor="@color/utama"
+            app:strokeWidth="1dp"
+            app:cornerRadius="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/filter_penerima"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/white"
+            android:text="Penerima"
+            android:textColor="@color/utama"
+            app:strokeColor="@color/utama"
+            app:strokeWidth="1dp"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
+
+    <!-- Riwayat dan state -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRiwayat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_riwayat_donasi" />
+
+        <FrameLayout
+            android:id="@+id/stateContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#F5F5F5"
+            android:visibility="gone">
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+            <TextView
+                android:id="@+id/tvEmptyState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Belum ada riwayat."
+                android:visibility="gone" />
+        </FrameLayout>
+
+    </FrameLayout>
+</LinearLayout>
