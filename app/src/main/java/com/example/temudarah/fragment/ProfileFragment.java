@@ -95,33 +95,34 @@ public class ProfileFragment extends Fragment {
         DocumentReference userDocRef = db.collection("users").document(uid);
 
         userDocRef.get().addOnSuccessListener(documentSnapshot -> {
-            executorService.execute(() -> {
-                User user = null;
-                if (documentSnapshot.exists()) {
-                    user = documentSnapshot.toObject(User.class);
-                }
-
-                User finalUser = user;
-                mainHandler.post(() -> {
-                    if (binding != null && getContext() != null) {
-                        if (finalUser != null) {
-                            populateUi(finalUser);
-                        } else {
-                            Toast.makeText(getContext(), "Data profil tidak dapat di-parse atau tidak ditemukan.", Toast.LENGTH_SHORT).show();
-                            // Atur teks ke default jika gagal
-                            binding.tvName.setText("Tidak tersedia");
-                            binding.tvBloodType.setText("-");
-                            binding.tvGender.setText("-");
-                            binding.tvWeight.setText("-");
-                            binding.tvHeight.setText("-");
-                            binding.tvAge.setText("-");
-                            binding.tvLastDonation.setText("Tidak tersedia");
-                            binding.profileImage.setImageResource(R.drawable.logo_merah);
-                        }
-                        hideLoading(); // Sembunyikan ProgressBar setelah data dimuat (baik berhasil/gagal parse)
+            if (executorService != null && !executorService.isShutdown()) {
+                executorService.execute(() -> {
+                    User user = null;
+                    if (documentSnapshot.exists()) {
+                        user = documentSnapshot.toObject(User.class);
                     }
+
+                    User finalUser = user;
+                    mainHandler.post(() -> {
+                        if (binding != null && getContext() != null) {
+                            if (finalUser != null) {
+                                populateUi(finalUser);
+                            } else {
+                                Toast.makeText(getContext(), "Data profil tidak dapat di-parse atau tidak ditemukan.", Toast.LENGTH_SHORT).show();
+                                binding.tvName.setText("Tidak tersedia");
+                                binding.tvBloodType.setText("-");
+                                binding.tvGender.setText("-");
+                                binding.tvWeight.setText("-");
+                                binding.tvHeight.setText("-");
+                                binding.tvAge.setText("-");
+                                binding.tvLastDonation.setText("Tidak tersedia");
+                                binding.profileImage.setImageResource(R.drawable.logo_merah);
+                            }
+                            hideLoading();
+                        }
+                    });
                 });
-            });
+            }
         }).addOnFailureListener(e -> {
             Log.e(TAG, "Gagal memuat data profil", e);
             mainHandler.post(() -> {
