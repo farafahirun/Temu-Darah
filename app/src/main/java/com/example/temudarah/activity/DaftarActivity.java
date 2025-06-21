@@ -70,7 +70,7 @@ public class DaftarActivity extends AppCompatActivity {
         ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, genders);
         binding.spinnerGender.setAdapter(genderAdapter);
 
-        String[] bloodTypes = {"A", "B", "AB", "O"};
+        String[] bloodTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Rh-null"};
         ArrayAdapter<String> bloodTypeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, bloodTypes);
         binding.spinnerGolonganDarah.setAdapter(bloodTypeAdapter);
 

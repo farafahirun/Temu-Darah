@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -18,6 +19,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -59,6 +62,9 @@ public class EditProfileFragment extends Fragment {
     private ActivityResultLauncher<String> requestCameraPermissionLauncher;
     private ActivityResultLauncher<String> requestGalleryPermissionLauncher;
 
+    private String selectedBloodType; // To store the selected blood type from AutoCompleteTextView
+    private String[] bloodTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"}; // Array of blood types
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,12 +90,13 @@ public class EditProfileFragment extends Fragment {
         setupListeners();
         setupDatePicker();
         setupGenderRadioButtons();
+        setupBloodTypeAutoComplete(); // Initialize the AutoCompleteTextView
 
         showScreenLoading();
 
-        new android.os.Handler().postDelayed(() -> {
+        new Handler().postDelayed(() -> {
             if (currentUser != null) {
-                loadUserData(); // load data setelah 2 detik
+                loadUserData(); // load data after 2 seconds
             } else {
                 hideScreenLoading();
                 Toast.makeText(getContext(), "Pengguna tidak terautentikasi.", Toast.LENGTH_SHORT).show();
@@ -150,7 +157,7 @@ public class EditProfileFragment extends Fragment {
         binding.editDateOfBirth.setOnClickListener(v -> {
             final Calendar c = Calendar.getInstance();
             new DatePickerDialog(requireContext(), (datePicker, year, month, day) -> {
-                binding.editDateOfBirth.setText(day + "/" + (month + 1) + "/" + year);
+                binding.editDateOfBirth.setText(String.format(Locale.getDefault(), "%02d/%02d/%04d", day, month + 1, year));
             }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
         });
     }
@@ -161,6 +168,21 @@ public class EditProfileFragment extends Fragment {
         });
         binding.radioFemale.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) binding.radioMale.setChecked(false);
+        });
+    }
+
+    private void setupBloodTypeAutoComplete() {
+        // Create an ArrayAdapter and set it to the AutoCompleteTextView
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line, // Layout for dropdown items
+                bloodTypes
+        );
+        binding.editBloodType.setAdapter(adapter);
+
+        // Set an item click listener to capture the selected value
+        binding.editBloodType.setOnItemClickListener((parent, view, position, id) -> {
+            selectedBloodType = (String) parent.getItemAtPosition(position);
         });
     }
 
@@ -225,7 +247,17 @@ public class EditProfileFragment extends Fragment {
         binding.editNamaPengguna.setText(user.getUsername() != null ? user.getUsername() : "");
         binding.editFullName.setText(user.getFullName() != null ? user.getFullName() : "");
         binding.editDateOfBirth.setText(user.getBirthDate() != null ? user.getBirthDate() : "");
-        binding.editBloodType.setText(user.getBloodType() != null ? user.getBloodType() : "");
+
+        // Set AutoCompleteTextView selection for blood type
+        String userBloodType = user.getBloodType();
+        if (userBloodType != null && !userBloodType.isEmpty()) {
+            binding.editBloodType.setText(userBloodType, false); // Set text, don't show dropdown
+            selectedBloodType = userBloodType; // Keep fragment's state updated
+        } else {
+            binding.editBloodType.setText(null); // Set text to null to prevent potential selection issues on empty string
+            selectedBloodType = null; // Ensure the internal state is null
+        }
+
         binding.editWeight.setText(user.getWeight() > 0 ? String.valueOf(user.getWeight()) : "");
         binding.editHeight.setText(user.getHeight() > 0 ? String.valueOf(user.getHeight()) : "");
         binding.editNomorKTP.setText(user.getKtpNumber() != null ? user.getKtpNumber() : "");
@@ -258,20 +290,43 @@ public class EditProfileFragment extends Fragment {
         String fullName = binding.editFullName.getText().toString().trim();
         String birthDate = binding.editDateOfBirth.getText().toString().trim();
         String gender = binding.radioMale.isChecked() ? "Laki-laki" : "Perempuan";
-        String bloodType = binding.editBloodType.getText().toString().trim();
+        // Get blood type from the selectedSpinner. If not selected from dropdown, get from current text.
+        // It's safer to always use selectedBloodType if it was set, otherwise fallback to text from ACTV.
+        String bloodType = (selectedBloodType != null && !selectedBloodType.isEmpty()) ? selectedBloodType : binding.editBloodType.getText().toString().trim();
+        if (bloodType.isEmpty()) { // Final check if still empty
+            Toast.makeText(getContext(), "Silakan pilih golongan darah.", Toast.LENGTH_SHORT).show();
+            hideScreenLoading();
+            return;
+        }
+
+
         String ktpNumber = binding.editNomorKTP.getText().toString().trim();
         String address = binding.editAlamatLengkap.getText().toString().trim();
         String age = calculateAge(birthDate);
 
-        int weight = Integer.parseInt(binding.editWeight.getText().toString().trim());
-        int height = Integer.parseInt(binding.editHeight.getText().toString().trim());
+        int weight = 0;
+        try {
+            weight = Integer.parseInt(binding.editWeight.getText().toString().trim());
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Invalid weight format", e);
+            // Handle error or set a default value
+        }
+
+        int height = 0;
+        try {
+            height = Integer.parseInt(binding.editHeight.getText().toString().trim());
+        } catch (NumberFormatException e) {
+            Log.e(TAG, "Invalid height format", e);
+            // Handle error or set a default value
+        }
+
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("username", username);
         updates.put("fullName", fullName);
         updates.put("birthDate", birthDate);
         updates.put("gender", gender);
-        updates.put("bloodType", bloodType);
+        updates.put("bloodType", bloodType); // Save the selected blood type
         updates.put("weight", weight);
         updates.put("height", height);
         updates.put("age", age);
@@ -313,6 +368,24 @@ public class EditProfileFragment extends Fragment {
         if (!binding.radioMale.isChecked() && !binding.radioFemale.isChecked()) {
             Toast.makeText(getContext(), "Silakan pilih jenis kelamin", Toast.LENGTH_SHORT).show();
             return false;
+        }
+        // Validate AutoCompleteTextView selection
+        if (selectedBloodType == null || selectedBloodType.isEmpty()) {
+            // Check if the text in the AutoCompleteTextView is one of the valid blood types
+            String enteredText = binding.editBloodType.getText().toString().trim();
+            boolean isValidBloodType = false;
+            for (String type : bloodTypes) {
+                if (type.equalsIgnoreCase(enteredText)) {
+                    isValidBloodType = true;
+                    selectedBloodType = type; // Ensure selectedBloodType is set if typed correctly
+                    break;
+                }
+            }
+            if (!isValidBloodType) {
+                binding.editBloodType.setError("Silakan pilih golongan darah yang valid");
+                Toast.makeText(getContext(), "Silakan pilih golongan darah yang valid", Toast.LENGTH_SHORT).show();
+                return false;
+            }
         }
         return true;
     }
@@ -390,7 +463,7 @@ public class EditProfileFragment extends Fragment {
 
     private void showScreenLoading() {
         binding.loadingOverlay.setVisibility(View.VISIBLE);
-        binding.scrollView.setVisibility(View.GONE); // sesuaikan ID ScrollView jika berbeda
+        binding.scrollView.setVisibility(View.GONE);
     }
 
     private void hideScreenLoading() {

@@ -102,7 +102,7 @@ public class BerandaFragment extends Fragment {
         binding.autoCompleteGender.setAdapter(genderAdapter);
         binding.autoCompleteGender.setText(genderOptions[0], false);
 
-        String[] goldarOptions = {"Semua Gol. Darah", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
+        String[] goldarOptions = {"Semua Gol. Darah", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Rh-null"};
         ArrayAdapter<String> goldarAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, goldarOptions);
         binding.autoCompleteGolonganDarah.setAdapter(goldarAdapter);
         binding.autoCompleteGolonganDarah.setText(goldarOptions[0], false);

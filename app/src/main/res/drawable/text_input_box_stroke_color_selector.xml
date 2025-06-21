@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Warna saat focused -->
+    <item android:color="#C11E3B" android:state_focused="true"/>
+    <!-- Warna default (saat tidak focused) -->
+    <item android:color="#C11E3B"/>
+</selector>
