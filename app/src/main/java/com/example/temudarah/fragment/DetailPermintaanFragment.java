@@ -141,12 +141,7 @@ public class DetailPermintaanFragment extends Fragment {
 
     private void offerHelp() {
         FirebaseUser donorUser = mAuth.getCurrentUser();
-
-        // Pengecekan awal (tidak berubah)
-        if (donorUser == null || currentPermintaan == null) {
-            Toast.makeText(getContext(), "Gagal, data tidak lengkap atau Anda belum login.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (donorUser == null || currentPermintaan == null) return;
         if (donorUser.getUid().equals(currentPermintaan.getPembuatUid())) {
             Toast.makeText(getContext(), "Anda tidak bisa membantu permintaan Anda sendiri.", Toast.LENGTH_SHORT).show();
             return;
@@ -155,45 +150,39 @@ public class DetailPermintaanFragment extends Fragment {
         binding.btnBeriBantuan.setEnabled(false);
         binding.btnBeriBantuan.setText("Memproses...");
 
-        // Buat ID ruang chat yang konsisten
         String chatRoomId = createChatRoomId(donorUser.getUid(), currentPermintaan.getPembuatUid());
-
-        // --- PERBAIKAN UTAMA: Pastikan SEMUA data untuk ProsesDonor diisi ---
-        ProsesDonor newProcess = new ProsesDonor();
-        newProcess.setRequestId(requestId); // ID dari permintaan donor aslinya
-        newProcess.setChatRoomId(chatRoomId);
-        newProcess.setParticipants(Arrays.asList(currentPermintaan.getPembuatUid(), donorUser.getUid()));
-        newProcess.setStatusProses("Berlangsung");
-        newProcess.setTimestamp(Timestamp.now());
-        // Tambahkan ID peminta dan pendonor secara eksplisit
-        newProcess.setRequesterId(currentPermintaan.getPembuatUid());
-        newProcess.setDonorId(donorUser.getUid());
-        // Inisialisasi pesan terakhir agar tidak null
-        newProcess.setLastMessage("Ketuk untuk memulai percakapan");
-        newProcess.setLastMessageTimestamp(Timestamp.now());
-
-
-        // --- Transaksi Aman dengan WriteBatch (Tidak berubah) ---
         WriteBatch batch = db.batch();
 
-        // Operasi 1: Update status di 'donation_requests'
         DocumentReference requestRef = db.collection("donation_requests").document(requestId);
         batch.update(requestRef, "status", "Dalam Proses");
 
-        // Operasi 2: Buat dokumen "jabat tangan" baru di 'active_donations'
-        DocumentReference donationProcessRef = db.collection("active_donations").document(chatRoomId);
-        batch.set(donationProcessRef, newProcess); // Gunakan objek newProcess yang sudah lengkap
+        // --- PERBAIKAN PALING PENTING ADA DI SINI ---
+        // Memanggil .document() tanpa argumen akan MEMBUAT ID DOKUMEN BARU YANG ACAK DAN UNIK.
+        DocumentReference donationProcessRef = db.collection("active_donations").document();
+        // ---------------------------------------------
 
-        // Jalankan kedua operasi
+        ProsesDonor newProcess = new ProsesDonor();
+        newProcess.setRequestId(requestId);
+        newProcess.setChatRoomId(chatRoomId);
+        newProcess.setParticipants(Arrays.asList(currentPermintaan.getPembuatUid(), donorUser.getUid()));
+        newProcess.setRequesterId(currentPermintaan.getPembuatUid());
+        newProcess.setDonorId(donorUser.getUid());
+        newProcess.setStatusProses("Berlangsung");
+        newProcess.setTimestamp(Timestamp.now());
+        newProcess.setLastMessage("Tawaran bantuan telah diterima. Mulai percakapan.");
+        newProcess.setLastMessageTimestamp(Timestamp.now());
+
+        batch.set(donationProcessRef, newProcess);
+
         batch.commit().addOnSuccessListener(aVoid -> {
-            Toast.makeText(getContext(), "Anda telah menawarkan bantuan! Silakan mulai percakapan.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Anda telah menawarkan bantuan!", Toast.LENGTH_LONG).show();
             navigateToChatRoom(chatRoomId, currentPermintaan.getNamaPembuat());
         }).addOnFailureListener(e -> {
-            Toast.makeText(getContext(), "Gagal menawarkan bantuan: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             binding.btnBeriBantuan.setEnabled(true);
             binding.btnBeriBantuan.setText("Beri Bantuan");
         });
     }
+
 
     private void navigateToChatRoom(String chatRoomId, String otherUserName) {
         // Pengecekan keamanan untuk memastikan fragment masih "hidup"

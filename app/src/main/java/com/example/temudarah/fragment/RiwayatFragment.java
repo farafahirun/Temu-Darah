@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RiwayatFragment extends Fragment {
 
@@ -47,7 +48,7 @@ public class RiwayatFragment extends Fragment {
     private FirebaseUser currentUser;
 
     private RiwayatDonasiAdapter donasiAdapter;
-    private List<RiwayatDonasiTampil> masterRiwayatList; // List utama untuk semua data mentah dari Firestore
+    private List<RiwayatDonasiTampil> masterRiwayatList; // List utama untuk semua data mentah
     private String currentFilter = "Semua";
 
     private enum UiState { LOADING, HAS_DATA, EMPTY }
@@ -63,7 +64,6 @@ public class RiwayatFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
         setupRecyclerView();
         setupFilterListeners();
     }
@@ -82,10 +82,8 @@ public class RiwayatFragment extends Fragment {
     private void setupRecyclerView() {
         binding.rvRiwayat.setLayoutManager(new LinearLayoutManager(getContext()));
         masterRiwayatList = new ArrayList<>();
-        // Inisialisasi adapter dengan list kosong, akan diisi oleh filterAndDisplayList
         donasiAdapter = new RiwayatDonasiAdapter(new ArrayList<>(), riwayat -> {
-            Toast.makeText(getContext(), "Membuka detail riwayat...", Toast.LENGTH_SHORT).show();
-            // TODO: Buka halaman DetailRiwayatFragment jika diperlukan
+            // TODO: Aksi saat item riwayat diklik
         });
         binding.rvRiwayat.setAdapter(donasiAdapter);
     }
@@ -98,8 +96,7 @@ public class RiwayatFragment extends Fragment {
 
     private void applyFilter(String filter) {
         currentFilter = filter;
-        updateButtonStyles(currentFilter);
-        // Memfilter dari data yang sudah ada di memori, tidak perlu query ulang ke internet
+        updateButtonStyles(filter);
         filterAndDisplayList();
     }
 
@@ -133,80 +130,116 @@ public class RiwayatFragment extends Fragment {
         if (currentUser == null) return;
         updateUiState(UiState.LOADING, null);
 
-        // Tugas 1: Ambil semua proses donasi yang melibatkan Anda
-        Task<QuerySnapshot> activeDonationsTask = db.collection("active_donations")
-                .whereArrayContains("participants", currentUser.getUid()).get();
-
-        // Tugas 2: Ambil semua permintaan yang Anda buat & BATALKAN sendiri
-        Task<QuerySnapshot> selfCanceledRequestsTask = db.collection("donation_requests")
-                .whereEqualTo("pembuatUid", currentUser.getUid())
-                .whereEqualTo("status", "Dibatalkan").get();
-
-        // Jalankan kedua tugas utama secara bersamaan
-        Tasks.whenAllComplete(activeDonationsTask, selfCanceledRequestsTask)
+        // Tahap 1: Ambil semua riwayat interaksi dari 'active_donations'
+        db.collection("active_donations")
+                .whereArrayContains("participants", currentUser.getUid())
+                .get()
                 .addOnCompleteListener(task -> {
-                    if (!isAdded() || !task.isSuccessful()) {
-                        if (isAdded()) updateUiState(UiState.EMPTY, "Gagal memuat riwayat.");
-                        Log.e(TAG, "Gagal memuat riwayat awal", task.getException());
+                    if (!isAdded()) return; // Pastikan fragment masih aktif
+                    if (!task.isSuccessful()) {
+                        updateUiState(UiState.EMPTY, "Gagal memuat riwayat.");
                         return;
                     }
 
-                    masterRiwayatList.clear();
-                    Set<String> processedRequestIds = new HashSet<>();
+                    List<RiwayatDonasiTampil> interactionHistory = new ArrayList<>();
+                    Set<String> processedRequestIds = new HashSet<>(); // Untuk mencegah duplikasi
+                    QuerySnapshot prosesSnapshots = task.getResult();
 
-                    // --- Tahap 1: Proses hasil dari `active_donations` (interaksi) ---
-                    Task<QuerySnapshot> activeDonationsResultTask = (Task<QuerySnapshot>) task.getResult().get(0);
-                    if (activeDonationsResultTask.isSuccessful() && activeDonationsResultTask.getResult() != null) {
-                        // Logika pengayaan data yang kompleks kita letakkan di sini nanti
-                        // Untuk sekarang kita hanya akan merakit data yang bisa dirakit
-                        // (Ini memerlukan query lanjutan untuk nama, akan kita sederhanakan untuk contoh ini)
-                        for(DocumentSnapshot doc : activeDonationsResultTask.getResult()) {
-                            ProsesDonor proses = doc.toObject(ProsesDonor.class);
-                            if(proses != null && proses.getRequestId() != null){
+                    if (prosesSnapshots.isEmpty()) {
+                        // Jika tidak ada interaksi, langsung lanjut ke tahap 2
+                        loadSelfCanceledRequests(interactionHistory, processedRequestIds);
+                        return;
+                    }
+
+                    AtomicInteger counter = new AtomicInteger(0);
+                    int totalItems = prosesSnapshots.size();
+
+                    for (DocumentSnapshot doc : prosesSnapshots) {
+                        ProsesDonor proses = doc.toObject(ProsesDonor.class);
+                        enrichInteractionData(proses, doc.getId(), (item) -> {
+                            if (item != null) {
+                                interactionHistory.add(item);
                                 processedRequestIds.add(proses.getRequestId());
-                                // Di sini seharusnya ada logika untuk mengambil detail user dan permintaan
-                                // Untuk sekarang kita buat placeholder
+                            }
+                            // Cek apakah ini item terakhir yang diproses
+                            if (counter.incrementAndGet() == totalItems) {
+                                // Lanjut ke tahap 2 dengan membawa hasil tahap 1
+                                loadSelfCanceledRequests(interactionHistory, processedRequestIds);
+                            }
+                        });
+                    }
+                });
+    }
+
+    private void enrichInteractionData(ProsesDonor proses, String prosesId, final OnEnrichmentComplete callback) {
+        if (proses == null || proses.getRequestId() == null) {
+            callback.onComplete(null);
+            return;
+        }
+
+        String otherUserId = Objects.equals(proses.getRequesterId(), currentUser.getUid()) ? proses.getDonorId() : proses.getRequesterId();
+        db.collection("users").document(otherUserId).get().addOnSuccessListener(userDoc -> {
+            db.collection("donation_requests").document(proses.getRequestId()).get().addOnSuccessListener(requestDoc -> {
+                if (userDoc.exists() && requestDoc.exists()) {
+                    User otherUser = userDoc.toObject(User.class);
+                    PermintaanDonor permintaan = requestDoc.toObject(PermintaanDonor.class);
+                    if (otherUser != null && permintaan != null) {
+                        RiwayatDonasiTampil item = new RiwayatDonasiTampil();
+                        item.setProsesId(prosesId);
+                        item.setTanggal(proses.getTimestamp());
+                        item.setStatusProses(proses.getStatusProses());
+                        item.setNamaPasien(permintaan.getNamaPasien());
+                        boolean sayaPendonor = currentUser.getUid().equals(proses.getDonorId());
+                        item.setPeranSaya(sayaPendonor ? "Sebagai Pendonor" : "Sebagai Penerima");
+                        item.setJudulTampilan(sayaPendonor ? "Permintaan dari " + otherUser.getFullName() : "Bantuan dari " + otherUser.getFullName());
+                        callback.onComplete(item);
+                    } else {
+                        callback.onComplete(null);
+                    }
+                } else {
+                    callback.onComplete(null);
+                }
+            }).addOnFailureListener(e -> callback.onComplete(null));
+        }).addOnFailureListener(e -> callback.onComplete(null));
+    }
+
+    private void loadSelfCanceledRequests(List<RiwayatDonasiTampil> currentHistory, Set<String> processedRequestIds) {
+        db.collection("donation_requests")
+                .whereEqualTo("pembuatUid", currentUser.getUid())
+                .whereEqualTo("status", "Dibatalkan")
+                .get()
+                .addOnSuccessListener(canceledSnapshots -> {
+                    if (!isAdded()) return;
+                    for (DocumentSnapshot doc : canceledSnapshots) {
+                        if (!processedRequestIds.contains(doc.getId())) {
+                            PermintaanDonor permintaan = doc.toObject(PermintaanDonor.class);
+                            if (permintaan != null) {
                                 RiwayatDonasiTampil item = new RiwayatDonasiTampil();
                                 item.setProsesId(doc.getId());
-                                item.setTanggal(proses.getTimestamp());
-                                item.setStatusProses(proses.getStatusProses());
-                                item.setNamaPasien("Memuat...");
-                                boolean sayaPendonor = currentUser.getUid().equals(proses.getDonorId());
-                                item.setPeranSaya(sayaPendonor ? "Sebagai Pendonor" : "Sebagai Penerima");
-                                item.setJudulTampilan("Interaksi...");
-                                masterRiwayatList.add(item);
+                                item.setTanggal(permintaan.getWaktuDibuat());
+                                item.setStatusProses(permintaan.getStatus());
+                                item.setNamaPasien(permintaan.getNamaPasien());
+                                item.setPeranSaya("Sebagai Penerima");
+                                item.setJudulTampilan("Permintaan Anda (dibatalkan)");
+                                currentHistory.add(item);
                             }
                         }
                     }
-
-                    // --- Tahap 2: Proses hasil dari `donation_requests` (permintaan batal) ---
-                    Task<QuerySnapshot> finalRequestsResultTask = (Task<QuerySnapshot>) task.getResult().get(1);
-                    if (finalRequestsResultTask.isSuccessful() && finalRequestsResultTask.getResult() != null) {
-                        for (DocumentSnapshot doc : finalRequestsResultTask.getResult()) {
-                            if (!processedRequestIds.contains(doc.getId())) {
-                                PermintaanDonor permintaan = doc.toObject(PermintaanDonor.class);
-                                if (permintaan != null) {
-                                    RiwayatDonasiTampil item = new RiwayatDonasiTampil();
-                                    item.setProsesId(doc.getId());
-                                    item.setTanggal(permintaan.getWaktuDibuat());
-                                    item.setStatusProses(permintaan.getStatus());
-                                    item.setNamaPasien(permintaan.getNamaPasien());
-                                    item.setPeranSaya("Sebagai Penerima");
-                                    item.setJudulTampilan("Permintaan Anda (dibatalkan)");
-                                    masterRiwayatList.add(item);
-                                }
-                            }
-                        }
-                    }
-
-                    // Setelah semua data mentah terkumpul, terapkan filter awal
+                    masterRiwayatList.clear();
+                    masterRiwayatList.addAll(currentHistory);
+                    filterAndDisplayList();
+                })
+                .addOnFailureListener(e -> {
+                    if (!isAdded()) return;
+                    // Jika query kedua gagal, setidaknya tampilkan hasil dari query pertama
+                    masterRiwayatList.clear();
+                    masterRiwayatList.addAll(currentHistory);
                     filterAndDisplayList();
                 });
     }
 
     private void filterAndDisplayList() {
         if (!isAdded()) return;
-
         List<RiwayatDonasiTampil> filteredList = new ArrayList<>();
         if ("Semua".equals(currentFilter)) {
             filteredList.addAll(masterRiwayatList);
@@ -217,13 +250,10 @@ public class RiwayatFragment extends Fragment {
                 }
             }
         }
-
         Collections.sort(filteredList, (o1, o2) -> {
-            if (o1.getTanggal() == null) return 1;
-            if (o2.getTanggal() == null) return -1;
+            if (o1.getTanggal() == null || o2.getTanggal() == null) return 0;
             return o2.getTanggal().compareTo(o1.getTanggal());
         });
-
         donasiAdapter.updateData(filteredList);
         updateUiState(filteredList.isEmpty() ? UiState.EMPTY : UiState.HAS_DATA, "Tidak ada riwayat untuk filter ini.");
     }
@@ -245,5 +275,10 @@ public class RiwayatFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    // Interface helper untuk callback
+    interface OnEnrichmentComplete {
+        void onComplete(RiwayatDonasiTampil item);
     }
 }
