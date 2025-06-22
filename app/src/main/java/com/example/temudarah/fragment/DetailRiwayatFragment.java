@@ -59,7 +59,8 @@ public class DetailRiwayatFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        binding.toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        binding.navbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
+        binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
 
         if (prosesId != null) {
             loadRiwayatDetails();
@@ -144,7 +145,8 @@ public class DetailRiwayatFragment extends Fragment {
         binding.tvNamaPihak1.setText(requesterName);
         binding.tvNamaPihak2.setText(donorName);
 
-        binding.tvDetailPasien.setText(permintaan.getNamaPasien() + " (" + permintaan.getGolonganDarahDibutuhkan() + ")");
+        binding.tvDetailPasien.setText(permintaan.getNamaPasien());
+        binding.tvDetailGolDarah.setText(permintaan.getGolonganDarahDibutuhkan());
         binding.tvDetailLokasi.setText(permintaan.getNamaRumahSakit());
 
         if (proses.getTimestamp() != null) {

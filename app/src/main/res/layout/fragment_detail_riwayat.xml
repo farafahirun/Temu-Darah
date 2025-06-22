@@ -7,20 +7,58 @@
     android:background="#F5F5F5"
     tools:context=".fragment.DetailRiwayatFragment">
 
-    <com.google.android.material.appbar.MaterialToolbar
+    <!-- Navbar dengan Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
-        app:navigationIcon="@drawable/kembali"
-        app:title="Detail Riwayat"
-        app:titleCentered="true"
-        app:titleTextColor="@color/black" />
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:elevation="4dp">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/navbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@color/background">
+
+            <!-- Tombol kembali -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/kembali"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_gravity="start|center_vertical" />
+
+            <!-- Judul tengah -->
+            <TextView
+                android:id="@+id/tvToolbarTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Riwayat Saya"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Spacer kanan untuk keseimbangan -->
+            <View
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="end|center_vertical" />
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Konten ScrollView -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toolbar">
+        android:layout_below="@id/toolbar"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -28,6 +66,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Kartu Status -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -37,13 +76,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:background="@color/background"
                     android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/fixed_black"
+                        android:textStyle="bold"
                         android:text="Status Proses"
-                        android:textSize="14sp" />
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/tvDetailStatus"
@@ -58,11 +100,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:textColor="@color/black"
                         android:textSize="12sp"
                         tools:text="Pada 22 Juni 2025" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Kartu Pihak -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,6 +116,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/background"
                     android:orientation="vertical"
                     android:padding="16dp">
 
@@ -79,18 +124,25 @@
                         android:id="@+id/tvPihak1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/fixed_black"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
                         android:text="Peminta Bantuan" />
 
                     <TextView
                         android:id="@+id/tvNamaPihak1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
                         tools:text="Ani" />
 
                     <TextView
                         android:id="@+id/tvPihak2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/fixed_black"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
                         android:layout_marginTop="12dp"
                         android:text="Pendonor" />
 
@@ -98,10 +150,12 @@
                         android:id="@+id/tvNamaPihak2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
                         tools:text="Budi" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Kartu Detail Kebutuhan -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -111,6 +165,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/background"
                     android:orientation="vertical"
                     android:padding="16dp">
 
@@ -118,48 +173,61 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Detail Kebutuhan"
-                        android:textSize="16sp"
+                        android:textColor="@color/fixed_black"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <View
                         android:layout_width="match_parent"
-                        android:background="@color/utama"
-                        android:layout_height="1dp"/>
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="8dp"
+                        android:background="@color/utama" />
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_marginVertical="8dp"
                         android:layout_height="wrap_content"
-                        tools:text="Pasien" />
+                        android:textColor="@color/fixed_black"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:text="Pasien" />
 
                     <TextView
                         android:id="@+id/tvDetailPasien"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
                         tools:text="Siti" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/fixed_black"
+                        android:textStyle="bold"
                         android:layout_marginTop="12dp"
+                        android:textSize="18sp"
                         android:text="Golongan Darah" />
 
                     <TextView
                         android:id="@+id/tvDetailGolDarah"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
                         tools:text="O+" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/fixed_black"
+                        android:textStyle="bold"
                         android:layout_marginTop="12dp"
+                        android:textSize="18sp"
                         android:text="Lokasi" />
 
                     <TextView
                         android:id="@+id/tvDetailLokasi"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
                         tools:text="RS. Wahidin" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -167,6 +235,7 @@
         </LinearLayout>
     </ScrollView>
 
+    <!-- ProgressBar Tengah -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"

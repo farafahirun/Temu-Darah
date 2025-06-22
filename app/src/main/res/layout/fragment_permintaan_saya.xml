@@ -3,9 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
-    tools:context=".fragment.PermintaanSayaFragment"
-    android:layout_marginBottom="60dp">
+    android:background="@color/background"
+    tools:context=".fragment.PermintaanSayaFragment">
 
     <LinearLayout
         android:id="@+id/navbar"
@@ -13,7 +12,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:background="@color/white">
+        android:background="@color/background">
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"

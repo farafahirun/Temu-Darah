@@ -74,6 +74,12 @@ public class DetailPermintaanSayaFragment extends Fragment {
 
         binding.toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
 
+
+        // Back button action
+        view.findViewById(R.id.btnBack).setOnClickListener(v -> {
+            requireActivity().onBackPressed();
+        });
+
         if (requestId != null) {
             loadRequestDetails();
         } else {

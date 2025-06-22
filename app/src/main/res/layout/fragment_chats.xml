@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    android:orientation="vertical"
     tools:context=".fragment.ChatsFragment">
 
-    <!-- Navbar -->
     <LinearLayout
         android:id="@+id/navbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:background="@color/background"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -41,14 +40,12 @@
             app:tint="@color/utama" />
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
+        android:layout_below="@id/navbar"
         android:background="@color/background">
 
-        <!-- RecyclerView for chats -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvChats"
             android:layout_width="match_parent"
@@ -58,25 +55,27 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_chat" />
 
-        <!-- Empty state message -->
         <TextView
             android:id="@+id/tvEmptyChat"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:text="Belum ada percakapan."
-            android:textSize="16sp"
             android:textAlignment="center"
             android:textColor="@color/black"
+            android:textSize="16sp"
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <!-- Loading indicator -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible"
             android:layout_height="wrap_content"
-            android:indeterminateTint="@color/utama" />
-    </LinearLayout>
-</LinearLayout>
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/utama"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

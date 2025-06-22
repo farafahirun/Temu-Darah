@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background"
     tools:context=".fragment.EditPermintaanFragment"
-    android:layout_marginBottom="30dp">
+    android:layout_marginBottom="20dp">
 
     <LinearLayout
         android:id="@+id/navbar"

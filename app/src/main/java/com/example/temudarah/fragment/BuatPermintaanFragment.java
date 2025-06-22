@@ -53,6 +53,9 @@ public class BuatPermintaanFragment extends Fragment {
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private Location lastKnownLocation;
 
+    // Add a Calendar instance
+    private Calendar calendar;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +78,8 @@ public class BuatPermintaanFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+
+        calendar = Calendar.getInstance(); // Initialize calendar here
 
         setupDropdowns();
         setupListeners();
@@ -99,7 +104,33 @@ public class BuatPermintaanFragment extends Fragment {
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         binding.btnGunakanLokasi.setOnClickListener(v -> checkLocationPermissionAndGetData());
         binding.btnKirimPermintaan.setOnClickListener(v -> saveDonationRequest());
+
+        // --- ADD THIS BLOCK FOR DATE PICKER ---
+        binding.editTanggalPenguguman.setOnClickListener(v -> showDatePickerDialog());
+        // --- END ADDITION ---
     }
+
+    // --- ADD THIS METHOD FOR DATE PICKER ---
+    private void showDatePickerDialog() {
+        DatePickerDialog.OnDateSetListener dateSetListener = (view, year, monthOfYear, dayOfMonth) -> {
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.MONTH, monthOfYear);
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateDateInView();
+        };
+
+        new DatePickerDialog(requireContext(), dateSetListener,
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private void updateDateInView() {
+        String myFormat = "dd/MM/yyyy"; // Or "yyyy-MM-dd", whatever format you prefer
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US); // Use Locale.US for consistent date format
+        binding.editTanggalPenguguman.setText(sdf.format(calendar.getTime()));
+    }
+    // --- END ADDITION ---
 
     @SuppressLint("MissingPermission")
     private void getCurrentUserLocation() {
@@ -187,6 +218,7 @@ public class BuatPermintaanFragment extends Fragment {
         int jumlahKantong = Integer.parseInt(binding.editJumlahKantong.getText().toString().trim());
         String namaRs = binding.editNamaRs.getText().toString().trim();
         String catatan = binding.editCatatan.getText().toString().trim();
+        String tanggalPengumuman = binding.editTanggalPenguguman.getText().toString().trim(); // Get the selected date
 
         PermintaanDonor permintaan = new PermintaanDonor();
         // Mengisi semua field, termasuk yang baru
@@ -196,6 +228,7 @@ public class BuatPermintaanFragment extends Fragment {
         permintaan.setJumlahKantong(jumlahKantong);
         permintaan.setNamaRumahSakit(namaRs);
         permintaan.setCatatan(catatan);
+        permintaan.setTanggalPenguguman(tanggalPengumuman); // Set the date
         permintaan.setPembuatUid(pembuat.getUid());
         permintaan.setNamaPembuat(pembuat.getFullName());
         permintaan.setFotoPembuatBase64(pembuat.getProfileImageBase64());
@@ -220,13 +253,14 @@ public class BuatPermintaanFragment extends Fragment {
         if (TextUtils.isEmpty(binding.dropdownGolonganDarah.getText())) {
             binding.dropdownGolonganDarah.setError("Pilih Golongan Darah"); return false;
         }
-        // --- VALIDASI BARU ---
         if (TextUtils.isEmpty(binding.dropdownJenisKelamin.getText())) {
             binding.dropdownJenisKelamin.setError("Pilih Jenis Kelamin"); return false;
         }
-        // --- AKHIR VALIDASI BARU ---
         if (TextUtils.isEmpty(binding.editJumlahKantong.getText())) {
             binding.editJumlahKantong.setError("Jumlah kantong wajib diisi"); return false;
+        }
+        if (TextUtils.isEmpty(binding.editTanggalPenguguman.getText())) { // Add validation for the date field
+            binding.editTanggalPenguguman.setError("Tanggal Pengumuman wajib diisi"); return false;
         }
         if (lastKnownLocation == null) {
             Toast.makeText(getContext(), "Harap tentukan lokasi dengan menekan tombol GPS.", Toast.LENGTH_LONG).show();
