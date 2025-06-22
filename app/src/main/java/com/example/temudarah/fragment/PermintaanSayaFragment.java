@@ -155,66 +155,90 @@ public class PermintaanSayaFragment extends Fragment {
         // Cari dokumen "jabat tangan" yang terkait dengan permintaan ini
         db.collection("active_donations")
                 .whereEqualTo("requestId", permintaan.getRequestId())
-                .limit(1).get()
+                .whereEqualTo("statusProses", "Berlangsung") // Hanya batalkan yang sedang berlangsung
+                .limit(1)
+                .get()
                 .addOnSuccessListener(snapshots -> {
+                    if (!isAdded()) return;
+
                     if (snapshots.isEmpty()) {
-                        // Jika tidak ada, kemungkinan ada error data. Kembalikan ke Aktif saja.
-                        db.collection("donation_requests").document(permintaan.getRequestId()).update("status", "Aktif");
+                        // Ini terjadi jika pendonor sudah membatalkan lebih dulu.
+                        // Cukup segarkan daftar.
+                        Toast.makeText(getContext(), "Proses ini sudah tidak aktif.", Toast.LENGTH_SHORT).show();
+                        binding.progressBar.setVisibility(View.GONE);
+                        loadMyRequests();
                         return;
                     }
 
                     DocumentSnapshot prosesDoc = snapshots.getDocuments().get(0);
-
-                    // Gunakan WriteBatch untuk keamanan
                     WriteBatch batch = db.batch();
 
-                    // Operasi 1: Hapus dokumen "jabat tangan"
-                    batch.delete(prosesDoc.getReference());
+                    // --- PERUBAHAN UTAMA DI SINI ---
+                    // Operasi 1: UPDATE status proses donasi menjadi "Dibatalkan oleh Penerima"
+                    // Kita TIDAK lagi menggunakan batch.delete()
+                    batch.update(prosesDoc.getReference(), "statusProses", "Dibatalkan oleh Penerima");
 
-                    // Operasi 2: Kembalikan status permintaan menjadi "Aktif"
+                    // Operasi 2: Kembalikan status permintaan utama menjadi "Aktif" agar bisa dibantu orang lain
                     DocumentReference requestRef = db.collection("donation_requests").document(permintaan.getRequestId());
                     batch.update(requestRef, "status", "Aktif");
 
+                    // Jalankan kedua update secara bersamaan
                     batch.commit().addOnSuccessListener(aVoid -> {
                         Toast.makeText(getContext(), "Bantuan telah dibatalkan. Permintaan Anda aktif kembali.", Toast.LENGTH_LONG).show();
-                        loadMyRequests(); // Muat ulang halaman
+                        loadMyRequests(); // Muat ulang halaman untuk refresh daftar permintaan aktif
                     }).addOnFailureListener(e -> {
-                        binding.progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getContext(), "Gagal membatalkan.", Toast.LENGTH_SHORT).show();
+                        if (isAdded()) {
+                            binding.progressBar.setVisibility(View.GONE);
+                            Toast.makeText(getContext(), "Gagal membatalkan.", Toast.LENGTH_SHORT).show();
+                        }
                     });
                 });
     }
+
 
     private void updateRequestStatus(PermintaanDonor permintaan, String newStatus) {
         binding.progressBar.setVisibility(View.VISIBLE);
         WriteBatch batch = db.batch();
 
-        // Operasi 1: Update status di `donation_requests`
         DocumentReference requestRef = db.collection("donation_requests").document(permintaan.getRequestId());
         batch.update(requestRef, "status", newStatus);
 
-        // Jika donasi selesai, update juga dokumen prosesnya dan tanggal donor terakhir si pendonor
+        // Jika donasi ditandai "Selesai", lakukan 3 operasi sekaligus
         if ("Selesai".equals(newStatus)) {
+            // Cari proses donasi yang terkait untuk menemukan ID pendonor
             db.collection("active_donations").whereEqualTo("requestId", permintaan.getRequestId()).limit(1).get()
                     .addOnSuccessListener(snapshots -> {
-                        if (!snapshots.isEmpty()) {
-                            DocumentSnapshot prosesDoc = snapshots.getDocuments().get(0);
-                            ProsesDonor proses = prosesDoc.toObject(ProsesDonor.class);
-
-                            // Operasi 2: Update status di `active_donations`
-                            batch.update(prosesDoc.getReference(), "statusProses", "Selesai");
-
-                            if (proses != null) {
-                                // Operasi 3: Update `lastDonationDate` di profil PENDONOR
-                                DocumentReference donorRef = db.collection("users").document(proses.getDonorId());
-                                batch.update(donorRef, "lastDonationDate", new SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("id-ID")).format(new Date()));
-                            }
+                        if (snapshots.isEmpty()) {
+                            // Jika tidak ada proses aktif, cukup commit perubahan status permintaan
+                            commitBatch(batch);
+                            return;
                         }
-                        // Jalankan semua operasi
+
+                        DocumentSnapshot prosesDoc = snapshots.getDocuments().get(0);
+                        ProsesDonor proses = prosesDoc.toObject(ProsesDonor.class);
+
+                        // Operasi 2: Update status di `active_donations` menjadi "Selesai"
+                        batch.update(prosesDoc.getReference(), "statusProses", "Selesai");
+
+                        if (proses != null && proses.getDonorId() != null) {
+                            // Operasi 3: Update `lastDonationDate` dan `hasDonatedBefore` di profil PENDONOR
+                            DocumentReference donorRef = db.collection("users").document(proses.getDonorId());
+                            String todayDate = new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID")).format(new Date());
+
+                            batch.update(donorRef, "lastDonationDate", todayDate);
+                            batch.update(donorRef, "hasDonatedBefore", "Ya");
+                        }
+
+                        // Jalankan semua (hingga 3) operasi dalam satu batch
                         commitBatch(batch);
+
+                    }).addOnFailureListener(e -> {
+                        // Jika gagal mencari, tetap commit perubahan status permintaan awal
+                        commitBatch(batch);
+                        Log.e(TAG, "Gagal mencari proses donasi aktif", e);
                     });
         } else {
-            // Jika hanya dibatalkan, langsung jalankan operasinya
+            // Jika status hanya "Dibatalkan", langsung jalankan batch (hanya 1 operasi)
             commitBatch(batch);
         }
     }
@@ -222,12 +246,15 @@ public class PermintaanSayaFragment extends Fragment {
     private void commitBatch(WriteBatch batch) {
         batch.commit().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Status berhasil diubah.", Toast.LENGTH_SHORT).show();
-            loadMyRequests(); // Muat ulang daftar
+            loadMyRequests(); // Muat ulang daftar untuk refresh tampilan
         }).addOnFailureListener(e -> {
-            binding.progressBar.setVisibility(View.GONE);
-            Toast.makeText(getContext(), "Gagal mengubah status.", Toast.LENGTH_SHORT).show();
+            if(isAdded()) {
+                binding.progressBar.setVisibility(View.GONE);
+                Toast.makeText(getContext(), "Gagal mengubah status.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
+
 
     @Override
     public void onDestroyView() {
