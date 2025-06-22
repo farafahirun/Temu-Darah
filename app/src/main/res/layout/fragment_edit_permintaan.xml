@@ -84,6 +84,31 @@
                     android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxStrokeColor="@drawable/text_input_box_stroke_color_selector"
+                app:hintEnabled="false">
+
+                <AutoCompleteTextView
+                    android:id="@+id/dropdownJenisKelamin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Pilih Jenis Kelamin"
+                    android:inputType="none"
+                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/black" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
             <!-- Golongan Darah -->
             <TextView
                 android:layout_width="wrap_content"
@@ -249,4 +274,17 @@
                 app:cornerRadius="8dp" />
         </LinearLayout>
     </ScrollView>
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CCFFFFFF"
+        android:visibility="gone">
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/utama"/>
+    </FrameLayout>
 </RelativeLayout>

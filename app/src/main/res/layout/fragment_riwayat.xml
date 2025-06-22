@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@color/background"
     tools:context=".fragment.RiwayatFragment">
 
     <!-- Navbar -->
@@ -42,88 +42,6 @@
             app:tint="@color/utama" />
     </LinearLayout>
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Riwayat Donasi"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/fixed_black"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp" />
-
-    <!-- Filter group (dari versi lokal) -->
-    <LinearLayout
-        android:id="@+id/filterGroupDonorDarah"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Filter:"
-            android:textColor="@color/fixed_black"
-            android:textSize="14sp"
-            android:layout_marginEnd="8dp" />
-
-        <HorizontalScrollView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/filterBtnSemuaDonor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="Semua"
-                    android:textSize="12sp"
-                    android:paddingHorizontal="16dp"
-                    android:background="@drawable/border_card_utama"
-                    android:textColor="@color/white"
-                    android:layout_marginEnd="8dp"
-                    android:textAllCaps="false" />
-
-                <Button
-                    android:id="@+id/filterBtnSebagaiPendonor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="Sebagai Pendonor"
-                    android:textSize="12sp"
-                    android:paddingHorizontal="16dp"
-                    android:background="@drawable/border_card_utama"
-                    android:textColor="@color/white"
-                    android:layout_marginEnd="8dp"
-                    android:textAllCaps="false" />
-
-                <Button
-                    android:id="@+id/filterBtnSebagaiPenerima"
-                    android:layout_width="wrap_content"
-                    android:layout_height="36dp"
-                    android:text="Sebagai Penerima"
-                    android:textSize="12sp"
-                    android:paddingHorizontal="16dp"
-                    android:background="@drawable/border_card_utama"
-                    android:textColor="@color/white"
-                    android:textAllCaps="false" />
-
-            </LinearLayout>
-        </HorizontalScrollView>
-    </LinearLayout>
-
-    <!-- Filter group (dari versi GitHub) -->
     <LinearLayout
         android:id="@+id/filter_riwayat"
         android:layout_width="match_parent"
@@ -170,39 +88,36 @@
             app:cornerRadius="8dp" />
     </LinearLayout>
 
-    <!-- Riwayat dan state -->
-    <FrameLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRiwayat"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_riwayat_donasi" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvRiwayat"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:padding="8dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_riwayat_donasi" />
+    <FrameLayout
+        android:id="@+id/stateContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#F5F5F5"
+        android:visibility="gone">
 
-        <FrameLayout
-            android:id="@+id/stateContainer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#F5F5F5"
-            android:visibility="gone">
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center" />
-            <TextView
-                android:id="@+id/tvEmptyState"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Belum ada riwayat."
-                android:visibility="gone" />
-        </FrameLayout>
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
 
+        <TextView
+            android:id="@+id/tvEmptyState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Belum ada riwayat."
+            android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>

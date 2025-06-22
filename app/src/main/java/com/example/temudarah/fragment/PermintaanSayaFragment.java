@@ -55,11 +55,6 @@ public class PermintaanSayaFragment extends Fragment {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         setupRecyclerView();
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
-        // Di onViewCreated
-        if (currentUser != null) {
-            Toast.makeText(getContext(), "UID Saya: " + currentUser.getUid(), Toast.LENGTH_LONG).show();
-            loadMyRequests();
-        }
     }
 
     @Override
@@ -79,7 +74,10 @@ public class PermintaanSayaFragment extends Fragment {
         adapter = new PermintaanSayaAdapter(permintaanSayaList, new PermintaanSayaAdapter.OnItemActionClickListener() {
             @Override
             public void onItemClick(PermintaanDonor permintaan) {
-                // TODO: Buka halaman detail read-only jika diperlukan
+                Fragment detailFragment = DetailPermintaanSayaFragment.newInstance(permintaan.getRequestId());
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, detailFragment)
+                        .addToBackStack(null).commit();
             }
             @Override
             public void onStatusChangeClick(PermintaanDonor permintaan) {
@@ -125,28 +123,66 @@ public class PermintaanSayaFragment extends Fragment {
 
     private void showStatusChangeDialog(PermintaanDonor permintaan) {
         String currentStatus = permintaan.getStatus();
-        final String newStatus;
-        String message;
-        String positiveButtonText;
 
+        // Opsi dialog akan berbeda tergantung status saat ini
         if ("Aktif".equals(currentStatus)) {
-            newStatus = "Dibatalkan";
-            message = "Anda yakin ingin membatalkan permintaan ini? Permintaan akan masuk ke riwayat dan tidak bisa diaktifkan kembali.";
-            positiveButtonText = "Ya, Batalkan";
+            // Jika belum ada yang bantu, hanya bisa dibatalkan
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Batalkan Permintaan?")
+                    .setMessage("Permintaan ini akan dihapus dari daftar publik dan masuk ke riwayat sebagai 'Dibatalkan'.")
+                    .setPositiveButton("Ya, Batalkan", (dialog, which) -> updateRequestStatus(permintaan, "Dibatalkan"))
+                    .setNegativeButton("Kembali", null)
+                    .show();
         } else if ("Dalam Proses".equals(currentStatus)) {
-            newStatus = "Selesai";
-            message = "Konfirmasi bahwa bantuan telah diterima. Status akan diubah menjadi Selesai.";
-            positiveButtonText = "Ya, Tandai Selesai";
-        } else {
-            return;
+            // Jika sudah ada yang bantu, ada dua pilihan
+            final CharSequence[] options = {"Tandai Selesai", "Batalkan Bantuan dari Pendonor Ini"};
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Pilih Aksi")
+                    .setItems(options, (dialog, which) -> {
+                        if (which == 0) { // Opsi "Tandai Selesai"
+                            updateRequestStatus(permintaan, "Selesai");
+                        } else if (which == 1) { // Opsi "Batalkan Bantuan"
+                            cancelDonationProcess(permintaan);
+                        }
+                    })
+                    .show();
         }
+    }
 
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Ubah Status Permintaan")
-                .setMessage(message)
-                .setPositiveButton(positiveButtonText, (dialog, which) -> updateRequestStatus(permintaan, newStatus))
-                .setNegativeButton("Kembali", null)
-                .show();
+    private void cancelDonationProcess(PermintaanDonor permintaan) {
+        binding.progressBar.setVisibility(View.VISIBLE);
+
+        // Cari dokumen "jabat tangan" yang terkait dengan permintaan ini
+        db.collection("active_donations")
+                .whereEqualTo("requestId", permintaan.getRequestId())
+                .limit(1).get()
+                .addOnSuccessListener(snapshots -> {
+                    if (snapshots.isEmpty()) {
+                        // Jika tidak ada, kemungkinan ada error data. Kembalikan ke Aktif saja.
+                        db.collection("donation_requests").document(permintaan.getRequestId()).update("status", "Aktif");
+                        return;
+                    }
+
+                    DocumentSnapshot prosesDoc = snapshots.getDocuments().get(0);
+
+                    // Gunakan WriteBatch untuk keamanan
+                    WriteBatch batch = db.batch();
+
+                    // Operasi 1: Hapus dokumen "jabat tangan"
+                    batch.delete(prosesDoc.getReference());
+
+                    // Operasi 2: Kembalikan status permintaan menjadi "Aktif"
+                    DocumentReference requestRef = db.collection("donation_requests").document(permintaan.getRequestId());
+                    batch.update(requestRef, "status", "Aktif");
+
+                    batch.commit().addOnSuccessListener(aVoid -> {
+                        Toast.makeText(getContext(), "Bantuan telah dibatalkan. Permintaan Anda aktif kembali.", Toast.LENGTH_LONG).show();
+                        loadMyRequests(); // Muat ulang halaman
+                    }).addOnFailureListener(e -> {
+                        binding.progressBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Gagal membatalkan.", Toast.LENGTH_SHORT).show();
+                    });
+                });
     }
 
     private void updateRequestStatus(PermintaanDonor permintaan, String newStatus) {

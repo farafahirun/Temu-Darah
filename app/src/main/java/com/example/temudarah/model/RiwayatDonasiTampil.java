@@ -4,6 +4,7 @@ import com.google.firebase.Timestamp;
 
 public class RiwayatDonasiTampil {
 
+    private String prosesId;
     private String peranSaya;          // "Anda Membantu" atau "Anda Dibantu oleh"
     private String judulTampilan;      // "Permintaan oleh Budi" atau "Bantuan dari Siti"
     private String namaPasien;
@@ -11,6 +12,14 @@ public class RiwayatDonasiTampil {
     private Timestamp tanggal;
 
     public RiwayatDonasiTampil() {}
+
+    public String getProsesId() {
+        return prosesId;
+    }
+
+    public void setProsesId(String prosesId) {
+        this.prosesId = prosesId;
+    }
 
     public String getPeranSaya() {
         return peranSaya;

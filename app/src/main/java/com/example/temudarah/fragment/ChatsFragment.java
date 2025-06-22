@@ -1,7 +1,6 @@
 package com.example.temudarah.fragment;
 
 import android.os.Bundle;
-import android.os.Handler; // Import Handler
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +25,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class ChatsFragment extends Fragment {
 
@@ -36,6 +37,7 @@ public class ChatsFragment extends Fragment {
     private FirebaseUser currentUser;
     private ChatsAdapter adapter;
     private List<ChatPreview> chatPreviewList;
+    private enum UiState { LOADING, HAS_DATA, EMPTY }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,195 +50,147 @@ public class ChatsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
         setupRecyclerView();
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Selalu muat ulang daftar chat saat halaman ini ditampilkan
         if (currentUser != null) {
             loadChatList();
         } else {
-            // If user is not logged in, hide loading overlay and show empty chat message
-            binding.loadingOverlay.setVisibility(View.GONE); // Hide overlay
-            binding.tvEmptyChat.setText("Anda perlu login untuk melihat pesan.");
-            binding.tvEmptyChat.setVisibility(View.VISIBLE);
+            updateUiState(UiState.EMPTY, "Anda perlu login untuk melihat pesan.");
         }
     }
 
     private void setupRecyclerView() {
+        binding.rvChats.setLayoutManager(new LinearLayoutManager(getContext()));
         chatPreviewList = new ArrayList<>();
         adapter = new ChatsAdapter(chatPreviewList, chatPreview -> {
-            // Aksi saat item chat di klik -> buka ChatRoomFragment
+            // Aksi saat item chat diklik -> buka ChatRoomFragment
             Fragment chatRoomFragment = ChatRoomFragment.newInstance(chatPreview.getChatRoomId(), chatPreview.getOtherUserName());
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, chatRoomFragment)
                     .addToBackStack(null)
                     .commit();
         });
-        binding.rvChats.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvChats.setAdapter(adapter);
     }
 
     private void loadChatList() {
-        // Show the full-screen loading overlay and hide other content
-        binding.loadingOverlay.setVisibility(View.VISIBLE); // Show the loading overlay
-        binding.tvEmptyChat.setVisibility(View.GONE);
-        binding.rvChats.setVisibility(View.GONE);
+        updateUiState(UiState.LOADING, null);
 
-        // Simulate a background task for 1 second
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // This code will run after 1 second
-                if (currentUser == null) {
-                    binding.loadingOverlay.setVisibility(View.GONE); // Hide overlay
-                    binding.tvEmptyChat.setText("Anda perlu login untuk melihat pesan.");
-                    binding.tvEmptyChat.setVisibility(View.VISIBLE);
-                    return;
-                }
+        // 1. Ambil semua "jabat tangan" (active_donations) di mana kita terlibat
+        db.collection("active_donations")
+                .whereArrayContains("participants", currentUser.getUid())
+                .get()
+                .addOnSuccessListener(prosesSnapshots -> {
+                    if (!isAdded() || getContext() == null) return;
+                    if (prosesSnapshots.isEmpty()) {
+                        updateUiState(UiState.EMPTY, "Belum ada percakapan.");
+                        return;
+                    }
 
-                // 1. Ambil dulu daftar "jabat tangan" (active_donations) di mana kita terlibat
-                db.collection("active_donations")
-                        .whereArrayContains("participants", currentUser.getUid())
-                        .get()
-                        .addOnSuccessListener(queryDocumentSnapshots -> {
-                            if (queryDocumentSnapshots.isEmpty()) {
-                                binding.loadingOverlay.setVisibility(View.GONE); // Hide overlay
-                                binding.tvEmptyChat.setText("Belum ada percakapan.");
-                                binding.tvEmptyChat.setVisibility(View.VISIBLE);
-                                return;
+                    List<Task<?>> detailTasks = new ArrayList<>();
+                    List<ProsesDonor> processes = new ArrayList<>();
+
+                    for (DocumentSnapshot prosesDoc : prosesSnapshots.getDocuments()) {
+                        ProsesDonor proses = prosesDoc.toObject(ProsesDonor.class);
+                        if (proses != null && proses.getParticipants() != null && proses.getRequestId() != null) {
+                            processes.add(proses);
+
+                            // Siapkan 2 tugas untuk setiap proses: ambil profil lawan bicara & ambil pesan terakhir
+                            String otherUserId = Objects.equals(proses.getRequesterId(), currentUser.getUid()) ? proses.getDonorId() : proses.getRequesterId();
+                            if (otherUserId != null && !otherUserId.isEmpty()) {
+                                detailTasks.add(db.collection("users").document(otherUserId).get());
+                                detailTasks.add(db.collection("chats").document(proses.getChatRoomId()).collection("messages")
+                                        .orderBy("timestamp", Query.Direction.DESCENDING).limit(1).get());
                             }
+                        }
+                    }
 
-                            // Siapkan list untuk menampung semua 'tugas' (query) yang akan dijalankan
-                            List<Task<?>> tasks = new ArrayList<>();
-                            List<ProsesDonor> processes = new ArrayList<>();
+                    if (detailTasks.isEmpty()) {
+                        updateUiState(UiState.EMPTY, "Gagal memproses data chat.");
+                        return;
+                    }
 
-                            for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                                ProsesDonor proses = doc.toObject(ProsesDonor.class);
-                                if (proses == null || proses.getParticipants() == null) continue;
+                    // Jalankan semua tugas secara bersamaan
+                    Tasks.whenAllComplete(detailTasks).addOnCompleteListener(task -> {
+                        if (!isAdded()) return;
+                        List<ChatPreview> tempList = new ArrayList<>();
+                        List<Task<?>> completedTasks = task.getResult();
 
-                                processes.add(proses);
+                        for (int i = 0; i < processes.size(); i++) {
+                            ProsesDonor proses = processes.get(i);
+                            int userTaskIndex = i * 2;
+                            int messageTaskIndex = i * 2 + 1;
+                            if (messageTaskIndex >= completedTasks.size()) continue;
 
-                                // 2. Untuk setiap 'jabat tangan', buat DUA tugas:
-                                //    a. Tugas untuk mengambil profil lawan bicara
-                                String otherUserId = "";
-                                for (String participantId : proses.getParticipants()) {
-                                    if (!participantId.equals(currentUser.getUid())) {
-                                        otherUserId = participantId;
-                                        break;
-                                    }
-                                }
-                                if (!otherUserId.isEmpty()) {
-                                    tasks.add(db.collection("users").document(otherUserId).get());
-                                } else {
-                                    // Handle case where otherUserId is not found (e.g., self-chat or malformed data)
-                                    Log.w(TAG, "Other user ID not found in participants for chatRoomId: " + proses.getChatRoomId());
-                                    // Add a dummy task or handle this scenario appropriately
-                                    // For now, we'll skip this process to avoid crashes if otherUser is null
-                                    continue; // Skip processing this 'proses' if otherUser is not found
-                                }
+                            Task<?> userTask = completedTasks.get(userTaskIndex);
+                            Task<?> messageTask = completedTasks.get(messageTaskIndex);
 
+                            if (userTask.isSuccessful() && messageTask.isSuccessful()) {
+                                DocumentSnapshot userDoc = (DocumentSnapshot) userTask.getResult();
+                                QuerySnapshot messageQuery = (QuerySnapshot) messageTask.getResult();
 
-                                //    b. Tugas untuk mengambil SATU pesan terakhir dari sub-koleksi
-                                tasks.add(db.collection("chats").document(proses.getChatRoomId()).collection("messages")
-                                        .orderBy("timestamp", Query.Direction.DESCENDING)
-                                        .limit(1)
-                                        .get());
-                            }
+                                if (userDoc.exists()) {
+                                    User otherUser = userDoc.toObject(User.class);
+                                    if (otherUser != null) {
+                                        ChatPreview preview = new ChatPreview();
+                                        preview.setChatRoomId(proses.getChatRoomId());
+                                        preview.setOtherUserId(otherUser.getUid());
+                                        preview.setOtherUserName(otherUser.getFullName());
+                                        preview.setOtherUserPhotoBase64(otherUser.getProfileImageBase64());
 
-                            // If there are no valid tasks, just hide the progress bar and show empty text
-                            if (tasks.isEmpty()) {
-                                binding.loadingOverlay.setVisibility(View.GONE); // Hide overlay
-                                binding.tvEmptyChat.setText("Belum ada percakapan.");
-                                binding.tvEmptyChat.setVisibility(View.VISIBLE);
-                                return;
-                            }
-
-                            // 3. Jalankan semua tugas (ambil profil & ambil pesan terakhir) secara bersamaan
-                            Tasks.whenAllComplete(tasks).addOnCompleteListener(allTasks -> {
-                                chatPreviewList.clear();
-                                for (int i = 0; i < processes.size(); i++) {
-                                    ProsesDonor proses = processes.get(i);
-
-                                    // Ensure we don't go out of bounds if some tasks were skipped
-                                    if ((i * 2 + 1) >= tasks.size()) {
-                                        Log.w(TAG, "Task index out of bounds for processes. Skipping remaining.");
-                                        continue;
-                                    }
-
-                                    // Ambil hasil dari tugas ambil profil
-                                    Task<DocumentSnapshot> userTask = (Task<DocumentSnapshot>) tasks.get(i * 2);
-                                    // Ambil hasil dari tugas ambil pesan terakhir
-                                    Task<QuerySnapshot> messageTask = (Task<QuerySnapshot>) tasks.get(i * 2 + 1);
-
-                                    if (userTask.isSuccessful() && messageTask.isSuccessful()) {
-                                        DocumentSnapshot userDoc = userTask.getResult();
-                                        QuerySnapshot messageQuery = messageTask.getResult();
-
-                                        User otherUser = userDoc.toObject(User.class);
-
-                                        if (otherUser != null) {
-                                            // 4. Rakit semua data menjadi satu objek ChatPreview
-                                            ChatPreview preview = new ChatPreview();
-                                            preview.setChatRoomId(proses.getChatRoomId());
-                                            preview.setOtherUserId(otherUser.getUid());
-                                            preview.setOtherUserName(otherUser.getFullName());
-                                            preview.setOtherUserPhotoBase64(otherUser.getProfileImageBase64());
-
-                                            // Cek apakah ada pesan terakhir
-                                            if (!messageQuery.isEmpty()) {
-                                                Pesan lastPesan = messageQuery.getDocuments().get(0).toObject(Pesan.class);
-                                                if (lastPesan != null) {
-                                                    preview.setLastMessage(lastPesan.getText());
-                                                    preview.setLastMessageTimestamp(lastPesan.getTimestamp());
-                                                }
-                                            } else {
-                                                preview.setLastMessage("Ketuk untuk memulai percakapan...");
-                                                preview.setLastMessageTimestamp(proses.getTimestamp()); // Use donation timestamp if no messages
-                                            }
-
-                                            chatPreviewList.add(preview);
+                                        // Isi pesan terakhir dan waktunya
+                                        if (!messageQuery.isEmpty()) {
+                                            Pesan lastPesan = messageQuery.getDocuments().get(0).toObject(Pesan.class);
+                                            preview.setLastMessage(lastPesan.getText());
+                                            preview.setLastMessageTimestamp(lastPesan.getTimestamp());
                                         } else {
-                                            Log.w(TAG, "Other user object is null for chatRoomId: " + proses.getChatRoomId());
+                                            preview.setLastMessage("Ketuk untuk memulai percakapan...");
+                                            preview.setLastMessageTimestamp(proses.getTimestamp());
                                         }
-                                    } else {
-                                        Log.e(TAG, "Failed to get user or message for chatRoomId: " + proses.getChatRoomId() +
-                                                ", User task success: " + userTask.isSuccessful() + ", Message task success: " + messageTask.isSuccessful() +
-                                                ", User exception: " + (userTask.getException() != null ? userTask.getException().getMessage() : "none") +
-                                                ", Message exception: " + (messageTask.getException() != null ? messageTask.getException().getMessage() : "none"));
+                                        tempList.add(preview);
                                     }
                                 }
+                            }
+                        }
 
-                                // Sort the chat previews by timestamp of the last message (or donation if no messages)
-                                chatPreviewList.sort((o1, o2) -> {
-                                    if (o1.getLastMessageTimestamp() == null && o2.getLastMessageTimestamp() == null) return 0;
-                                    if (o1.getLastMessageTimestamp() == null) return 1; // o1 comes after o2 if o1 has no timestamp
-                                    if (o2.getLastMessageTimestamp() == null) return -1; // o2 comes after o1 if o2 has no timestamp
-                                    return o2.getLastMessageTimestamp().compareTo(o1.getLastMessageTimestamp()); // Newest first
-                                });
-
-
-                                // 5. Setelah semua data dirakit, baru update RecyclerView
-                                adapter.notifyDataSetChanged();
-                                binding.loadingOverlay.setVisibility(View.GONE); // Hide overlay
-                                if (chatPreviewList.isEmpty()) {
-                                    binding.tvEmptyChat.setText("Belum ada percakapan.");
-                                    binding.tvEmptyChat.setVisibility(View.VISIBLE);
-                                } else {
-                                    binding.rvChats.setVisibility(View.VISIBLE);
-                                }
-                            }).addOnFailureListener(e -> {
-                                Log.e(TAG, "Error completing all chat tasks", e);
-                                binding.loadingOverlay.setVisibility(View.GONE); // Hide overlay
-                                binding.tvEmptyChat.setText("Gagal memuat percakapan.");
-                                binding.tvEmptyChat.setVisibility(View.VISIBLE);
-                            });
-
-                        }).addOnFailureListener(e -> {
-                            binding.loadingOverlay.setVisibility(View.GONE); // Hide overlay
-                            binding.tvEmptyChat.setText("Gagal memuat daftar chat.");
-                            binding.tvEmptyChat.setVisibility(View.VISIBLE);
-                            Log.e(TAG, "Gagal memuat daftar chat", e);
+                        // Urutkan berdasarkan waktu pesan terakhir
+                        Collections.sort(tempList, (o1, o2) -> {
+                            if (o1.getLastMessageTimestamp() == null) return 1;
+                            if (o2.getLastMessageTimestamp() == null) return -1;
+                            return o2.getLastMessageTimestamp().compareTo(o1.getLastMessageTimestamp());
                         });
-            }
-        }, 1000);
+
+                        chatPreviewList.clear();
+                        chatPreviewList.addAll(tempList);
+                        adapter.notifyDataSetChanged();
+                        updateUiState(chatPreviewList.isEmpty() ? UiState.EMPTY : UiState.HAS_DATA, "Belum ada percakapan.");
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    if (!isAdded()) return;
+                    updateUiState(UiState.EMPTY, "Gagal memuat daftar chat.");
+                    Log.e(TAG, "Error loading chat list", e);
+                });
+    }
+
+    private void updateUiState(UiState state, String emptyMessage) {
+        if (binding == null) return;
+        binding.progressBar.setVisibility(state == UiState.LOADING ? View.VISIBLE : View.GONE);
+        binding.rvChats.setVisibility(state == UiState.HAS_DATA ? View.VISIBLE : View.GONE);
+        binding.tvEmptyChat.setVisibility(state == UiState.EMPTY ? View.VISIBLE : View.GONE);
+        if (state == UiState.EMPTY) {
+            binding.tvEmptyChat.setText(emptyMessage);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

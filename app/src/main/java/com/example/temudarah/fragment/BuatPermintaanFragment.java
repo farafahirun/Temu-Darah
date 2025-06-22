@@ -2,7 +2,7 @@ package com.example.temudarah.fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.DatePickerDialog; // Import DatePickerDialog
+import android.app.DatePickerDialog;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -15,13 +15,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import com.example.temudarah.R;
+
 import com.example.temudarah.databinding.FragmentBuatPermintaanBinding;
 import com.example.temudarah.model.PermintaanDonor;
 import com.example.temudarah.model.User;
@@ -35,10 +36,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
-import java.util.Calendar; // Import Calendar
-import java.util.List; // Import List
-import java.util.Locale; // Import Locale
-import java.text.SimpleDateFormat; // Import SimpleDateFormat
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 public class BuatPermintaanFragment extends Fragment {
 
@@ -50,12 +52,6 @@ public class BuatPermintaanFragment extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private Location lastKnownLocation;
-
-    private String selectedBloodType; // To store selected blood type
-    private String selectedGender; // To store selected gender
-
-    private String[] bloodTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
-    private String[] genderTypes = {"Laki-laki", "Perempuan"}; // Updated: Removed "Semua jenis"
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,31 +75,24 @@ public class BuatPermintaanFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+
         setupDropdowns();
         setupListeners();
-        setupDatePicker(); // Call the new setupDatePicker method
     }
 
     private void setupDropdowns() {
-        // Setup Blood Type Dropdown
-        ArrayAdapter<String> bloodTypeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, bloodTypes);
-        binding.dropdownGolonganDarah.setAdapter(bloodTypeAdapter);
-        binding.dropdownGolonganDarah.setText(""); // agar hint muncul
+        // Dropdown Golongan Darah
+        String[] bloodTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
+        ArrayAdapter<String> bloodAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, bloodTypes);
+        binding.dropdownGolonganDarah.setAdapter(bloodAdapter);
+        // Trik agar dropdown muncul saat diklik
         binding.dropdownGolonganDarah.setOnClickListener(v -> binding.dropdownGolonganDarah.showDropDown());
-        binding.dropdownGolonganDarah.setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) binding.dropdownGolonganDarah.showDropDown(); });
-        binding.dropdownGolonganDarah.setOnItemClickListener((parent, view, position, id) -> {
-            selectedBloodType = (String) parent.getItemAtPosition(position);
-        });
 
-        // Setup Gender Dropdown
+        // Dropdown Jenis Kelamin
+        String[] genderTypes = {"Laki-laki", "Perempuan"};
         ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, genderTypes);
         binding.dropdownJenisKelamin.setAdapter(genderAdapter);
-        binding.dropdownJenisKelamin.setText(""); // agar hint muncul
         binding.dropdownJenisKelamin.setOnClickListener(v -> binding.dropdownJenisKelamin.showDropDown());
-        binding.dropdownJenisKelamin.setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) binding.dropdownJenisKelamin.showDropDown(); });
-        binding.dropdownJenisKelamin.setOnItemClickListener((parent, view, position, id) -> {
-            selectedGender = (String) parent.getItemAtPosition(position);
-        });
     }
 
     private void setupListeners() {
@@ -112,110 +101,65 @@ public class BuatPermintaanFragment extends Fragment {
         binding.btnKirimPermintaan.setOnClickListener(v -> saveDonationRequest());
     }
 
-    // New method to set up the DatePicker
-    private void setupDatePicker() {
-        // Ensure the TextInputEditText is clickable but not focusable for manual input
-        binding.etTanggalPengumuman.setFocusable(false);
-        binding.etTanggalPengumuman.setClickable(true);
-
-        // Set OnClickListener to show DatePickerDialog
-        binding.etTanggalPengumuman.setOnClickListener(v -> {
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
-                    (view, selectedYear, selectedMonth, selectedDay) -> {
-                        // Format the selected date and set it to the EditText
-                        String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear);
-                        binding.etTanggalPengumuman.setText(formattedDate);
-                    }, year, month, day);
-            datePickerDialog.show();
+    @SuppressLint("MissingPermission")
+    private void getCurrentUserLocation() {
+        binding.btnGunakanLokasi.setEnabled(false);
+        binding.btnGunakanLokasi.setText("Mencari GPS...");
+        fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
+            binding.btnGunakanLokasi.setEnabled(true);
+            binding.btnGunakanLokasi.setText("Gunakan Lokasi Saat Ini");
+            if (location != null) {
+                lastKnownLocation = location;
+                getAddressFromLocation(location); // Panggil fungsi baru untuk dapatkan alamat
+            } else {
+                Toast.makeText(getContext(), "Gagal mendapatkan lokasi. Pastikan GPS aktif.", Toast.LENGTH_LONG).show();
+            }
         });
     }
 
+    private void getAddressFromLocation(Location location) {
+        binding.tvLokasiTerpilih.setText(String.format(Locale.getDefault(), "Mencari alamat untuk Lat: %.4f, Lng: %.4f...", location.getLatitude(), location.getLongitude()));
+
+        // Geocoder perlu dijalankan di background thread agar UI tidak macet
+        new Thread(() -> {
+            if (getContext() == null) return;
+            try {
+                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        if (addresses != null && !addresses.isEmpty()) {
+                            Address address = addresses.get(0);
+                            String addressLine = address.getAddressLine(0);
+                            binding.editNamaRs.setText(addressLine); // Otomatis isi ke kolom RS
+                            binding.tvLokasiTerpilih.setText("Lokasi ditemukan: " + addressLine);
+                            Toast.makeText(getContext(), "Alamat berhasil ditemukan!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            binding.tvLokasiTerpilih.setText("Alamat tidak ditemukan.");
+                        }
+                    });
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Geocoder error", e);
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> binding.tvLokasiTerpilih.setText("Gagal mendapatkan alamat dari koordinat."));
+                }
+            }
+        }).start();
+    }
 
     private void checkLocationPermissionAndGetData() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (getContext() != null && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             getCurrentUserLocation();
         } else {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         }
     }
 
-    @SuppressLint("MissingPermission")
-    private void getCurrentUserLocation() {
-        binding.btnGunakanLokasi.setEnabled(false);
-        binding.btnGunakanLokasi.setText("Mencari GPS...");
-        fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
-            if (location != null) {
-                lastKnownLocation = location;
-                // Use Geocoder to get address from coordinates
-                getAddressFromLocation(location);
-            } else {
-                Toast.makeText(getContext(), "Gagal mendapatkan lokasi. Pastikan GPS aktif.", Toast.LENGTH_LONG).show();
-                binding.btnGunakanLokasi.setEnabled(true);
-                binding.btnGunakanLokasi.setText("Gunakan Lokasi Saat Ini (GPS)");
-            }
-        });
-    }
-
-    private void getAddressFromLocation(Location location) {
-        try {
-            Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
-
-            // Pendekatan yang berfungsi di semua versi Android
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                // Untuk Android 13 (API 33) ke atas menggunakan callback
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1, addresses -> {
-                    processAddressResult(addresses, location);
-                });
-            } else {
-                // Untuk Android 12 (API 32) ke bawah menggunakan metode sinkronus
-                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                processAddressResult(addresses, location);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error getting address: ", e);
-            binding.tvLokasiTerpilih.setText(String.format("Lokasi didapat: Lat %.4f, Lng %.4f\nGagal mendapatkan alamat",
-                    location.getLatitude(), location.getLongitude()));
-            binding.btnGunakanLokasi.setEnabled(true);
-            binding.btnGunakanLokasi.setText("Gunakan Lokasi Saat Ini (GPS)");
-        }
-    }
-
-    private void processAddressResult(List<Address> addresses, Location location) {
-        if (addresses != null && addresses.size() > 0) {
-            Address address = addresses.get(0);
-            StringBuilder addressText = new StringBuilder();
-
-            // Get the complete address line
-            for (int i = 0; i <= address.getMaxAddressLineIndex(); i++) {
-                addressText.append(address.getAddressLine(i));
-                if (i < address.getMaxAddressLineIndex()) {
-                    addressText.append(", ");
-                }
-            }
-
-            // Display both the coordinates and the address
-            String locationText = String.format("Lokasi: Lat %.4f, Lng %.4f\nAlamat: %s",
-                    location.getLatitude(), location.getLongitude(), addressText.toString());
-            binding.tvLokasiTerpilih.setText(locationText);
-        } else {
-            binding.tvLokasiTerpilih.setText(String.format("Lokasi didapat: Lat %.4f, Lng %.4f\nAlamat tidak ditemukan",
-                    location.getLatitude(), location.getLongitude()));
-        }
-
-        Toast.makeText(getContext(), "Lokasi berhasil didapatkan!", Toast.LENGTH_SHORT).show();
-        binding.btnGunakanLokasi.setEnabled(true);
-        binding.btnGunakanLokasi.setText("Gunakan Lokasi Saat Ini (GPS)");
-    }
-
     private void saveDonationRequest() {
-        if (!validateInput()) return;
-        if (currentUser == null) {
-            Toast.makeText(getContext(), "Anda harus login untuk membuat permintaan.", Toast.LENGTH_SHORT).show();
+        if (!validateInput() || currentUser == null) {
+            if(currentUser == null) Toast.makeText(getContext(), "Anda harus login.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -228,55 +172,36 @@ public class BuatPermintaanFragment extends Fragment {
                 if (user != null) {
                     createRequestObject(user);
                 } else {
-                    Toast.makeText(getContext(), "Gagal memuat data profil Anda.", Toast.LENGTH_SHORT).show();
-                    binding.btnKirimPermintaan.setEnabled(true);
-                    binding.btnKirimPermintaan.setText("Kirim Permintaan");
+                    handleSaveFailure("Gagal memuat data profil Anda.");
                 }
             } else {
-                Toast.makeText(getContext(), "Profil pengguna tidak ditemukan.", Toast.LENGTH_SHORT).show();
-                binding.btnKirimPermintaan.setEnabled(true);
-                binding.btnKirimPermintaan.setText("Kirim Permintaan");
+                handleSaveFailure("Data profil Anda tidak ditemukan.");
             }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(getContext(), "Kesalahan saat memuat profil.", Toast.LENGTH_SHORT).show();
-            binding.btnKirimPermintaan.setEnabled(true);
-            binding.btnKirimPermintaan.setText("Kirim Permintaan");
-            Log.e(TAG, "Error fetching user profile", e);
-        });
+        }).addOnFailureListener(e -> handleSaveFailure("Gagal memuat profil."));
     }
 
     private void createRequestObject(User pembuat) {
         String namaPasien = binding.editNamaPasien.getText().toString().trim();
-        String jenisKelamin = (selectedGender != null && !selectedGender.isEmpty()) ? selectedGender : binding.dropdownJenisKelamin.getText().toString().trim();
-        String golDarah = (selectedBloodType != null && !selectedBloodType.isEmpty()) ? selectedBloodType : binding.dropdownGolonganDarah.getText().toString().trim();
-        int jumlahKantong = 0;
-        try {
-            jumlahKantong = Integer.parseInt(binding.editJumlahKantong.getText().toString().trim());
-        } catch (NumberFormatException e) {
-            Toast.makeText(getContext(), "Jumlah kantong harus berupa angka.", Toast.LENGTH_SHORT).show();
-            binding.btnKirimPermintaan.setEnabled(true);
-            binding.btnKirimPermintaan.setText("Kirim Permintaan");
-            return;
-        }
+        String golDarah = binding.dropdownGolonganDarah.getText().toString().trim();
+        String jenisKelamin = binding.dropdownJenisKelamin.getText().toString().trim(); // Ambil data gender
+        int jumlahKantong = Integer.parseInt(binding.editJumlahKantong.getText().toString().trim());
         String namaRs = binding.editNamaRs.getText().toString().trim();
         String catatan = binding.editCatatan.getText().toString().trim();
-        String tanggalPengumuman = binding.etTanggalPengumuman.getText().toString().trim(); // Get the announcement date
 
         PermintaanDonor permintaan = new PermintaanDonor();
+        // Mengisi semua field, termasuk yang baru
         permintaan.setNamaPasien(namaPasien);
-        permintaan.setJenisKelamin(jenisKelamin);
         permintaan.setGolonganDarahDibutuhkan(golDarah);
+        permintaan.setJenisKelamin(jenisKelamin);
         permintaan.setJumlahKantong(jumlahKantong);
         permintaan.setNamaRumahSakit(namaRs);
         permintaan.setCatatan(catatan);
         permintaan.setPembuatUid(pembuat.getUid());
         permintaan.setNamaPembuat(pembuat.getFullName());
         permintaan.setFotoPembuatBase64(pembuat.getProfileImageBase64());
-        permintaan.setTanggalPenguguman(tanggalPengumuman); // Set the announcement date
         GeoPoint lokasi = new GeoPoint(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
         permintaan.setLokasiRs(lokasi);
-        String geohash = GeoFireUtils.getGeoHashForLocation(new GeoLocation(lokasi.getLatitude(), lokasi.getLongitude()));
-        permintaan.setGeohash(geohash);
+        permintaan.setGeohash(GeoFireUtils.getGeoHashForLocation(new GeoLocation(lokasi.getLatitude(), lokasi.getLongitude())));
         permintaan.setStatus("Aktif");
         permintaan.setWaktuDibuat(Timestamp.now());
 
@@ -285,90 +210,36 @@ public class BuatPermintaanFragment extends Fragment {
                     Toast.makeText(getContext(), "Permintaan donor berhasil dibuat!", Toast.LENGTH_SHORT).show();
                     getParentFragmentManager().popBackStack();
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Gagal membuat permintaan.", Toast.LENGTH_SHORT).show();
-                    binding.btnKirimPermintaan.setEnabled(true);
-                    binding.btnKirimPermintaan.setText("Kirim Permintaan");
-                    Log.e(TAG, "Error creating donation request", e);
-                });
+                .addOnFailureListener(e -> handleSaveFailure("Gagal membuat permintaan."));
     }
 
     private boolean validateInput() {
-        if (TextUtils.isEmpty(binding.editNamaPasien.getText().toString().trim())) {
-            binding.editNamaPasien.setError("Nama pasien tidak boleh kosong");
-            return false;
+        if (TextUtils.isEmpty(binding.editNamaPasien.getText())) {
+            binding.editNamaPasien.setError("Nama Pasien wajib diisi"); return false;
         }
-
-        // Validate Jenis Kelamin
-        String enteredGender = binding.dropdownJenisKelamin.getText().toString().trim();
-        boolean isValidGender = false;
-        if (!TextUtils.isEmpty(enteredGender)) {
-            for (String type : genderTypes) { // Check against the updated genderTypes array
-                if (type.equalsIgnoreCase(enteredGender)) {
-                    isValidGender = true;
-                    selectedGender = type;
-                    break;
-                }
-            }
+        if (TextUtils.isEmpty(binding.dropdownGolonganDarah.getText())) {
+            binding.dropdownGolonganDarah.setError("Pilih Golongan Darah"); return false;
         }
-        if (!isValidGender) {
-            binding.dropdownJenisKelamin.setError("Silakan pilih jenis kelamin yang valid");
-            Toast.makeText(getContext(), "Silakan pilih jenis kelamin yang valid.", Toast.LENGTH_SHORT).show();
-            return false;
+        // --- VALIDASI BARU ---
+        if (TextUtils.isEmpty(binding.dropdownJenisKelamin.getText())) {
+            binding.dropdownJenisKelamin.setError("Pilih Jenis Kelamin"); return false;
         }
-
-        // Validate Golongan Darah
-        String enteredBloodType = binding.dropdownGolonganDarah.getText().toString().trim();
-        boolean isValidBloodType = false;
-        if (!TextUtils.isEmpty(enteredBloodType)) {
-            for (String type : bloodTypes) {
-                if (type.equalsIgnoreCase(enteredBloodType)) {
-                    isValidBloodType = true;
-                    selectedBloodType = type;
-                    break;
-                }
-            }
+        // --- AKHIR VALIDASI BARU ---
+        if (TextUtils.isEmpty(binding.editJumlahKantong.getText())) {
+            binding.editJumlahKantong.setError("Jumlah kantong wajib diisi"); return false;
         }
-        if (!isValidBloodType) {
-            binding.dropdownGolonganDarah.setError("Silakan pilih golongan darah yang valid");
-            Toast.makeText(getContext(), "Silakan pilih golongan darah yang valid.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        if (TextUtils.isEmpty(binding.editJumlahKantong.getText().toString().trim())) {
-            binding.editJumlahKantong.setError("Jumlah kantong tidak boleh kosong");
-            return false;
-        } else {
-            try {
-                int jumlah = Integer.parseInt(binding.editJumlahKantong.getText().toString().trim());
-                if (jumlah <= 0) {
-                    binding.editJumlahKantong.setError("Jumlah kantong harus lebih dari 0");
-                    return false;
-                }
-            } catch (NumberFormatException e) {
-                binding.editJumlahKantong.setError("Masukkan jumlah kantong yang valid");
-                return false;
-            }
-        }
-
-        if (TextUtils.isEmpty(binding.editNamaRs.getText().toString().trim())) {
-            binding.editNamaRs.setError("Nama rumah sakit tidak boleh kosong");
-            return false;
-        }
-
-        // Validate Tanggal Pengumuman
-        if (TextUtils.isEmpty(binding.etTanggalPengumuman.getText().toString().trim())) {
-            binding.etTanggalPengumuman.setError("Tanggal Pengumuman tidak boleh kosong");
-            Toast.makeText(getContext(), "Silakan pilih tanggal pengumuman.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-
         if (lastKnownLocation == null) {
-            Toast.makeText(getContext(), "Harap tentukan lokasi RS dengan menekan tombol GPS.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Harap tentukan lokasi dengan menekan tombol GPS.", Toast.LENGTH_LONG).show();
             return false;
         }
         return true;
+    }
+
+    private void handleSaveFailure(String message) {
+        if (getContext() == null) return;
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        binding.btnKirimPermintaan.setEnabled(true);
+        binding.btnKirimPermintaan.setText("Kirim Permintaan");
     }
 
     @Override

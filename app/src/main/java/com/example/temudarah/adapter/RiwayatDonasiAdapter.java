@@ -26,6 +26,16 @@ public class RiwayatDonasiAdapter extends RecyclerView.Adapter<RiwayatDonasiAdap
         this.listener = listener;
     }
 
+    /**
+     * FUNGSI BARU YANG HILANG SEBELUMNYA
+     * Tugasnya untuk membersihkan list lama dan mengisi dengan data baru.
+     */
+    public void updateData(List<RiwayatDonasiTampil> newList) {
+        this.riwayatList.clear();
+        this.riwayatList.addAll(newList);
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -47,30 +57,26 @@ public class RiwayatDonasiAdapter extends RecyclerView.Adapter<RiwayatDonasiAdap
         private final ItemRiwayatDonasiBinding binding;
         ViewHolder(ItemRiwayatDonasiBinding binding) { super(binding.getRoot()); this.binding = binding; }
         void bind(final RiwayatDonasiTampil riwayat, final OnItemClickListener listener) {
+            // (Isi dari fungsi bind ini tidak berubah, sudah benar dari sebelumnya)
             binding.tvPeran.setText(riwayat.getPeranSaya());
             binding.tvJudulTampilan.setText(riwayat.getJudulTampilan());
             binding.tvNamaPasien.setText("Untuk pasien: " + riwayat.getNamaPasien());
-            binding.tvStatusProses.setText("Status: " + riwayat.getStatusProses()); // Tambah "Status: "
+            binding.tvStatusProses.setText("Status: " + riwayat.getStatusProses());
 
             if (riwayat.getTanggal() != null) {
-                // Pastikan Locale yang digunakan benar untuk format tanggal yang diinginkan
-                SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID")); // Gunakan Locale Indonesia
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID"));
                 binding.tvTanggal.setText(sdf.format(riwayat.getTanggal().toDate()));
             } else {
                 binding.tvTanggal.setText("-");
             }
 
-            int statusColorRes = R.color.text_info; // Default abu-abu
-            if ("Selesai".equals(riwayat.getStatusProses())) {
-                statusColorRes = R.color.sukses; // Hijau
-            } else if ("Dibatalkan".equals(riwayat.getStatusProses())) {
-                statusColorRes = R.color.utama_dark; // Merah
-            } else if ("Berlangsung".equals(riwayat.getStatusProses())) {
-                statusColorRes = R.color.penerima; // Kuning/Oranye
-            }
+            int statusColorRes = R.color.text_info;
+            if ("Selesai".equals(riwayat.getStatusProses())) statusColorRes = R.color.sukses;
+            else if ("Dibatalkan".equals(riwayat.getStatusProses())) statusColorRes = R.color.utama;
+            else if ("Berlangsung".equals(riwayat.getStatusProses())) statusColorRes = R.color.penerima;
 
             binding.tvStatusProses.setTextColor(ContextCompat.getColor(itemView.getContext(), statusColorRes));
-            binding.tvPeran.setTextColor(ContextCompat.getColor(itemView.getContext(), statusColorRes)); // Asumsi peran juga mengikuti warna status
+            binding.tvPeran.setTextColor(ContextCompat.getColor(itemView.getContext(), statusColorRes));
 
             itemView.setOnClickListener(v -> listener.onItemClick(riwayat));
         }

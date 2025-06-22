@@ -1,6 +1,8 @@
 package com.example.temudarah.fragment;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -12,19 +14,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import com.example.temudarah.databinding.FragmentEditPermintaanBinding; // Gunakan binding untuk layout edit
+
+import com.example.temudarah.R;
+import com.example.temudarah.databinding.FragmentEditPermintaanBinding;
 import com.example.temudarah.model.PermintaanDonor;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -38,9 +48,9 @@ public class EditPermintaanFragment extends Fragment {
     private FragmentEditPermintaanBinding binding;
     private FirebaseFirestore db;
     private String requestId;
-    private Location lastKnownLocation; // Untuk menyimpan lokasi jika diubah
+    private Location lastKnownLocation; // Menyimpan lokasi baru jika diubah
     private FusedLocationProviderClient fusedLocationClient;
-    // Launcher untuk izin bisa ditambahkan jika perlu, sama seperti di BuatPermintaanFragment
+    private ActivityResultLauncher<String> requestPermissionLauncher;
 
     public static EditPermintaanFragment newInstance(String requestId) {
         EditPermintaanFragment fragment = new EditPermintaanFragment();
@@ -56,6 +66,11 @@ public class EditPermintaanFragment extends Fragment {
         if (getArguments() != null) {
             requestId = getArguments().getString(ARG_REQUEST_ID);
         }
+        // Inisialisasi launcher untuk izin lokasi
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) getCurrentUserLocation();
+            else Toast.makeText(getContext(), "Izin lokasi diperlukan.", Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override
@@ -70,7 +85,7 @@ public class EditPermintaanFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
-        setupDropdown();
+        setupDropdowns();
         setupListeners();
 
         if (requestId != null) {
@@ -78,28 +93,30 @@ public class EditPermintaanFragment extends Fragment {
         }
     }
 
+    private void setupDropdowns() {
+        String[] bloodTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
+        ArrayAdapter<String> bloodAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, bloodTypes);
+        binding.dropdownGolonganDarah.setAdapter(bloodAdapter);
+        binding.dropdownGolonganDarah.setOnClickListener(v -> binding.dropdownGolonganDarah.showDropDown());
+
+        String[] genderTypes = {"Laki-laki", "Perempuan"};
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, genderTypes);
+        binding.dropdownJenisKelamin.setAdapter(genderAdapter);
+        binding.dropdownJenisKelamin.setOnClickListener(v -> binding.dropdownJenisKelamin.showDropDown());
+    }
+
     private void setupListeners() {
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
-        // Tombol Simpan sekarang memanggil saveChanges
         binding.btnSimpanPerubahan.setOnClickListener(v -> saveChanges());
-        // binding.btnGunakanLokasi.setOnClickListener(...) bisa ditambahkan jika ingin ada fitur ubah lokasi
+        binding.btnGunakanLokasi.setOnClickListener(v -> checkLocationPermission());
     }
 
-    private void setupDropdown() {
-        String[] bloodTypes = {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, bloodTypes);
-        binding.dropdownGolonganDarah.setAdapter(adapter);
-    }
-
-    /**
-     * Memuat data permintaan yang ada dari Firestore.
-     */
     private void loadRequestData() {
-//        binding.progressBar.setVisibility(View.VISIBLE); // Asumsi ada ProgressBar di layout
+        binding.progressBar.setVisibility(View.VISIBLE);
         db.collection("donation_requests").document(requestId).get()
                 .addOnSuccessListener(documentSnapshot -> {
-//                    binding.progressBar.setVisibility(View.GONE);
-                    if (documentSnapshot.exists()) {
+                    binding.progressBar.setVisibility(View.GONE);
+                    if (isAdded() && documentSnapshot.exists()) {
                         PermintaanDonor permintaan = documentSnapshot.toObject(PermintaanDonor.class);
                         if (permintaan != null) {
                             populateForm(permintaan);
@@ -107,45 +124,58 @@ public class EditPermintaanFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> {
-//                    binding.progressBar.setVisibility(View.GONE);
+                    if(isAdded()) binding.progressBar.setVisibility(View.GONE);
                     Toast.makeText(getContext(), "Gagal memuat data.", Toast.LENGTH_SHORT).show();
                 });
     }
 
-    /**
-     * Mengisi form dengan data yang sudah ada.
-     */
     private void populateForm(PermintaanDonor permintaan) {
         binding.editNamaPasien.setText(permintaan.getNamaPasien());
         binding.dropdownGolonganDarah.setText(permintaan.getGolonganDarahDibutuhkan(), false);
+        binding.dropdownJenisKelamin.setText(permintaan.getJenisKelamin(), false);
         binding.editJumlahKantong.setText(String.valueOf(permintaan.getJumlahKantong()));
         binding.editNamaRs.setText(permintaan.getNamaRumahSakit());
         binding.editCatatan.setText(permintaan.getCatatan());
 
+        // Simpan lokasi awal untuk digunakan jika tidak ada perubahan lokasi
         if (permintaan.getLokasiRs() != null) {
             GeoPoint gp = permintaan.getLokasiRs();
             lastKnownLocation = new Location("");
             lastKnownLocation.setLatitude(gp.getLatitude());
             lastKnownLocation.setLongitude(gp.getLongitude());
-
-            // Tampilkan koordinat terlebih dahulu (agar UI responsif)
-            binding.tvLokasiTerpilih.setText(String.format("Lokasi tersimpan: Lat %.4f, Lng %.4f", gp.getLatitude(), gp.getLongitude()));
-
-            // Ambil alamat lengkap dari koordinat (asinkronus)
-            getAddressFromLocation(lastKnownLocation);
+            binding.tvLokasiTerpilih.setText("Lokasi tersimpan. Tekan tombol untuk mengubah.");
         }
     }
 
-    /**
-     * Mengambil alamat lengkap dari koordinat lokasi
-     */
+    private void checkLocationPermission() {
+        if (getContext() != null && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            getCurrentUserLocation();
+        } else {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getCurrentUserLocation() {
+        binding.btnGunakanLokasi.setText("Mencari...");
+        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+            if (isAdded()) {
+                binding.btnGunakanLokasi.setText("Gunakan Lokasi Saat Ini");
+                if (location != null) {
+                    lastKnownLocation = location; // Update lastKnownLocation dengan koordinat baru
+                    getAddressFromLocation(location);
+                }
+            }
+        });
+    }
+
     private void getAddressFromLocation(Location location) {
         try {
             Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
 
             // Langsung tampilkan pesan bahwa sistem sedang mencari alamat
             binding.tvLokasiTerpilih.setText(String.format("Lokasi: Lat %.4f, Lng %.4f\nMencari alamat lengkap...",
-                location.getLatitude(), location.getLongitude()));
+                    location.getLatitude(), location.getLongitude()));
 
             // Pendekatan yang berfungsi di semua versi Android
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
@@ -164,13 +194,10 @@ public class EditPermintaanFragment extends Fragment {
             Log.e(TAG, "Error getting address: ", e);
             // Tampilkan pesan error tetapi tetap pertahankan informasi koordinat yang sudah ada
             binding.tvLokasiTerpilih.setText(String.format("Lokasi: Lat %.4f, Lng %.4f\nGagal mendapatkan alamat lengkap",
-                location.getLatitude(), location.getLongitude()));
+                    location.getLatitude(), location.getLongitude()));
         }
     }
 
-    /**
-     * Memproses hasil dari Geocoder dan menampilkan alamat lengkap
-     */
     private void processAddressResult(List<Address> addresses, Location location) {
         try {
             if (addresses != null && !addresses.isEmpty()) {
@@ -252,47 +279,44 @@ public class EditPermintaanFragment extends Fragment {
         }
     }
 
-    /**
-     * Menyimpan perubahan ke Firestore menggunakan .update()
-     */
     private void saveChanges() {
-        // Lakukan validasi input di sini jika perlu
+        if (TextUtils.isEmpty(binding.editNamaPasien.getText())) {
+            // ... (Tambahkan validasi lain jika perlu) ...
+            return;
+        }
 
         binding.btnSimpanPerubahan.setEnabled(false);
         binding.btnSimpanPerubahan.setText("Menyimpan...");
 
-        String namaPasien = binding.editNamaPasien.getText().toString().trim();
-        String golDarah = binding.dropdownGolonganDarah.getText().toString().trim();
-        int jumlahKantong = Integer.parseInt(binding.editJumlahKantong.getText().toString().trim());
-        String namaRs = binding.editNamaRs.getText().toString().trim();
-        String catatan = binding.editCatatan.getText().toString().trim();
-
-        DocumentReference requestRef = db.collection("donation_requests").document(requestId);
-
         Map<String, Object> updates = new HashMap<>();
-        updates.put("namaPasien", namaPasien);
-        updates.put("golonganDarahDibutuhkan", golDarah);
-        updates.put("jumlahKantong", jumlahKantong);
-        updates.put("namaRumahSakit", namaRs);
-        updates.put("catatan", catatan);
+        updates.put("namaPasien", binding.editNamaPasien.getText().toString().trim());
+        updates.put("golonganDarahDibutuhkan", binding.dropdownGolonganDarah.getText().toString().trim());
+        updates.put("jenisKelamin", binding.dropdownJenisKelamin.getText().toString().trim());
+        updates.put("jumlahKantong", Integer.parseInt(binding.editJumlahKantong.getText().toString().trim()));
+        updates.put("namaRumahSakit", binding.editNamaRs.getText().toString().trim());
+        updates.put("catatan", binding.editCatatan.getText().toString().trim());
 
-        // Jika user memilih lokasi baru, update juga lokasi & geohash
+        // --- LOGIKA BARU ---
+        // Selalu update waktu ke saat ini setiap kali ada perubahan
+        updates.put("waktuDibuat", Timestamp.now());
+
         if (lastKnownLocation != null) {
             GeoPoint lokasiBaru = new GeoPoint(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-            String geohashBaru = GeoFireUtils.getGeoHashForLocation(new GeoLocation(lokasiBaru.getLatitude(), lokasiBaru.getLongitude()));
             updates.put("lokasiRs", lokasiBaru);
-            updates.put("geohash", geohashBaru);
+            updates.put("geohash", GeoFireUtils.getGeoHashForLocation(new GeoLocation(lokasiBaru.getLatitude(), lokasiBaru.getLongitude())));
         }
 
-        requestRef.update(updates)
+        db.collection("donation_requests").document(requestId).update(updates)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "Permintaan berhasil diperbarui.", Toast.LENGTH_SHORT).show();
                     getParentFragmentManager().popBackStack();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Gagal memperbarui permintaan.", Toast.LENGTH_SHORT).show();
-                    binding.btnSimpanPerubahan.setEnabled(true);
-                    binding.btnSimpanPerubahan.setText("Simpan Perubahan");
+                    if(isAdded()) {
+                        Toast.makeText(getContext(), "Gagal memperbarui.", Toast.LENGTH_SHORT).show();
+                        binding.btnSimpanPerubahan.setEnabled(true);
+                        binding.btnSimpanPerubahan.setText("Simpan Perubahan");
+                    }
                 });
     }
 

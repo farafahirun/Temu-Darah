@@ -1,97 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
+    android:orientation="vertical"
     tools:context=".fragment.ChatsFragment">
 
-    <!-- Header/Navbar -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- Navbar -->
+    <LinearLayout
         android:id="@+id/navbar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="20dp"
-        android:paddingVertical="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@color/background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingTop="15dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="5dp">
 
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="Logo"
+            android:src="@drawable/logo_merah" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/iv_notification"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:contentDescription="Notification"
+            android:src="@drawable/notifikasi_on"
+            app:tint="@color/utama" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@color/background">
+
+        <!-- RecyclerView for chats -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChats"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:background="@color/background"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_chat" />
+
+        <!-- Empty state message -->
         <TextView
-            android:id="@+id/titleText"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvEmptyChat"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pesan"
+            android:text="Belum ada percakapan."
+            android:textSize="16sp"
+            android:textAlignment="center"
             android:textColor="@color/black"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Divider line -->
-    <View
-        android:id="@+id/divider"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="#E0E0E0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/navbar" />
-
-    <!-- RecyclerView for chats -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvChats"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:paddingHorizontal="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/divider"
-        tools:listitem="@layout/item_chat" />
-
-    <!-- Empty state message -->
-    <TextView
-        android:id="@+id/tvEmptyChat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Belum ada percakapan."
-        android:textSize="16sp"
-        android:textColor="@color/black"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
-
-    <!-- Loading overlay -->
-    <FrameLayout
-        android:id="@+id/loadingOverlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="#CCFFFFFF"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <!-- Loading indicator -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_height="wrap_content"
-            android:indeterminateTint="@color/utama"
-            android:layout_gravity="center" />
-    </FrameLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:indeterminateTint="@color/utama" />
+    </LinearLayout>
+</LinearLayout>
