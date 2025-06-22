@@ -205,10 +205,10 @@ public class ChatRoomFragment extends Fragment {
      * FUNGSI BARU: Untuk mengupdate field pesan terakhir di koleksi active_donations.
      */
     private void updateLastMessage(String chatRoomId, String message, Timestamp timestamp) {
-        db.collection("active_donations").document(chatRoomId)
+        db.collection("chat_rooms").document(chatRoomId)
                 .update("lastMessage", message, "lastMessageTimestamp", timestamp)
-                .addOnSuccessListener(aVoid -> Log.d(TAG, "Last message updated successfully."))
-                .addOnFailureListener(e -> Log.e(TAG, "Error updating last message", e));
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Chat room last message updated."))
+                .addOnFailureListener(e -> Log.e(TAG, "Error updating chat room", e));
     }
 
     private void showCancellationConfirmationDialog() {

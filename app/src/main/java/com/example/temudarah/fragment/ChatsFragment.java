@@ -13,21 +13,19 @@ import com.example.temudarah.R;
 import com.example.temudarah.adapter.ChatsAdapter;
 import com.example.temudarah.databinding.FragmentChatsBinding;
 import com.example.temudarah.model.ChatPreview;
-import com.example.temudarah.model.Pesan;
-import com.example.temudarah.model.ProsesDonor;
 import com.example.temudarah.model.User;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ChatsFragment extends Fragment {
 
@@ -37,6 +35,7 @@ public class ChatsFragment extends Fragment {
     private FirebaseUser currentUser;
     private ChatsAdapter adapter;
     private List<ChatPreview> chatPreviewList;
+
     private enum UiState { LOADING, HAS_DATA, EMPTY }
 
     @Override
@@ -56,7 +55,6 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Selalu muat ulang daftar chat saat halaman ini ditampilkan
         if (currentUser != null) {
             loadChatList();
         } else {
@@ -68,7 +66,6 @@ public class ChatsFragment extends Fragment {
         binding.rvChats.setLayoutManager(new LinearLayoutManager(getContext()));
         chatPreviewList = new ArrayList<>();
         adapter = new ChatsAdapter(chatPreviewList, chatPreview -> {
-            // Aksi saat item chat diklik -> buka ChatRoomFragment
             Fragment chatRoomFragment = ChatRoomFragment.newInstance(chatPreview.getChatRoomId(), chatPreview.getOtherUserName());
             getParentFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, chatRoomFragment)
@@ -78,108 +75,109 @@ public class ChatsFragment extends Fragment {
         binding.rvChats.setAdapter(adapter);
     }
 
+    /**
+     * FUNGSI YANG DIPERBAIKI TOTAL - DENGAN LOGIKA BERANTAI YANG AMAN
+     */
     private void loadChatList() {
+        if (currentUser == null) return;
         updateUiState(UiState.LOADING, null);
 
-        // 1. Ambil semua "jabat tangan" (active_donations) di mana kita terlibat
-        db.collection("active_donations")
+        // 1. Ambil semua ruang chat di mana kita adalah peserta
+        db.collection("chat_rooms")
                 .whereArrayContains("participants", currentUser.getUid())
+                .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
                 .get()
-                .addOnSuccessListener(prosesSnapshots -> {
-                    if (!isAdded() || getContext() == null) return;
-                    if (prosesSnapshots.isEmpty()) {
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (!isAdded() || queryDocumentSnapshots.isEmpty()) {
                         updateUiState(UiState.EMPTY, "Belum ada percakapan.");
                         return;
                     }
 
-                    List<Task<?>> detailTasks = new ArrayList<>();
-                    List<ProsesDonor> processes = new ArrayList<>();
+                    List<ChatPreview> tempList = new ArrayList<>();
+                    int totalChats = queryDocumentSnapshots.size();
+                    AtomicInteger counter = new AtomicInteger(0);
 
-                    for (DocumentSnapshot prosesDoc : prosesSnapshots.getDocuments()) {
-                        ProsesDonor proses = prosesDoc.toObject(ProsesDonor.class);
-                        if (proses != null && proses.getParticipants() != null && proses.getRequestId() != null) {
-                            processes.add(proses);
+                    for (QueryDocumentSnapshot chatRoomDoc : queryDocumentSnapshots) {
+                        List<String> participants = (List<String>) chatRoomDoc.get("participants");
+                        if (participants == null) {
+                            // Jika ada data aneh, lewati dan anggap sudah diproses
+                            if (counter.incrementAndGet() == totalChats) {
+                                updateAdapterWithList(tempList);
+                            }
+                            continue;
+                        }
 
-                            // Siapkan 2 tugas untuk setiap proses: ambil profil lawan bicara & ambil pesan terakhir
-                            String otherUserId = Objects.equals(proses.getRequesterId(), currentUser.getUid()) ? proses.getDonorId() : proses.getRequesterId();
-                            if (otherUserId != null && !otherUserId.isEmpty()) {
-                                detailTasks.add(db.collection("users").document(otherUserId).get());
-                                detailTasks.add(db.collection("chats").document(proses.getChatRoomId()).collection("messages")
-                                        .orderBy("timestamp", Query.Direction.DESCENDING).limit(1).get());
+                        // 2. Untuk setiap ruang chat, cari tahu siapa ID lawan bicara
+                        String otherUserId = "";
+                        for (String participantId : participants) {
+                            if (!participantId.equals(currentUser.getUid())) {
+                                otherUserId = participantId;
+                                break;
                             }
                         }
-                    }
 
-                    if (detailTasks.isEmpty()) {
-                        updateUiState(UiState.EMPTY, "Gagal memproses data chat.");
-                        return;
-                    }
+                        if (otherUserId.isEmpty()) {
+                            if (counter.incrementAndGet() == totalChats) {
+                                updateAdapterWithList(tempList);
+                            }
+                            continue;
+                        }
 
-                    // Jalankan semua tugas secara bersamaan
-                    Tasks.whenAllComplete(detailTasks).addOnCompleteListener(task -> {
-                        if (!isAdded()) return;
-                        List<ChatPreview> tempList = new ArrayList<>();
-                        List<Task<?>> completedTasks = task.getResult();
-
-                        for (int i = 0; i < processes.size(); i++) {
-                            ProsesDonor proses = processes.get(i);
-                            int userTaskIndex = i * 2;
-                            int messageTaskIndex = i * 2 + 1;
-                            if (messageTaskIndex >= completedTasks.size()) continue;
-
-                            Task<?> userTask = completedTasks.get(userTaskIndex);
-                            Task<?> messageTask = completedTasks.get(messageTaskIndex);
-
-                            if (userTask.isSuccessful() && messageTask.isSuccessful()) {
-                                DocumentSnapshot userDoc = (DocumentSnapshot) userTask.getResult();
-                                QuerySnapshot messageQuery = (QuerySnapshot) messageTask.getResult();
-
-                                if (userDoc.exists()) {
-                                    User otherUser = userDoc.toObject(User.class);
-                                    if (otherUser != null) {
-                                        ChatPreview preview = new ChatPreview();
-                                        preview.setChatRoomId(proses.getChatRoomId());
-                                        preview.setOtherUserId(otherUser.getUid());
-                                        preview.setOtherUserName(otherUser.getFullName());
-                                        preview.setOtherUserPhotoBase64(otherUser.getProfileImageBase64());
-
-                                        // Isi pesan terakhir dan waktunya
-                                        if (!messageQuery.isEmpty()) {
-                                            Pesan lastPesan = messageQuery.getDocuments().get(0).toObject(Pesan.class);
-                                            preview.setLastMessage(lastPesan.getText());
-                                            preview.setLastMessageTimestamp(lastPesan.getTimestamp());
-                                        } else {
-                                            preview.setLastMessage("Ketuk untuk memulai percakapan...");
-                                            preview.setLastMessageTimestamp(proses.getTimestamp());
+                        // 3. Setelah ID lawan bicara didapat, ambil profilnya dari koleksi 'users'
+                        db.collection("users").document(otherUserId).get()
+                                .addOnSuccessListener(userDoc -> {
+                                    if (userDoc.exists()) {
+                                        User otherUser = userDoc.toObject(User.class);
+                                        if (otherUser != null) {
+                                            // 4. Rakit semua data menjadi satu objek ChatPreview
+                                            ChatPreview preview = new ChatPreview();
+                                            preview.setChatRoomId(chatRoomDoc.getId());
+                                            preview.setOtherUserId(otherUser.getUid());
+                                            preview.setOtherUserName(otherUser.getFullName());
+                                            preview.setOtherUserPhotoBase64(otherUser.getProfileImageBase64());
+                                            preview.setLastMessage(chatRoomDoc.getString("lastMessage"));
+                                            preview.setLastMessageTimestamp(chatRoomDoc.getTimestamp("lastMessageTimestamp"));
+                                            tempList.add(preview);
                                         }
-                                        tempList.add(preview);
                                     }
-                                }
-                            }
-                        }
-
-                        // Urutkan berdasarkan waktu pesan terakhir
-                        Collections.sort(tempList, (o1, o2) -> {
-                            if (o1.getLastMessageTimestamp() == null) return 1;
-                            if (o2.getLastMessageTimestamp() == null) return -1;
-                            return o2.getLastMessageTimestamp().compareTo(o1.getLastMessageTimestamp());
-                        });
-
-                        chatPreviewList.clear();
-                        chatPreviewList.addAll(tempList);
-                        adapter.notifyDataSetChanged();
-                        updateUiState(chatPreviewList.isEmpty() ? UiState.EMPTY : UiState.HAS_DATA, "Belum ada percakapan.");
-                    });
+                                    // 5. Cek apakah ini item terakhir yang diproses
+                                    if (counter.incrementAndGet() == totalChats) {
+                                        updateAdapterWithList(tempList);
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Jika gagal ambil profil, tetap lanjutkan
+                                    if (counter.incrementAndGet() == totalChats) {
+                                        updateAdapterWithList(tempList);
+                                    }
+                                });
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    if (!isAdded()) return;
-                    updateUiState(UiState.EMPTY, "Gagal memuat daftar chat.");
-                    Log.e(TAG, "Error loading chat list", e);
+                    if (isAdded()) {
+                        updateUiState(UiState.EMPTY, "Gagal memuat daftar chat.");
+                        Log.e(TAG, "Gagal memuat daftar chat", e);
+                    }
                 });
     }
 
+    private void updateAdapterWithList(List<ChatPreview> list) {
+        chatPreviewList.clear();
+        chatPreviewList.addAll(list);
+
+        // Urutkan berdasarkan waktu pesan terakhir
+        Collections.sort(chatPreviewList, (o1, o2) -> {
+            if (o1.getLastMessageTimestamp() == null) return 1;
+            if (o2.getLastMessageTimestamp() == null) return -1;
+            return o2.getLastMessageTimestamp().compareTo(o1.getLastMessageTimestamp());
+        });
+
+        adapter.notifyDataSetChanged();
+        updateUiState(chatPreviewList.isEmpty() ? UiState.EMPTY : UiState.HAS_DATA, "Belum ada percakapan.");
+    }
+
     private void updateUiState(UiState state, String emptyMessage) {
-        if (binding == null) return;
+        if (binding == null || !isAdded()) return;
         binding.progressBar.setVisibility(state == UiState.LOADING ? View.VISIBLE : View.GONE);
         binding.rvChats.setVisibility(state == UiState.HAS_DATA ? View.VISIBLE : View.GONE);
         binding.tvEmptyChat.setVisibility(state == UiState.EMPTY ? View.VISIBLE : View.GONE);

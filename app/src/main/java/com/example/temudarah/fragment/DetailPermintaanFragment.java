@@ -24,10 +24,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class DetailPermintaanFragment extends Fragment {
 
@@ -174,6 +177,14 @@ public class DetailPermintaanFragment extends Fragment {
         newProcess.setLastMessageTimestamp(Timestamp.now());
 
         batch.set(donationProcessRef, newProcess);
+
+        DocumentReference chatRoomRef = db.collection("chat_rooms").document(chatRoomId);
+        Map<String, Object> chatRoomData = new HashMap<>();
+        chatRoomData.put("participants", Arrays.asList(currentPermintaan.getPembuatUid(), donorUser.getUid()));
+        chatRoomData.put("lastMessageTimestamp", Timestamp.now()); // Set waktu awal
+        // Menggunakan SetOptions.merge() akan membuat dokumen baru jika belum ada,
+        // atau hanya memperbarui jika sudah ada, tanpa menghapus field lain.
+        batch.set(chatRoomRef, chatRoomData, SetOptions.merge());
 
         batch.commit().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Anda telah menawarkan bantuan!", Toast.LENGTH_LONG).show();
