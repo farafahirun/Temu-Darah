@@ -10,8 +10,11 @@ public class ChatPreview {
     private String otherUserPhotoBase64;
     private String lastMessage;
     private Timestamp lastMessageTimestamp;
+    private int unreadCount; // Added new field for unread message count
 
-    public ChatPreview() {}
+    public ChatPreview() {
+        this.unreadCount = 0; // Default value
+    }
 
     public String getChatRoomId() {
         return chatRoomId;
@@ -59,5 +62,13 @@ public class ChatPreview {
 
     public void setLastMessageTimestamp(Timestamp lastMessageTimestamp) {
         this.lastMessageTimestamp = lastMessageTimestamp;
+    }
+
+    public int getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
     }
 }

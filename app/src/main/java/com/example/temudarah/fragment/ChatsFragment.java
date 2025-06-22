@@ -18,12 +18,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,6 +38,9 @@ public class ChatsFragment extends Fragment {
     private FirebaseUser currentUser;
     private ChatsAdapter adapter;
     private List<ChatPreview> chatPreviewList;
+    private ListenerRegistration chatRoomsListener;
+    private ListenerRegistration notificationsListener;
+    private Map<String, Integer> unreadCountsMap = new HashMap<>();
 
     private enum UiState { LOADING, HAS_DATA, EMPTY }
 
@@ -56,9 +62,21 @@ public class ChatsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (currentUser != null) {
-            setupChatListListener(); // Changed from loadChatList() to setupChatListListener()
+            setupNotificationsListener();
+            setupChatListListener();
         } else {
             updateUiState(UiState.EMPTY, "Anda perlu login untuk melihat pesan.");
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (chatRoomsListener != null) {
+            chatRoomsListener.remove();
+        }
+        if (notificationsListener != null) {
+            notificationsListener.remove();
         }
     }
 
@@ -75,12 +93,55 @@ public class ChatsFragment extends Fragment {
         binding.rvChats.setAdapter(adapter);
     }
 
+    private void setupNotificationsListener() {
+        if (currentUser == null) return;
+
+        // Remove any existing listener
+        if (notificationsListener != null) {
+            notificationsListener.remove();
+        }
+
+        // Listen for all notification changes
+        notificationsListener = db.collection("users")
+                .document(currentUser.getUid())
+                .collection("notifikasi")
+                .whereEqualTo("tipe", "pesan")
+                .whereEqualTo("sudahDibaca", false)
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null) {
+                        Log.w(TAG, "Listen for notifications failed.", e);
+                        return;
+                    }
+
+                    if (snapshots != null) {
+                        // Clear previous counts
+                        unreadCountsMap.clear();
+
+                        // Count notifications by chatRoomId
+                        for (QueryDocumentSnapshot doc : snapshots) {
+                            String chatRoomId = doc.getString("tujuanId");
+                            if (chatRoomId != null) {
+                                unreadCountsMap.put(chatRoomId, unreadCountsMap.getOrDefault(chatRoomId, 0) + 1);
+                            }
+                        }
+
+                        // Update the chat list with new unread counts
+                        updateUnreadCounts();
+                    }
+                });
+    }
+
     private void setupChatListListener() {
         if (currentUser == null) return;
         updateUiState(UiState.LOADING, null);
 
+        // Remove any existing listener
+        if (chatRoomsListener != null) {
+            chatRoomsListener.remove();
+        }
+
         // Use a real-time listener instead of get() to automatically update when changes occur
-        db.collection("chat_rooms")
+        chatRoomsListener = db.collection("chat_rooms")
                 .whereArrayContains("participants", currentUser.getUid())
                 .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener((queryDocumentSnapshots, e) -> {
@@ -129,6 +190,7 @@ public class ChatsFragment extends Fragment {
 
                         // Get the other user's profile
                         final String finalOtherUserId = otherUserId;
+                        final String chatRoomId = chatRoomDoc.getId();
                         db.collection("users").document(otherUserId).get()
                                 .addOnSuccessListener(userDoc -> {
                                     if (userDoc.exists()) {
@@ -136,12 +198,18 @@ public class ChatsFragment extends Fragment {
                                         if (otherUser != null) {
                                             // Create ChatPreview object
                                             ChatPreview preview = new ChatPreview();
-                                            preview.setChatRoomId(chatRoomDoc.getId());
+                                            preview.setChatRoomId(chatRoomId);
                                             preview.setOtherUserId(finalOtherUserId);
                                             preview.setOtherUserName(otherUser.getFullName());
                                             preview.setOtherUserPhotoBase64(otherUser.getProfileImageBase64());
                                             preview.setLastMessage(chatRoomDoc.getString("lastMessage"));
                                             preview.setLastMessageTimestamp(chatRoomDoc.getTimestamp("lastMessageTimestamp"));
+
+                                            // Set unread count if available
+                                            if (unreadCountsMap.containsKey(chatRoomId)) {
+                                                preview.setUnreadCount(unreadCountsMap.get(chatRoomId));
+                                            }
+
                                             tempList.add(preview);
                                         }
                                     }
@@ -160,6 +228,18 @@ public class ChatsFragment extends Fragment {
                 });
     }
 
+    private void updateUnreadCounts() {
+        for (ChatPreview preview : chatPreviewList) {
+            String chatRoomId = preview.getChatRoomId();
+            if (unreadCountsMap.containsKey(chatRoomId)) {
+                preview.setUnreadCount(unreadCountsMap.get(chatRoomId));
+            } else {
+                preview.setUnreadCount(0);
+            }
+        }
+        adapter.notifyDataSetChanged();
+    }
+
     private void updateAdapterWithList(List<ChatPreview> list) {
         chatPreviewList.clear();
         chatPreviewList.addAll(list);
@@ -170,6 +250,9 @@ public class ChatsFragment extends Fragment {
             if (o2.getLastMessageTimestamp() == null) return -1;
             return o2.getLastMessageTimestamp().compareTo(o1.getLastMessageTimestamp());
         });
+
+        // Update unread counts for all chats
+        updateUnreadCounts();
 
         adapter.notifyDataSetChanged();
         updateUiState(chatPreviewList.isEmpty() ? UiState.EMPTY : UiState.HAS_DATA, "Belum ada percakapan.");
@@ -188,6 +271,12 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (chatRoomsListener != null) {
+            chatRoomsListener.remove();
+        }
+        if (notificationsListener != null) {
+            notificationsListener.remove();
+        }
         binding = null;
     }
 }

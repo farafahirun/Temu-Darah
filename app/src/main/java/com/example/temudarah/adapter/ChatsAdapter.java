@@ -2,6 +2,7 @@ package com.example.temudarah.adapter;
 
 import android.util.Base64;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -88,6 +89,18 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
                 }
             } else {
                 binding.ivChatProfile.setImageResource(R.drawable.logo_merah);
+            }
+
+            // Show unread message count if any
+            if (chatPreview.getUnreadCount() > 0) {
+                binding.tvUnreadCounter.setVisibility(View.VISIBLE);
+                binding.tvUnreadCounter.setText(String.valueOf(chatPreview.getUnreadCount()));
+
+                // Make last message text bold to indicate unread
+                binding.tvLastMessage.setTypeface(null, android.graphics.Typeface.BOLD);
+            } else {
+                binding.tvUnreadCounter.setVisibility(View.GONE);
+                binding.tvLastMessage.setTypeface(null, android.graphics.Typeface.NORMAL);
             }
 
             // Atur listener klik untuk seluruh item

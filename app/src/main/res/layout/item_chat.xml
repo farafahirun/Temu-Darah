@@ -62,5 +62,24 @@
             android:textSize="12sp"
             android:text="10:30" />
 
+        <!-- Added unread message counter badge -->
+        <TextView
+            android:id="@+id/tvUnreadCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/tvChatTimestamp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/badge_background"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:minWidth="24dp"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="1" />
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>
