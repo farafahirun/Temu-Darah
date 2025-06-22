@@ -16,6 +16,7 @@ import com.example.temudarah.adapter.PermintaanSayaAdapter;
 import com.example.temudarah.databinding.FragmentPermintaanSayaBinding;
 import com.example.temudarah.model.PermintaanDonor;
 import com.example.temudarah.model.ProsesDonor;
+import com.example.temudarah.util.NotificationUtil;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -230,6 +231,17 @@ public class PermintaanSayaFragment extends Fragment {
                             batch.update(donorRef, "hasDonatedBefore", "Ya");
 
                             batch.update(donorRef, "donationCount", FieldValue.increment(1));
+
+                            String notifTitle = "Proses Donasi Selesai";
+                            String notifMessage = "Terima kasih! Permintaan untuk " + permintaan.getNamaPasien() + " telah ditandai selesai.";
+                            NotificationUtil.createNotification(
+                                    db,
+                                    proses.getDonorId(), // ID Penerima Notif (si pendonor)
+                                    notifTitle,
+                                    notifMessage,
+                                    "selesai", // Tipe notifikasi
+                                    proses.getRequestId()
+                            );
                         }
 
                         // Jalankan semua (hingga 3) operasi dalam satu batch

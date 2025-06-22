@@ -88,8 +88,17 @@ public class RiwayatFragment extends Fragment {
     private void setupRecyclerView() {
         binding.rvRiwayat.setLayoutManager(new LinearLayoutManager(getContext()));
         masterRiwayatList = new ArrayList<>();
-        donasiAdapter = new RiwayatDonasiAdapter(new ArrayList<>(), riwayat -> {
-            // TODO: Aksi saat item riwayat diklik
+        donasiAdapter = new RiwayatDonasiAdapter(new ArrayList<>(), proses -> {
+            if (proses.getProsesId() != null && !proses.getProsesId().isEmpty()) {
+                // Buat instance fragment detail dengan mengirim ID prosesnya
+                Fragment detailRiwayatFragment = DetailRiwayatFragment.newInstance(proses.getProsesId());
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, detailRiwayatFragment)
+                        .addToBackStack(null)
+                        .commit();
+            } else {
+                Toast.makeText(getContext(), "Tidak bisa membuka detail, ID tidak ditemukan.", Toast.LENGTH_SHORT).show();
+            }
         });
         binding.rvRiwayat.setAdapter(donasiAdapter);
     }

@@ -15,15 +15,10 @@ import com.example.temudarah.databinding.FragmentDetailRiwayatBinding;
 import com.example.temudarah.model.PermintaanDonor;
 import com.example.temudarah.model.ProsesDonor;
 import com.example.temudarah.model.User;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -68,86 +63,109 @@ public class DetailRiwayatFragment extends Fragment {
 
         if (prosesId != null) {
             loadRiwayatDetails();
+        } else {
+            handleFailure("ID Riwayat tidak valid.");
         }
     }
 
-    // Di dalam class DetailRiwayatFragment.java
-
+    /**
+     * FUNGSI YANG DIPERBAIKI TOTAL DENGAN LOGIKA BERANTAI YANG AMAN
+     */
     private void loadRiwayatDetails() {
         binding.progressBar.setVisibility(View.VISIBLE);
+
+        // Tahap 1: Ambil data utama dari 'active_donations'
         db.collection("active_donations").document(prosesId).get()
                 .addOnSuccessListener(prosesDoc -> {
                     if (!isAdded() || !prosesDoc.exists()) {
-                        if (isAdded()) Toast.makeText(getContext(), "Riwayat tidak ditemukan.", Toast.LENGTH_SHORT).show();
-                        binding.progressBar.setVisibility(View.GONE);
+                        handleFailure("Riwayat tidak ditemukan.");
+                        return;
+                    }
+                    ProsesDonor proses = prosesDoc.toObject(ProsesDonor.class);
+                    if (proses == null || proses.getRequestId() == null || proses.getRequesterId() == null || proses.getDonorId() == null) {
+                        handleFailure("Data riwayat tidak lengkap.");
                         return;
                     }
 
-                    ProsesDonor proses = prosesDoc.toObject(ProsesDonor.class);
-                    if (proses == null) return;
+                    // Tahap 2: Setelah data proses didapat, ambil detail permintaannya
+                    db.collection("donation_requests").document(proses.getRequestId()).get()
+                            .addOnSuccessListener(requestDoc -> {
+                                if (!isAdded() || !requestDoc.exists()) {
+                                    handleFailure("Detail permintaan tidak ditemukan.");
+                                    return;
+                                }
+                                PermintaanDonor permintaan = requestDoc.toObject(PermintaanDonor.class);
 
-                    String otherUserId = Objects.equals(currentUser.getUid(), proses.getRequesterId()) ? proses.getDonorId() : proses.getRequesterId();
+                                // Tahap 3: Ambil detail user peminta (requester)
+                                db.collection("users").document(proses.getRequesterId()).get()
+                                        .addOnSuccessListener(requesterDoc -> {
+                                            if (!isAdded() || !requesterDoc.exists()) {
+                                                handleFailure("Profil peminta tidak ditemukan.");
+                                                return;
+                                            }
+                                            User requester = requesterDoc.toObject(User.class);
 
-                    Task<DocumentSnapshot> userTask = db.collection("users").document(otherUserId).get();
-                    Task<DocumentSnapshot> requestTask = db.collection("donation_requests").document(proses.getRequestId()).get();
+                                            // Tahap 4: Ambil detail user pendonor (donor)
+                                            db.collection("users").document(proses.getDonorId()).get()
+                                                    .addOnSuccessListener(donorDoc -> {
+                                                        if (!isAdded() || !donorDoc.exists()) {
+                                                            handleFailure("Profil pendonor tidak ditemukan.");
+                                                            return;
+                                                        }
+                                                        User donor = donorDoc.toObject(User.class);
 
-                    // Kita gunakan List<Task<?>> agar lebih fleksibel
-                    List<Task<?>> allTasks = new ArrayList<>();
-                    allTasks.add(userTask);
-                    allTasks.add(requestTask);
+                                                        // Tahap Final: Setelah semua data lengkap, baru tampilkan ke UI
+                                                        binding.progressBar.setVisibility(View.GONE);
+                                                        populateUi(proses, permintaan, requester, donor);
 
-                    Tasks.whenAllSuccess(allTasks).addOnSuccessListener(results -> {
-                        if (!isAdded()) return;
-
-                        // --- PERBAIKAN UTAMA DI SINI (CASTING) ---
-                        // Kita konfirmasi secara manual bahwa hasil ke-0 adalah DocumentSnapshot
-                        DocumentSnapshot userResultDoc = (DocumentSnapshot) results.get(0);
-                        // Kita konfirmasi juga hasil ke-1 adalah DocumentSnapshot
-                        DocumentSnapshot requestResultDoc = (DocumentSnapshot) results.get(1);
-
-                        if (userResultDoc.exists() && requestResultDoc.exists()) {
-                            User otherUser = userResultDoc.toObject(User.class);
-                            PermintaanDonor permintaan = requestResultDoc.toObject(PermintaanDonor.class);
-                            populateUi(proses, permintaan, otherUser);
-                        }
-                        binding.progressBar.setVisibility(View.GONE);
-                    }).addOnFailureListener(e -> {
-                        if(isAdded()) binding.progressBar.setVisibility(View.GONE);
-                        Log.e(TAG, "Gagal mengambil detail user/permintaan.", e);
-                    });
+                                                    }).addOnFailureListener(e -> handleFailure("Gagal memuat profil pendonor."));
+                                        }).addOnFailureListener(e -> handleFailure("Gagal memuat profil peminta."));
+                            }).addOnFailureListener(e -> handleFailure("Gagal memuat detail permintaan."));
                 })
-                .addOnFailureListener(e -> {
-                    if (isAdded()) binding.progressBar.setVisibility(View.GONE);
-                    Log.e(TAG, "Gagal memuat detail riwayat", e);
-                });
+                .addOnFailureListener(e -> handleFailure("Gagal memuat riwayat."));
     }
 
-    private void populateUi(ProsesDonor proses, PermintaanDonor permintaan, User otherUser) {
-        if (getContext() == null) return;
+    private void populateUi(ProsesDonor proses, PermintaanDonor permintaan, User requester, User donor) {
+        if (getContext() == null || binding == null) return;
 
-        binding.tvDetailStatus.setText("Status: " + proses.getStatusProses());
+        binding.tvDetailStatus.setText(proses.getStatusProses());
+
+        String requesterName = (requester != null && requester.getFullName() != null) ? requester.getFullName() : "Data Dihapus";
+        String donorName = (donor != null && donor.getFullName() != null) ? donor.getFullName() : "Data Dihapus";
+
+        // Tambahkan label "(Anda)" untuk kejelasan
+        if (currentUser.getUid().equals(requester.getUid())) {
+            requesterName += " (Anda)";
+        }
+        if (currentUser.getUid().equals(donor.getUid())) {
+            donorName += " (Anda)";
+        }
+
+        binding.tvNamaPihak1.setText(requesterName);
+        binding.tvNamaPihak2.setText(donorName);
+
         binding.tvDetailPasien.setText(permintaan.getNamaPasien() + " (" + permintaan.getGolonganDarahDibutuhkan() + ")");
         binding.tvDetailLokasi.setText(permintaan.getNamaRumahSakit());
 
         if (proses.getTimestamp() != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", Locale.forLanguageTag("id-ID"));
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy, HH:mm", new Locale("id", "ID"));
             binding.tvDetailTanggal.setText("Pada " + sdf.format(proses.getTimestamp().toDate()));
         }
 
-        boolean sayaPendonor = currentUser.getUid().equals(proses.getDonorId());
-        if (sayaPendonor) {
-            binding.tvDetailPeran.setText("Anda Membantu");
-            binding.tvDetailNamaLawan.setText("Permintaan dari " + otherUser.getFullName());
-        } else {
-            binding.tvDetailPeran.setText("Anda Dibantu oleh");
-            binding.tvDetailNamaLawan.setText(otherUser.getFullName());
-        }
-
-        // Atur warna status
         int colorRes = R.color.text_info;
-        if ("Selesai".equals(proses.getStatusProses())) colorRes = R.color.sukses;
-        else if ("Dibatalkan".equals(proses.getStatusProses())) colorRes = R.color.utama;
+        if ("Selesai".equals(proses.getStatusProses())) {
+            colorRes = R.color.sukses;
+        } else if (proses.getStatusProses() != null && proses.getStatusProses().contains("Dibatalkan")) {
+            colorRes = R.color.utama;
+        }
         binding.tvDetailStatus.setTextColor(ContextCompat.getColor(getContext(), colorRes));
+    }
+
+    private void handleFailure(String message) {
+        if (isAdded() && getContext() != null) {
+            binding.progressBar.setVisibility(View.GONE);
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

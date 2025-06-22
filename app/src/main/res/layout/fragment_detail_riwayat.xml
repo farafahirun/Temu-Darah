@@ -13,7 +13,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/white"
         app:navigationIcon="@drawable/kembali"
-        app:title="Detail Riwayat Donasi"
+        app:title="Detail Riwayat"
         app:titleCentered="true"
         app:titleTextColor="@color/black" />
 
@@ -40,18 +40,24 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Status Proses"
+                        android:textSize="14sp" />
+
+                    <TextView
                         android:id="@+id/tvDetailStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="18sp"
+                        android:textSize="20sp"
                         android:textStyle="bold"
-                        tools:text="Status: Selesai" />
+                        tools:text="Selesai" />
 
                     <TextView
                         android:id="@+id/tvDetailTanggal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="8dp"
                         android:textSize="12sp"
                         tools:text="Pada 22 Juni 2025" />
                 </LinearLayout>
@@ -70,53 +76,94 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/tvPihak1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Peran Anda" />
+                        android:text="Peminta Bantuan" />
 
                     <TextView
-                        android:id="@+id/tvDetailPeran"
+                        android:id="@+id/tvNamaPihak1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Anda Membantu" />
+                        tools:text="Ani" />
 
                     <TextView
+                        android:id="@+id/tvPihak2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Interaksi dengan" />
+                        android:text="Pendonor" />
 
                     <TextView
-                        android:id="@+id/tvDetailNamaLawan"
+                        android:id="@+id/tvNamaPihak2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Permintaan dari Budi Santoso" />
+                        tools:text="Budi" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
-                        android:layout_marginTop="12dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Untuk Pasien" />
+                        android:text="Detail Kebutuhan"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:background="@color/utama"
+                        android:layout_height="1dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_marginVertical="8dp"
+                        android:layout_height="wrap_content"
+                        tools:text="Pasien" />
 
                     <TextView
                         android:id="@+id/tvDetailPasien"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="Anisa Putri (A+)" />
+                        tools:text="Siti" />
 
                     <TextView
-                        android:layout_marginTop="12dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Golongan Darah" />
+
+                    <TextView
+                        android:id="@+id/tvDetailGolDarah"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="O+" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
                         android:text="Lokasi" />
 
                     <TextView
                         android:id="@+id/tvDetailLokasi"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        tools:text="RS. Harapan Bunda" />
+                        tools:text="RS. Wahidin" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
     </ScrollView>
 

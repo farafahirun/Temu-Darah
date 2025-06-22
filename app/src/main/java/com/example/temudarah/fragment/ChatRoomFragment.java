@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.temudarah.activity.MainActivity;
 import com.example.temudarah.adapter.PesanAdapter;
 import com.example.temudarah.databinding.FragmentChatRoomBinding;
+import com.example.temudarah.model.Notifikasi;
 import com.example.temudarah.model.Pesan;
 import com.example.temudarah.model.ProsesDonor;
 import com.google.firebase.Timestamp;
@@ -24,7 +25,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
+//import com.google.firebase.firestore.auth.User;
+import com.example.temudarah.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +99,7 @@ public class ChatRoomFragment extends Fragment {
         loadDonationProcess(); // Load process info to check who's the requester/donor
 
         binding.btnSendMessage.setOnClickListener(v -> sendMessage());
+        markNotificationsAsRead();
     }
 
     private void setupRecyclerView() {
@@ -134,24 +139,65 @@ public class ChatRoomFragment extends Fragment {
         String messageText = binding.etMessage.getText().toString().trim();
         if (TextUtils.isEmpty(messageText) || currentUser == null || chatRoomId == null) return;
 
-        // Buat objek Pesan baru
+        String senderName = currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User";
+
         Pesan pesan = new Pesan();
         pesan.setText(messageText);
         pesan.setSenderId(currentUser.getUid());
-        pesan.setSenderName(currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User");
+        pesan.setSenderName(senderName);
         pesan.setTimestamp(Timestamp.now());
 
-        // 1. Simpan pesan ke sub-koleksi 'messages' (ini tidak berubah)
+        binding.etMessage.setText(""); // Langsung kosongkan UI
+
+        // Simpan pesan ke sub-koleksi 'messages'
         db.collection("chats").document(chatRoomId).collection("messages")
                 .add(pesan)
                 .addOnSuccessListener(documentReference -> {
-                    binding.etMessage.setText(""); // Kosongkan input setelah terkirim
-
-                    // 2. SETELAH PESAN BERHASIL DISIMPAN, UPDATE DOKUMEN 'active_donations'
+                    binding.etMessage.setText("");
+                    createMessageNotification(pesan);
+                    // Panggil dengan 3 parameter yang benar
                     updateLastMessage(chatRoomId, messageText, pesan.getTimestamp());
                 })
                 .addOnFailureListener(e -> {
+                    // Jika gagal, mungkin kembalikan teksnya atau tampilkan pesan error
+                    binding.etMessage.setText(messageText);
                     Toast.makeText(getContext(), "Gagal mengirim pesan.", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void createMessageNotification(Pesan pesan) {
+        if (chatRoomId == null) return;
+
+        // 1. Cari tahu siapa ID penerima
+        String[] participants = chatRoomId.split("_");
+        String recipientId = participants[0].equals(currentUser.getUid()) ? participants[1] : participants[0];
+
+        // 2. Cek pengaturan notifikasi si penerima terlebih dahulu
+        db.collection("users").document(recipientId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        User recipient = documentSnapshot.toObject(User.class);
+                        // Hanya kirim notifikasi jika user mengizinkannya
+                        if (recipient != null && recipient.isNotifPesanBaru()) {
+
+                            // 3. Buat objek notifikasi
+                            Notifikasi notif = new Notifikasi();
+                            notif.setJudul("Pesan baru dari " + pesan.getSenderName());
+                            notif.setPesan(pesan.getText());
+                            notif.setWaktu(pesan.getTimestamp());
+                            notif.setSudahDibaca(false);
+                            notif.setTipe("pesan"); // Tipe notifikasi
+                            notif.setTujuanId(chatRoomId); // ID tujuan agar bisa diklik
+
+                            // 4. Simpan notifikasi ke sub-koleksi milik si PENERIMA
+                            db.collection("users").document(recipientId)
+                                    .collection("notifikasi").add(notif)
+                                    .addOnSuccessListener(docRef -> Log.d(TAG, "Notifikasi berhasil dibuat untuk " + recipientId))
+                                    .addOnFailureListener(e -> Log.e(TAG, "Gagal membuat notifikasi", e));
+                        } else {
+                            Log.d(TAG, "User " + recipientId + " mematikan notifikasi pesan baru.");
+                        }
+                    }
                 });
     }
 
@@ -214,5 +260,29 @@ public class ChatRoomFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "Error loading donation process", e));
+    }
+
+    private void markNotificationsAsRead() {
+        if (currentUser == null || chatRoomId == null) return;
+
+        db.collection("users").document(currentUser.getUid()).collection("notifikasi")
+                .whereEqualTo("tujuanId", chatRoomId)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        // Tidak ada notifikasi untuk dihapus, tidak perlu melakukan apa-apa
+                        return;
+                    }
+
+                    // Gunakan WriteBatch untuk menghapus semua notifikasi yang cocok dalam satu operasi
+                    WriteBatch batch = db.batch();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        batch.delete(doc.getReference());
+                    }
+
+                    batch.commit()
+                            .addOnSuccessListener(aVoid -> Log.d(TAG, "Notifikasi untuk chat " + chatRoomId + " berhasil dihapus."))
+                            .addOnFailureListener(e -> Log.e(TAG, "Gagal menghapus notifikasi", e));
+                });
     }
 }

@@ -18,6 +18,7 @@ import com.example.temudarah.activity.MainActivity;
 import com.example.temudarah.databinding.FragmentDetailPermintaanBinding;
 import com.example.temudarah.model.PermintaanDonor;
 import com.example.temudarah.model.ProsesDonor;
+import com.example.temudarah.util.NotificationUtil;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -176,6 +177,16 @@ public class DetailPermintaanFragment extends Fragment {
 
         batch.commit().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Anda telah menawarkan bantuan!", Toast.LENGTH_LONG).show();
+            String notifTitle = "Bantuan Datang!";
+            String notifMessage = mAuth.getCurrentUser().getDisplayName() + " menawarkan bantuan untuk permintaan Anda.";
+            NotificationUtil.createNotification(
+                    db,
+                    currentPermintaan.getPembuatUid(), // ID Penerima Notif
+                    notifTitle,
+                    notifMessage,
+                    "bantuan", // Tipe notifikasi
+                    currentPermintaan.getRequestId() // ID tujuan
+            );
             navigateToChatRoom(chatRoomId, currentPermintaan.getNamaPembuat());
         }).addOnFailureListener(e -> {
             binding.btnBeriBantuan.setEnabled(true);

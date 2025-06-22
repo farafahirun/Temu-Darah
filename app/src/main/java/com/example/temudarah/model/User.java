@@ -21,10 +21,13 @@ public class User {
     private String geohash;
     private String fcmToken;
     private int donationCount;
+    private boolean notifPesanBaru = true; // Notifikasi untuk chat baru
+    private boolean notifTawaranBantuan = true; // Notifikasi saat ada yg "Beri Bantuan"
+    private boolean notifPermintaanSelesai = true;
 
     public User() {}
 
-    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageBase64, String lastDonationDate, GeoPoint location, String geohash, String fcmToken, int donationCount) {
+    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageBase64, String lastDonationDate, GeoPoint location, String geohash, String fcmToken, int donationCount, boolean notifPesanBaru, boolean notifTawaranBantuan, boolean notifPermintaanSelesai) {
         this.uid = uid;
         this.email = email;
         this.username = username;
@@ -43,6 +46,9 @@ public class User {
         this.geohash = geohash;
         this.fcmToken = fcmToken;
         this.donationCount = donationCount;
+        this.notifPesanBaru = notifPesanBaru;
+        this.notifTawaranBantuan = notifTawaranBantuan;
+        this.notifPermintaanSelesai = notifPermintaanSelesai;
     }
 
     public String getUid() {
@@ -179,5 +185,29 @@ public class User {
 
     public void setDonationCount(int donationCount) {
         this.donationCount = donationCount;
+    }
+
+    public boolean isNotifPesanBaru() {
+        return notifPesanBaru;
+    }
+
+    public void setNotifPesanBaru(boolean notifPesanBaru) {
+        this.notifPesanBaru = notifPesanBaru;
+    }
+
+    public boolean isNotifTawaranBantuan() {
+        return notifTawaranBantuan;
+    }
+
+    public void setNotifTawaranBantuan(boolean notifTawaranBantuan) {
+        this.notifTawaranBantuan = notifTawaranBantuan;
+    }
+
+    public boolean isNotifPermintaanSelesai() {
+        return notifPermintaanSelesai;
+    }
+
+    public void setNotifPermintaanSelesai(boolean notifPermintaanSelesai) {
+        this.notifPermintaanSelesai = notifPermintaanSelesai;
     }
 }

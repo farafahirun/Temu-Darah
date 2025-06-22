@@ -24,7 +24,7 @@
 
             <!-- Back Button -->
             <ImageView
-                android:id="@+id/iv_back"
+                android:id="@+id/btn_back"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginEnd="20dp"
@@ -68,13 +68,27 @@
 
         <!-- RecyclerView for notifications will go below -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_notifications"
+            android:id="@+id/rv_notifikasi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/underline_separator"
             android:clipToPadding="false"
             android:paddingTop="8dp"
             tools:listitem="@layout/item_notifikasi" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/tvEmptyState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Belum ada riwayat."
+            android:visibility="gone" />
     </RelativeLayout>
 
 </FrameLayout>
