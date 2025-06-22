@@ -27,7 +27,7 @@ import java.util.List;
 
 public class NotifikasiFragment extends Fragment {
 
-    private static final String TAG = "NotifikasiFragment";
+    private static final String TAG = "NotifikasiFragmentDebug";
     private FragmentNotifikasiBinding binding;
     private FirebaseFirestore db;
     private FirebaseUser currentUser;
@@ -71,6 +71,9 @@ public class NotifikasiFragment extends Fragment {
         binding.rvNotifikasi.setAdapter(adapter);
     }
 
+    // Di NotifikasiFragment.java
+
+
     private void loadNotifications() {
         binding.progressBar.setVisibility(View.VISIBLE);
         db.collection("users").document(currentUser.getUid()).collection("notifikasi")
@@ -83,8 +86,15 @@ public class NotifikasiFragment extends Fragment {
                     notifikasiList.clear();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Notifikasi notifikasi = doc.toObject(Notifikasi.class);
-                        // PENTING: Simpan ID dokumen ke dalam objek notifikasi
                         notifikasi.setNotifId(doc.getId());
+
+                        // --- Tambahkan log ini ---
+                        Log.d(TAG, "Notifikasi Loaded: " + notifikasi.getJudul());
+                        Log.d(TAG, "Pesan: " + notifikasi.getPesan());
+                        Log.d(TAG, "Sender Name (dari objek Notifikasi): " + notifikasi.getSenderName());
+                        Log.d(TAG, "Tipe: " + notifikasi.getTipe());
+                        // --- Akhir log ---
+
                         notifikasiList.add(notifikasi);
                     }
                     adapter.notifyDataSetChanged();
@@ -96,7 +106,6 @@ public class NotifikasiFragment extends Fragment {
                     Log.e(TAG, "Gagal memuat notifikasi", e);
                 });
     }
-
     /**
      * Fungsi utama untuk menangani klik pada notifikasi.
      */

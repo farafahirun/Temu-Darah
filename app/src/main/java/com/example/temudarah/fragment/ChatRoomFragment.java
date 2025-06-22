@@ -145,12 +145,19 @@ public class ChatRoomFragment extends Fragment {
         String messageText = binding.etMessage.getText().toString().trim();
         if (TextUtils.isEmpty(messageText) || currentUser == null || chatRoomId == null) return;
 
-        String senderName = currentUser.getDisplayName() != null ? currentUser.getDisplayName() : "User";
+        // Ambil nama pengirim dari display name, jika null/kosong, fallback ke email, lalu "User"
+        String senderName = currentUser.getDisplayName();
+        if (senderName == null || senderName.trim().isEmpty()) {
+            senderName = currentUser.getEmail(); // Fallback ke email
+            if (senderName == null || senderName.trim().isEmpty()) {
+                senderName = "User"; // Fallback terakhir jika email juga null/kosong
+            }
+        }
 
         Pesan pesan = new Pesan();
         pesan.setText(messageText);
         pesan.setSenderId(currentUser.getUid());
-        pesan.setSenderName(senderName);
+        pesan.setSenderName(senderName); // Menggunakan senderName yang sudah diproses
         pesan.setTimestamp(Timestamp.now());
 
         binding.etMessage.setText(""); // Langsung kosongkan UI
@@ -171,31 +178,41 @@ public class ChatRoomFragment extends Fragment {
                 });
     }
 
+    // Di dalam ChatRoomFragment.java
     private void createMessageNotification(Pesan pesan) {
         if (chatRoomId == null) return;
 
-        // 1. Cari tahu siapa ID penerima
         String[] participants = chatRoomId.split("_");
         String recipientId = participants[0].equals(currentUser.getUid()) ? participants[1] : participants[0];
 
-        // 2. Cek pengaturan notifikasi si penerima terlebih dahulu
         db.collection("users").document(recipientId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         User recipient = documentSnapshot.toObject(User.class);
-                        // Hanya kirim notifikasi jika user mengizinkannya
                         if (recipient != null && recipient.isNotifPesanBaru()) {
 
-                            // 3. Buat objek notifikasi
                             Notifikasi notif = new Notifikasi();
-                            notif.setJudul("Pesan baru dari " + pesan.getSenderName());
+                            notif.setJudul("Pesan baru"); // Judul umum
                             notif.setPesan(pesan.getText());
                             notif.setWaktu(pesan.getTimestamp());
                             notif.setSudahDibaca(false);
-                            notif.setTipe("pesan"); // Tipe notifikasi
-                            notif.setTujuanId(chatRoomId); // ID tujuan agar bisa diklik
+                            notif.setTipe("pesan");
+                            notif.setTujuanId(chatRoomId);
+                            notif.setSenderId(pesan.getSenderId());
 
-                            // 4. Simpan notifikasi ke sub-koleksi milik si PENERIMA
+                            // PENTING: Prioritaskan nama dari objek Pesan, lalu display name, lalu email, lalu "Pengguna Tak Dikenal"
+                            String senderNameForNotification = pesan.getSenderName(); // Coba ambil dari objek Pesan dulu
+                            if (senderNameForNotification == null || senderNameForNotification.trim().isEmpty()) {
+                                senderNameForNotification = currentUser.getDisplayName(); // Coba ambil dari displayName pengguna saat ini
+                                if (senderNameForNotification == null || senderNameForNotification.trim().isEmpty()) {
+                                    senderNameForNotification = currentUser.getEmail(); // Fallback ke email
+                                    if (senderNameForNotification == null || senderNameForNotification.trim().isEmpty()) {
+                                        senderNameForNotification = "Pengguna Tak Dikenal"; // Fallback terakhir
+                                    }
+                                }
+                            }
+                            notif.setSenderName(senderNameForNotification);
+
                             db.collection("users").document(recipientId)
                                     .collection("notifikasi").add(notif)
                                     .addOnSuccessListener(docRef -> Log.d(TAG, "Notifikasi berhasil dibuat untuk " + recipientId))

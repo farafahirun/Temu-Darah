@@ -12,6 +12,8 @@ public class Notifikasi {
     private boolean sudahDibaca;
     private String tipe; // "pesan", "bantuan", "selesai"
     private String tujuanId; // ID dari chat, permintaan, atau proses donasi
+    private String senderId; // BARU: Tambahkan properti ini
+    private String senderName; // BARU: Tambahkan properti ini
 
     public Notifikasi() {}
 
@@ -69,5 +71,23 @@ public class Notifikasi {
 
     public void setTujuanId(String tujuanId) {
         this.tujuanId = tujuanId;
+    }
+
+    // BARU: Tambahkan getter dan setter untuk senderId
+    public String getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
+    }
+
+    // BARU: Tambahkan getter dan setter untuk senderName
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 }

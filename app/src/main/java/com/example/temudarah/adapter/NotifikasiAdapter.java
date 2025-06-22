@@ -53,6 +53,7 @@ public class NotifikasiAdapter extends RecyclerView.Adapter<NotifikasiAdapter.Vi
 
         void bind(final Notifikasi notifikasi, final OnItemClickListener listener) {
             binding.tvNotifJudul.setText(notifikasi.getJudul());
+            binding.tvNotifSender.setText("From: " + (notifikasi.getSenderName() != null ? notifikasi.getSenderName() : "-"));
             binding.tvNotifPesan.setText(notifikasi.getPesan());
 
             if (notifikasi.getWaktu() != null) {

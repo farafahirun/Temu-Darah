@@ -11,39 +11,38 @@ public class NotificationUtil {
     private static final String TAG = "NotificationUtil";
 
     /**
-     * Fungsi terpusat untuk membuat dokumen notifikasi di Firestore.
-     * @param db Instance dari FirebaseFirestore.
-     * @param recipientId UID dari pengguna yang akan menerima notifikasi.
-     * @param title Judul notifikasi.
-     * @param message Isi pesan notifikasi.
-     * @param type Tipe notifikasi ("bantuan", "selesai", dll.)
-     * @param tujuanId ID dokumen tujuan (misal: requestId atau chatRoomId).
+     * Centralized function to create a notification document in Firestore.
+     * @param db Instance of FirebaseFirestore.
+     * @param recipientId UID of the user who will receive the notification.
+     * @param title Notification title.
+     * @param message Notification message.
+     * @param type Notification type ("bantuan", "selesai", etc.)
+     * @param targetId Target document ID (e.g., requestId or chatRoomId).
+     * @param senderId UID of the sender.
+     * @param senderName Name of the sender.
      */
-    public static void createNotification(FirebaseFirestore db, String recipientId, String title, String message, String type, String tujuanId) {
-        // Cek pengaturan notifikasi si penerima terlebih dahulu
+    public static void createNotification(FirebaseFirestore db, String recipientId, String title, String message, String type, String targetId, String senderId, String senderName) {
         db.collection("users").document(recipientId).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         User recipient = documentSnapshot.toObject(User.class);
 
-                        // TODO: Tambahkan pengecekan spesifik berdasarkan tipe notifikasi
-                        // Contoh: if (recipient != null && recipient.isNotifTawaranBantuan()) { ... }
-                        // Untuk saat ini, kita anggap semua notif diizinkan
+                        // For now, assume all notifications are allowed
                         if (recipient != null) {
-
                             Notifikasi notif = new Notifikasi();
                             notif.setJudul(title);
                             notif.setPesan(message);
                             notif.setWaktu(Timestamp.now());
                             notif.setSudahDibaca(false);
                             notif.setTipe(type);
-                            notif.setTujuanId(tujuanId);
+                            notif.setTujuanId(targetId);
+                            notif.setSenderId(senderId);
+                            notif.setSenderName(senderName);
 
-                            // Simpan notifikasi ke sub-koleksi milik si PENERIMA
                             db.collection("users").document(recipientId)
                                     .collection("notifikasi").add(notif)
-                                    .addOnSuccessListener(docRef -> Log.d(TAG, "Notifikasi '" + type + "' berhasil dibuat untuk " + recipientId))
-                                    .addOnFailureListener(e -> Log.e(TAG, "Gagal membuat notifikasi '" + type + "'", e));
+                                    .addOnSuccessListener(docRef -> Log.d(TAG, "Notification '" + type + "' created for " + recipientId))
+                                    .addOnFailureListener(e -> Log.e(TAG, "Failed to create notification '" + type + "'", e));
                         }
                     }
                 });

@@ -143,6 +143,7 @@ public class DetailPermintaanFragment extends Fragment {
      */
     // Di dalam class DetailPermintaanFragment.java
 
+    // Di dalam DetailPermintaanFragment.java
     private void offerHelp() {
         FirebaseUser donorUser = mAuth.getCurrentUser();
         if (donorUser == null || currentPermintaan == null) return;
@@ -160,10 +161,7 @@ public class DetailPermintaanFragment extends Fragment {
         DocumentReference requestRef = db.collection("donation_requests").document(requestId);
         batch.update(requestRef, "status", "Dalam Proses");
 
-        // --- PERBAIKAN PALING PENTING ADA DI SINI ---
-        // Memanggil .document() tanpa argumen akan MEMBUAT ID DOKUMEN BARU YANG ACAK DAN UNIK.
         DocumentReference donationProcessRef = db.collection("active_donations").document();
-        // ---------------------------------------------
 
         ProsesDonor newProcess = new ProsesDonor();
         newProcess.setRequestId(requestId);
@@ -181,22 +179,35 @@ public class DetailPermintaanFragment extends Fragment {
         DocumentReference chatRoomRef = db.collection("chat_rooms").document(chatRoomId);
         Map<String, Object> chatRoomData = new HashMap<>();
         chatRoomData.put("participants", Arrays.asList(currentPermintaan.getPembuatUid(), donorUser.getUid()));
-        chatRoomData.put("lastMessageTimestamp", Timestamp.now()); // Set waktu awal
-        // Menggunakan SetOptions.merge() akan membuat dokumen baru jika belum ada,
-        // atau hanya memperbarui jika sudah ada, tanpa menghapus field lain.
+        chatRoomData.put("lastMessageTimestamp", Timestamp.now());
         batch.set(chatRoomRef, chatRoomData, SetOptions.merge());
 
         batch.commit().addOnSuccessListener(aVoid -> {
             Toast.makeText(getContext(), "Anda telah menawarkan bantuan!", Toast.LENGTH_LONG).show();
+
             String notifTitle = "Bantuan Datang!";
-            String notifMessage = mAuth.getCurrentUser().getDisplayName() + " menawarkan bantuan untuk permintaan Anda.";
+
+            // START OF MODIFICATION for senderName fallback logic
+            String senderName = donorUser.getDisplayName(); // Coba ambil display name dulu
+            if (senderName == null || senderName.trim().isEmpty()) {
+                senderName = donorUser.getEmail(); // Jika display name kosong/null, fallback ke email
+                if (senderName == null || senderName.trim().isEmpty()) {
+                    senderName = "Pengguna Tak Dikenal"; // Jika email juga kosong/null, fallback akhir
+                }
+            }
+            // END OF MODIFICATION
+
+            String notifMessage = senderName + " menawarkan bantuan untuk permintaan Anda.";
+
             NotificationUtil.createNotification(
                     db,
                     currentPermintaan.getPembuatUid(), // ID Penerima Notif
                     notifTitle,
                     notifMessage,
                     "bantuan", // Tipe notifikasi
-                    currentPermintaan.getRequestId() // ID tujuan
+                    currentPermintaan.getRequestId(), // ID tujuan
+                    donorUser.getUid(), // Mengatur senderId
+                    senderName // Mengatur senderName yang sudah diproses
             );
             navigateToChatRoom(chatRoomId, currentPermintaan.getNamaPembuat());
         }).addOnFailureListener(e -> {

@@ -1,6 +1,7 @@
 package com.example.temudarah.fragment;
 
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,7 +69,7 @@ public class PermintaanSayaFragment extends Fragment {
         } else {
             binding.tvEmptyState.setText("Harap login untuk melihat riwayat.");
             binding.tvEmptyState.setVisibility(View.VISIBLE);
-            binding.progressBar.setVisibility(View.GONE); // Pastikan progress bar mati
+            binding.progressBar.setVisibility(View.GONE);
         }
     }
 
@@ -126,25 +127,25 @@ public class PermintaanSayaFragment extends Fragment {
                 .orderBy("waktuDibuat", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!isAdded()) return; // Pastikan fragment masih melekat
+                    if (!isAdded()) return;
 
                     binding.progressBar.setVisibility(View.GONE);
                     permintaanSayaList.clear();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         PermintaanDonor permintaan = doc.toObject(PermintaanDonor.class);
                         if (permintaan != null) {
-                            permintaan.setRequestId(doc.getId()); // Set ID dokumen dari Firestore
+                            permintaan.setRequestId(doc.getId());
                             permintaanSayaList.add(permintaan);
                         }
                     }
                     adapter.notifyDataSetChanged();
-                    updateEmptyState(); // Panggil metode untuk mengupdate empty state
+                    updateEmptyState();
                 }).addOnFailureListener(e -> {
                     if (!isAdded()) return;
                     binding.progressBar.setVisibility(View.GONE);
                     Toast.makeText(getContext(), "Gagal memuat permintaan saya.", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Error loading my requests", e);
-                    updateEmptyState(); // Perbarui status kosong meskipun ada error
+                    updateEmptyState();
                 });
     }
 
@@ -155,7 +156,6 @@ public class PermintaanSayaFragment extends Fragment {
             binding.tvEmptyState.setText("Belum ada permintaan donor yang aktif.");
         }
     }
-
 
     private void showStatusChangeDialog(PermintaanDonor permintaan) {
         String currentStatus = permintaan.getStatus();
@@ -218,13 +218,24 @@ public class PermintaanSayaFragment extends Fragment {
 
                         // Kirim notifikasi ke pendonor bahwa permintaannya dibatalkan
                         if (proses != null && proses.getDonorId() != null) {
+                            // Ambil nama pengirim dari display name, jika null/kosong, fallback ke email, lalu "User"
+                            String senderNameForNotification = currentUser.getDisplayName();
+                            if (senderNameForNotification == null || senderNameForNotification.trim().isEmpty()) {
+                                senderNameForNotification = currentUser.getEmail(); // Fallback ke email
+                                if (senderNameForNotification == null || senderNameForNotification.trim().isEmpty()) {
+                                    senderNameForNotification = "Pengguna"; // Fallback terakhir
+                                }
+                            }
+
                             NotificationUtil.createNotification(
                                     db,
-                                    proses.getDonorId(), // ID Penerima Notif (si pendonor)
+                                    proses.getDonorId(),
                                     "Bantuan Dibatalkan",
-                                    "Permintaan untuk " + permintaan.getNamaPasien() + " telah dibatalkan oleh penerima.",
-                                    "dibatalkan", // Tipe notifikasi
-                                    permintaan.getRequestId() // ID permintaan
+                                    "Permintaan untuk " + permintaan.getNamaPasien() + " telah dibatalkan oleh " + senderNameForNotification + ".",
+                                    "dibatalkan",
+                                    permintaan.getRequestId(),
+                                    currentUser.getUid(),
+                                    senderNameForNotification
                             );
                         }
 
@@ -245,7 +256,6 @@ public class PermintaanSayaFragment extends Fragment {
                 });
     }
 
-
     private void updateRequestStatus(PermintaanDonor permintaan, String newStatus) {
         binding.progressBar.setVisibility(View.VISIBLE);
         WriteBatch batch = db.batch();
@@ -256,21 +266,21 @@ public class PermintaanSayaFragment extends Fragment {
         if ("Selesai".equals(newStatus)) {
             db.collection("active_donations").whereEqualTo("requestId", permintaan.getRequestId()).limit(1).get()
                     .addOnSuccessListener(snapshots -> {
-                        if (!isAdded()) return; // Pastikan fragment masih melekat
+                        if (!isAdded()) return;
 
                         if (snapshots.isEmpty()) {
-                            commitBatch(batch); // Jika tidak ada proses aktif, hanya update status permintaan
+                            commitBatch(batch);
                             return;
                         }
 
                         DocumentSnapshot prosesDoc = snapshots.getDocuments().get(0);
                         ProsesDonor proses = prosesDoc.toObject(ProsesDonor.class);
 
-                        batch.update(prosesDoc.getReference(), "statusProses", "Selesai"); // Update status di active_donations
+                        batch.update(prosesDoc.getReference(), "statusProses", "Selesai");
 
                         if (proses != null && proses.getDonorId() != null) {
                             DocumentReference donorRef = db.collection("users").document(proses.getDonorId());
-                            String todayDate = new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID")).format(new Date());
+                            String todayDate = new SimpleDateFormat("dd MMMMyyyy", new Locale("id", "ID")).format(new Date());
 
                             batch.update(donorRef, "lastDonationDate", todayDate);
                             batch.update(donorRef, "hasDonatedBefore", "Ya");
@@ -278,16 +288,28 @@ public class PermintaanSayaFragment extends Fragment {
 
                             String notifTitle = "Proses Donasi Selesai";
                             String notifMessage = "Terima kasih! Permintaan untuk " + permintaan.getNamaPasien() + " telah ditandai selesai.";
+
+                            // Ambil email user saat ini untuk senderName
+                            String senderEmail = currentUser.getEmail();
+                            String senderNameForNotification;
+                            if (senderEmail != null && !senderEmail.trim().isEmpty()) {
+                                senderNameForNotification = senderEmail;
+                            } else {
+                                senderNameForNotification = "Pengguna";
+                            }
+
                             NotificationUtil.createNotification(
                                     db,
                                     proses.getDonorId(),
                                     notifTitle,
                                     notifMessage,
                                     "selesai",
-                                    proses.getRequestId()
+                                    proses.getRequestId(),
+                                    currentUser.getUid(),
+                                    senderNameForNotification
                             );
                         }
-                        commitBatch(batch); // Jalankan semua operasi dalam satu batch
+                        commitBatch(batch);
                     }).addOnFailureListener(e -> {
                         if (!isAdded()) return;
                         commitBatch(batch); // Jika gagal mencari, tetap commit perubahan status permintaan awal
