@@ -24,10 +24,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
-//import com.google.firebase.firestore.auth.User;
 import com.example.temudarah.model.User;
 
 import java.util.ArrayList;
@@ -47,6 +47,9 @@ public class ChatRoomFragment extends Fragment {
     private List<Pesan> pesanList;
     private String chatRoomId;
     private String otherUserName;
+
+    // Add ListenerRegistration to properly manage the listener lifecycle
+    private ListenerRegistration messagesListener;
 
     public static ChatRoomFragment newInstance(String chatRoomId, String otherUserName) {
         ChatRoomFragment fragment = new ChatRoomFragment();
@@ -114,8 +117,13 @@ public class ChatRoomFragment extends Fragment {
     private void listenForMessages() {
         if (chatRoomId == null || currentUser == null) return;
 
+        // Remove any existing listener before setting a new one
+        if (messagesListener != null) {
+            messagesListener.remove();
+        }
+
         // Ini adalah listener real-time. Kode ini akan otomatis berjalan setiap ada pesan baru.
-        db.collection("chats").document(chatRoomId).collection("messages")
+        messagesListener = db.collection("chats").document(chatRoomId).collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
@@ -123,7 +131,7 @@ public class ChatRoomFragment extends Fragment {
                         return;
                     }
 
-                    if (value != null) {
+                    if (value != null && isAdded()) {
                         pesanList.clear();
                         pesanList.addAll(value.toObjects(Pesan.class));
                         adapter.notifyDataSetChanged();
@@ -132,8 +140,6 @@ public class ChatRoomFragment extends Fragment {
                     }
                 });
     }
-
-// Di dalam class ChatRoomFragment.java
 
     private void sendMessage() {
         String messageText = binding.etMessage.getText().toString().trim();
@@ -153,7 +159,7 @@ public class ChatRoomFragment extends Fragment {
         db.collection("chats").document(chatRoomId).collection("messages")
                 .add(pesan)
                 .addOnSuccessListener(documentReference -> {
-                    binding.etMessage.setText("");
+                    // Chat room will be automatically updated via listener
                     createMessageNotification(pesan);
                     // Panggil dengan 3 parameter yang benar
                     updateLastMessage(chatRoomId, messageText, pesan.getTimestamp());
@@ -284,5 +290,18 @@ public class ChatRoomFragment extends Fragment {
                             .addOnSuccessListener(aVoid -> Log.d(TAG, "Notifikasi untuk chat " + chatRoomId + " berhasil dihapus."))
                             .addOnFailureListener(e -> Log.e(TAG, "Gagal menghapus notifikasi", e));
                 });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Clean up listener when fragment is destroyed
+        if (messagesListener != null) {
+            messagesListener.remove();
+        }
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).showBottomNav(); // Restore bottom nav if it was hidden
+        }
+        binding = null;
     }
 }

@@ -56,7 +56,7 @@ public class ChatsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (currentUser != null) {
-            loadChatList();
+            setupChatListListener(); // Changed from loadChatList() to setupChatListListener()
         } else {
             updateUiState(UiState.EMPTY, "Anda perlu login untuk melihat pesan.");
         }
@@ -75,20 +75,24 @@ public class ChatsFragment extends Fragment {
         binding.rvChats.setAdapter(adapter);
     }
 
-    /**
-     * FUNGSI YANG DIPERBAIKI TOTAL - DENGAN LOGIKA BERANTAI YANG AMAN
-     */
-    private void loadChatList() {
+    private void setupChatListListener() {
         if (currentUser == null) return;
         updateUiState(UiState.LOADING, null);
 
-        // 1. Ambil semua ruang chat di mana kita adalah peserta
+        // Use a real-time listener instead of get() to automatically update when changes occur
         db.collection("chat_rooms")
                 .whereArrayContains("participants", currentUser.getUid())
                 .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!isAdded() || queryDocumentSnapshots.isEmpty()) {
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if (e != null) {
+                        Log.e(TAG, "Listen failed.", e);
+                        if (isAdded()) {
+                            updateUiState(UiState.EMPTY, "Gagal memuat daftar chat.");
+                        }
+                        return;
+                    }
+
+                    if (!isAdded() || queryDocumentSnapshots == null || queryDocumentSnapshots.isEmpty()) {
                         updateUiState(UiState.EMPTY, "Belum ada percakapan.");
                         return;
                     }
@@ -100,14 +104,14 @@ public class ChatsFragment extends Fragment {
                     for (QueryDocumentSnapshot chatRoomDoc : queryDocumentSnapshots) {
                         List<String> participants = (List<String>) chatRoomDoc.get("participants");
                         if (participants == null) {
-                            // Jika ada data aneh, lewati dan anggap sudah diproses
+                            // Skip if there's weird data
                             if (counter.incrementAndGet() == totalChats) {
                                 updateAdapterWithList(tempList);
                             }
                             continue;
                         }
 
-                        // 2. Untuk setiap ruang chat, cari tahu siapa ID lawan bicara
+                        // Find the other user's ID
                         String otherUserId = "";
                         for (String participantId : participants) {
                             if (!participantId.equals(currentUser.getUid())) {
@@ -123,16 +127,17 @@ public class ChatsFragment extends Fragment {
                             continue;
                         }
 
-                        // 3. Setelah ID lawan bicara didapat, ambil profilnya dari koleksi 'users'
+                        // Get the other user's profile
+                        final String finalOtherUserId = otherUserId;
                         db.collection("users").document(otherUserId).get()
                                 .addOnSuccessListener(userDoc -> {
                                     if (userDoc.exists()) {
                                         User otherUser = userDoc.toObject(User.class);
                                         if (otherUser != null) {
-                                            // 4. Rakit semua data menjadi satu objek ChatPreview
+                                            // Create ChatPreview object
                                             ChatPreview preview = new ChatPreview();
                                             preview.setChatRoomId(chatRoomDoc.getId());
-                                            preview.setOtherUserId(otherUser.getUid());
+                                            preview.setOtherUserId(finalOtherUserId);
                                             preview.setOtherUserName(otherUser.getFullName());
                                             preview.setOtherUserPhotoBase64(otherUser.getProfileImageBase64());
                                             preview.setLastMessage(chatRoomDoc.getString("lastMessage"));
@@ -140,23 +145,17 @@ public class ChatsFragment extends Fragment {
                                             tempList.add(preview);
                                         }
                                     }
-                                    // 5. Cek apakah ini item terakhir yang diproses
+                                    // Check if this is the last processed item
                                     if (counter.incrementAndGet() == totalChats) {
                                         updateAdapterWithList(tempList);
                                     }
                                 })
-                                .addOnFailureListener(e -> {
-                                    // Jika gagal ambil profil, tetap lanjutkan
+                                .addOnFailureListener(err -> {
+                                    // Continue even if profile fetch fails
                                     if (counter.incrementAndGet() == totalChats) {
                                         updateAdapterWithList(tempList);
                                     }
                                 });
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    if (isAdded()) {
-                        updateUiState(UiState.EMPTY, "Gagal memuat daftar chat.");
-                        Log.e(TAG, "Gagal memuat daftar chat", e);
                     }
                 });
     }
