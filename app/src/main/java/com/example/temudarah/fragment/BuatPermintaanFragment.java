@@ -83,6 +83,11 @@ public class BuatPermintaanFragment extends Fragment {
 
         setupDropdowns();
         setupListeners();
+
+        // ✅ Tambahan ini untuk mengisi tanggal otomatis saat halaman dibuka
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String currentDate = sdf.format(Calendar.getInstance().getTime());
+        binding.editTanggalPenguguman.setText(currentDate);
     }
 
     private void setupDropdowns() {

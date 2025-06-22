@@ -73,12 +73,7 @@ public class DetailPermintaanSayaFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         binding.toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
-
-
-        // Back button action
-        view.findViewById(R.id.btnBack).setOnClickListener(v -> {
-            requireActivity().onBackPressed();
-        });
+        binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
 
         if (requestId != null) {
             loadRequestDetails();
