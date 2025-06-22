@@ -20,10 +20,11 @@ public class User {
     private GeoPoint location; // Untuk menyimpan koordinat lat/lng
     private String geohash;
     private String fcmToken;
+    private int donationCount;
 
     public User() {}
 
-    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageBase64, String lastDonationDate, GeoPoint location, String geohash, String fcmToken) {
+    public User(String uid, String email, String username, String fullName, String ktpNumber, String address, String birthDate, String gender, String bloodType, String hasDonatedBefore, int weight, int height, String profileImageBase64, String lastDonationDate, GeoPoint location, String geohash, String fcmToken, int donationCount) {
         this.uid = uid;
         this.email = email;
         this.username = username;
@@ -41,6 +42,7 @@ public class User {
         this.location = location;
         this.geohash = geohash;
         this.fcmToken = fcmToken;
+        this.donationCount = donationCount;
     }
 
     public String getUid() {
@@ -169,5 +171,13 @@ public class User {
 
     public void setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
+    }
+
+    public int getDonationCount() {
+        return donationCount;
+    }
+
+    public void setDonationCount(int donationCount) {
+        this.donationCount = donationCount;
     }
 }

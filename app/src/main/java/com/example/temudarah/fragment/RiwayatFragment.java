@@ -66,6 +66,12 @@ public class RiwayatFragment extends Fragment {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         setupRecyclerView();
         setupFilterListeners();
+        binding.cardPenghargaan.setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new PenghargaanFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
     }
 
     @Override

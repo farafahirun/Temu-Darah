@@ -42,6 +42,17 @@
             app:tint="@color/utama" />
     </LinearLayout>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/card_penghargaan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/utama"
+        android:text="Penghargaan"
+        android:layout_marginHorizontal="15dp"
+        android:textColor="@color/white"
+        android:layout_marginTop="10dp"
+        app:cornerRadius="8dp" />
+
     <LinearLayout
         android:id="@+id/filter_riwayat"
         android:layout_width="match_parent"

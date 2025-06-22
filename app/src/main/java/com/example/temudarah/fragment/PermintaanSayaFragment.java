@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -227,6 +228,8 @@ public class PermintaanSayaFragment extends Fragment {
 
                             batch.update(donorRef, "lastDonationDate", todayDate);
                             batch.update(donorRef, "hasDonatedBefore", "Ya");
+
+                            batch.update(donorRef, "donationCount", FieldValue.increment(1));
                         }
 
                         // Jalankan semua (hingga 3) operasi dalam satu batch
