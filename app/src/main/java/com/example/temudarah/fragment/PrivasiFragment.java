@@ -7,12 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.temudarah.activity.MainActivity;
 import com.example.temudarah.databinding.FragmentPrivasiBinding;
+import com.example.temudarah.util.AlertUtil;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,9 +57,20 @@ public class PrivasiFragment extends Fragment {
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         binding.btnSave.setOnClickListener(v -> {
             if (validateInput()) {
-                attemptPasswordChange();
+                showConfirmationDialog();
             }
         });
+    }
+
+    private void showConfirmationDialog() {
+        if (getContext() != null) {
+            AlertUtil.showAlert(getContext(),
+                    "Konfirmasi Perubahan Password",
+                    "Apakah Anda yakin ingin mengubah password akun Anda?",
+                    "Simpan", "Batal",
+                    v -> attemptPasswordChange(),
+                    null);
+        }
     }
 
     private boolean validateInput() {

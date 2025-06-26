@@ -22,7 +22,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.example.temudarah.R;
 import com.example.temudarah.databinding.FragmentEditPermintaanBinding;
 import com.example.temudarah.model.PermintaanDonor;
 import com.firebase.geofire.GeoFireUtils;
@@ -30,11 +29,9 @@ import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;

@@ -11,18 +11,15 @@ import com.example.temudarah.R;
 import com.example.temudarah.databinding.ItemChatBinding;
 import com.example.temudarah.model.ChatPreview;
 import com.google.firebase.Timestamp;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> {
-
     private List<ChatPreview> chatPreviewList;
     private OnChatClickListener listener;
 
-    // Interface untuk menangani klik pada setiap item
     public interface OnChatClickListener {
         void onChatClick(ChatPreview chatPreview);
     }
@@ -58,24 +55,20 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
         }
 
         void bind(final ChatPreview chatPreview, final OnChatClickListener listener) {
-            // Set nama lawan bicara
             binding.tvChatName.setText(chatPreview.getOtherUserName());
 
-            // Set pesan terakhir
             if (chatPreview.getLastMessage() != null && !chatPreview.getLastMessage().isEmpty()) {
                 binding.tvLastMessage.setText(chatPreview.getLastMessage());
             } else {
                 binding.tvLastMessage.setText("Ketuk untuk memulai percakapan...");
             }
 
-            // Set waktu pesan terakhir dengan format yang bagus
             if (chatPreview.getLastMessageTimestamp() != null) {
                 binding.tvChatTimestamp.setText(formatTimestamp(chatPreview.getLastMessageTimestamp()));
             } else {
                 binding.tvChatTimestamp.setText("");
             }
 
-            // Set foto profil lawan bicara
             if (chatPreview.getOtherUserPhotoBase64() != null && !chatPreview.getOtherUserPhotoBase64().isEmpty()) {
                 try {
                     byte[] imageBytes = Base64.decode(chatPreview.getOtherUserPhotoBase64(), Base64.DEFAULT);

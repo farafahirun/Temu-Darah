@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
+    android:layout_marginBottom="50dp"
     tools:context=".fragment.RiwayatFragment">
 
     <LinearLayout
@@ -76,6 +77,8 @@
                 android:layout_weight="1"
                 android:backgroundTint="@color/utama"
                 android:text="Semua"
+                app:strokeColor="@color/utama"
+                app:strokeWidth="1dp"
                 android:textColor="@color/white"
                 app:cornerRadius="8dp" />
 

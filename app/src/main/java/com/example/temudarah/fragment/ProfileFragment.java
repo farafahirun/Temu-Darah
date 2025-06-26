@@ -20,6 +20,7 @@ import com.example.temudarah.R;
 import com.example.temudarah.activity.MasukActivity;
 import com.example.temudarah.databinding.FragmentProfileBinding;
 import com.example.temudarah.model.User;
+import com.example.temudarah.util.AlertUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -116,7 +117,7 @@ public class ProfileFragment extends Fragment {
                                 binding.tvHeight.setText("-");
                                 binding.tvAge.setText("-");
                                 binding.tvLastDonation.setText("Tidak tersedia");
-                                binding.profileImage.setImageResource(R.drawable.logo_merah);
+                                binding.profileImage.setImageResource(R.drawable.foto_profil);
                             }
                             hideLoading();
                         }
@@ -136,7 +137,7 @@ public class ProfileFragment extends Fragment {
                     binding.tvHeight.setText("-");
                     binding.tvAge.setText("-");
                     binding.tvLastDonation.setText("Tidak tersedia");
-                    binding.profileImage.setImageResource(R.drawable.logo_merah);
+                    binding.profileImage.setImageResource(R.drawable.foto_profil);
                     hideLoading(); // Sembunyikan ProgressBar setelah gagal
                 }
             });
@@ -175,18 +176,18 @@ public class ProfileFragment extends Fragment {
                 Glide.with(requireContext())
                         .asBitmap()
                         .load(imageBytes)
-                        .placeholder(R.drawable.logo_merah)
-                        .error(R.drawable.logo_merah)
+                        .placeholder(R.drawable.foto_profil)
+                        .error(R.drawable.foto_profil)
                         .into(binding.profileImage);
             } catch (IllegalArgumentException e) {
                 Log.e(TAG, "Gagal decode Base64: String bukan format Base64 yang valid.", e);
-                binding.profileImage.setImageResource(R.drawable.logo_merah);
+                binding.profileImage.setImageResource(R.drawable.foto_profil);
             } catch (Exception e) {
                 Log.e(TAG, "Kesalahan saat memuat gambar profil.", e);
-                binding.profileImage.setImageResource(R.drawable.logo_merah);
+                binding.profileImage.setImageResource(R.drawable.foto_profil);
             }
         } else {
-            binding.profileImage.setImageResource(R.drawable.logo_merah);
+            binding.profileImage.setImageResource(R.drawable.foto_profil);
         }
     }
 
@@ -201,7 +202,18 @@ public class ProfileFragment extends Fragment {
         binding.layoutHelpCenter.setOnClickListener(v -> navigateToFragment(new HelpCenterFragment()));
         binding.layoutTerms.setOnClickListener(v -> navigateToFragment(new SyaratKetentuanFragment()));
         binding.layoutFAQs.setOnClickListener(v -> navigateToFragment(new FaqFragment()));
-        binding.layoutLogout.setOnClickListener(v -> logoutUser());
+        binding.layoutLogout.setOnClickListener(v -> showLogoutConfirmation());
+    }
+
+    private void showLogoutConfirmation() {
+        if (getContext() != null) {
+            AlertUtil.showAlert(getContext(),
+                    "Konfirmasi Logout",
+                    "Apakah Anda yakin ingin keluar dari aplikasi?",
+                    "Ya", "Tidak",
+                    v -> logoutUser(),
+                    null);
+        }
     }
 
     private void navigateToFragment(Fragment fragment) {

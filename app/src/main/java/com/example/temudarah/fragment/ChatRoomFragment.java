@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -19,16 +20,15 @@ import com.example.temudarah.databinding.FragmentChatRoomBinding;
 import com.example.temudarah.model.Notifikasi;
 import com.example.temudarah.model.Pesan;
 import com.example.temudarah.model.ProsesDonor;
+import com.example.temudarah.model.User;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
-import com.example.temudarah.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,17 +85,14 @@ public class ChatRoomFragment extends Fragment {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         binding.tvToolbarTitle.setText(otherUserName);
-        binding.toolbarChat.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
 
-        // Add cancel button to the toolbar's menu
-        binding.toolbarChat.inflateMenu(com.example.temudarah.R.menu.chat_menu);
-        binding.toolbarChat.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == com.example.temudarah.R.id.action_cancel) {
-                showCancellationConfirmationDialog();
-                return true;
-            }
-            return false;
-        });
+        // Set click listener for the new back button
+        binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
+
+        // Set click listener for the menu button (optional)
+
+        // Load other user's profile picture
+        loadOtherUserProfile();
 
         setupRecyclerView();
         listenForMessages();
@@ -133,7 +130,30 @@ public class ChatRoomFragment extends Fragment {
 
                     if (value != null && isAdded()) {
                         pesanList.clear();
-                        pesanList.addAll(value.toObjects(Pesan.class));
+
+                        // Batch update untuk mengubah status pesan menjadi "dibaca"
+                        WriteBatch batch = db.batch();
+                        boolean hasUnreadMessages = false;
+
+                        for (QueryDocumentSnapshot doc : value) {
+                            Pesan pesan = doc.toObject(Pesan.class);
+                            pesanList.add(pesan);
+
+                            // Jika pesan dikirim oleh pengguna lain dan belum dibaca
+                            if (!currentUser.getUid().equals(pesan.getSenderId()) && !pesan.isRead()) {
+                                hasUnreadMessages = true;
+                                // Tandai pesan sebagai sudah dibaca
+                                batch.update(doc.getReference(), "isRead", true);
+                            }
+                        }
+
+                        // Commit batch update jika ada pesan yang belum dibaca
+                        if (hasUnreadMessages) {
+                            batch.commit()
+                                .addOnSuccessListener(aVoid -> Log.d(TAG, "Messages marked as read"))
+                                .addOnFailureListener(e -> Log.e(TAG, "Error marking messages as read", e));
+                        }
+
                         adapter.notifyDataSetChanged();
                         // Scroll otomatis ke pesan paling bawah
                         binding.rvMessages.scrollToPosition(pesanList.size() - 1);
@@ -145,19 +165,12 @@ public class ChatRoomFragment extends Fragment {
         String messageText = binding.etMessage.getText().toString().trim();
         if (TextUtils.isEmpty(messageText) || currentUser == null || chatRoomId == null) return;
 
-        // Ambil nama pengirim dari display name, jika null/kosong, fallback ke email, lalu "User"
-        String senderName = currentUser.getDisplayName();
-        if (senderName == null || senderName.trim().isEmpty()) {
-            senderName = currentUser.getEmail(); // Fallback ke email
-            if (senderName == null || senderName.trim().isEmpty()) {
-                senderName = "User"; // Fallback terakhir jika email juga null/kosong
-            }
-        }
-
+        // Membuat pesan tanpa nama pengirim karena sudah tampil di bagian atas chat
         Pesan pesan = new Pesan();
         pesan.setText(messageText);
         pesan.setSenderId(currentUser.getUid());
-        pesan.setSenderName(senderName); // Menggunakan senderName yang sudah diproses
+        // Set empty string for sender name since we don't need to display it in the bubbles
+        pesan.setSenderName("");
         pesan.setTimestamp(Timestamp.now());
 
         binding.etMessage.setText(""); // Langsung kosongkan UI
@@ -308,6 +321,70 @@ public class ChatRoomFragment extends Fragment {
                             .addOnFailureListener(e -> Log.e(TAG, "Gagal menghapus notifikasi", e));
                 });
     }
+
+    /**
+     * Memuat data profil pengguna lawan chat untuk ditampilkan di toolbar
+     */
+    private void loadOtherUserProfile() {
+    if (chatRoomId == null || currentUser == null) return;
+
+    // Parse chatRoomId untuk mendapatkan ID lawan chat
+    String[] userIds = chatRoomId.split("_");
+    String otherUserId = userIds[0].equals(currentUser.getUid()) ? userIds[1] : userIds[0];
+
+    // Ambil data pengguna dari Firestore
+    db.collection("users").document(otherUserId)
+        .get()
+        .addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists() && isAdded()) {
+                User otherUser = documentSnapshot.toObject(User.class);
+                if (otherUser != null) {
+                    // Set nama pengguna di toolbar - using fullName instead of nama
+                    binding.tvToolbarTitle.setText(otherUser.getFullName() != null ?
+                        otherUser.getFullName() :
+                        (otherUser.getUsername() != null ? otherUser.getUsername() : "User"));
+
+                    // Load profile picture if available - using profileImageBase64 instead of fotoUrl
+                    String profileImage = otherUser.getProfileImageBase64();
+                    if (profileImage != null && !profileImage.isEmpty()) {
+                        try {
+                            // If it's a Base64 string
+                            if (profileImage.startsWith("data:image") || profileImage.startsWith("/9j")) {
+                                // For Base64 encoded images
+                                byte[] decodedString;
+                                if (profileImage.contains(",")) {
+                                    decodedString = android.util.Base64.decode(
+                                            profileImage.split(",")[1],
+                                            android.util.Base64.DEFAULT);
+                                } else {
+                                    decodedString = android.util.Base64.decode(
+                                            profileImage,
+                                            android.util.Base64.DEFAULT);
+                                }
+
+                                android.graphics.Bitmap bitmap = android.graphics.BitmapFactory.decodeByteArray(
+                                        decodedString, 0, decodedString.length);
+                                binding.ivToolbarProfile.setImageBitmap(bitmap);
+                            } else {
+                                // For URL images, use Glide
+                                com.bumptech.glide.Glide.with(requireContext())
+                                    .load(profileImage)
+                                    .placeholder(com.example.temudarah.R.drawable.logo_merah)
+                                    .error(com.example.temudarah.R.drawable.logo_merah)
+                                    .into(binding.ivToolbarProfile);
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error loading profile image", e);
+                            // Set default image if loading fails
+                            binding.ivToolbarProfile.setImageResource(
+                                    com.example.temudarah.R.drawable.logo_merah);
+                        }
+                    }
+                }
+            }
+        })
+        .addOnFailureListener(e -> Log.e(TAG, "Error loading user data", e));
+}
 
     @Override
     public void onDestroyView() {

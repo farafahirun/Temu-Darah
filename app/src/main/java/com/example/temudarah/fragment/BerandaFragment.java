@@ -5,12 +5,14 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.example.temudarah.R;
 import com.example.temudarah.adapter.PermintaanDonorAdapter;
 import com.example.temudarah.databinding.FragmentBerandaBinding;
@@ -31,8 +34,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -107,7 +109,7 @@ public class BerandaFragment extends Fragment {
         binding.autoCompleteGender.setAdapter(genderAdapter);
         binding.autoCompleteGender.setText(genderOptions[0], false);
 
-        String[] goldarOptions = {"Semua Gol. Darah", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
+        String[] goldarOptions = {"Semua Golongan", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
         ArrayAdapter<String> goldarAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, goldarOptions);
         binding.autoCompleteGolonganDarah.setAdapter(goldarAdapter);
         binding.autoCompleteGolonganDarah.setText(goldarOptions[0], false);
@@ -155,81 +157,86 @@ public class BerandaFragment extends Fragment {
             updateUiState(UiState.EMPTY, "Anda perlu login.");
             return;
         }
+
+        // Set loading UI state
         updateUiState(UiState.LOADING, "");
 
-        String genderFilter = binding.autoCompleteGender.getText().toString();
-        String bloodTypeFilter = binding.autoCompleteGolonganDarah.getText().toString();
-        final GeoLocation center = new GeoLocation(location.getLatitude(), location.getLongitude());
-        final double radiusInM = 50 * 1000; // 50 km
+        // Add delay of 1 second before fetching data
+        new Handler().postDelayed(() -> {
+            String genderFilter = binding.autoCompleteGender.getText().toString();
+            String bloodTypeFilter = binding.autoCompleteGolonganDarah.getText().toString();
+            final GeoLocation center = new GeoLocation(location.getLatitude(), location.getLongitude());
+            final double radiusInM = 50 * 1000; // 50 km
 
-        // 1. Ambil SEMUA permintaan yang statusnya "Aktif"
-        db.collection("donation_requests")
-                .whereEqualTo("status", "Aktif")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!isAdded()) return;
+            // 1. Ambil SEMUA permintaan yang statusnya "Aktif"
+            db.collection("donation_requests")
+                    .whereEqualTo("status", "Aktif")
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!isAdded()) return;
 
-                    List<PermintaanDonor> allActiveRequests = new ArrayList<>();
-                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        PermintaanDonor permintaan = doc.toObject(PermintaanDonor.class);
-                        if (permintaan != null) {
-                            permintaan.setRequestId(doc.getId());
-                            allActiveRequests.add(permintaan);
-                        }
-                    }
-
-                    // 2. Lakukan semua filter di sisi aplikasi
-                    List<PermintaanDonor> filteredList = new ArrayList<>();
-                    for (PermintaanDonor p : allActiveRequests) {
-                        // Filter 1: Bukan postingan sendiri
-                        if (p.getPembuatUid() != null && p.getPembuatUid().equals(currentUser.getUid())) {
-                            continue;
-                        }
-
-                        // Filter 2: Jarak
-                        GeoPoint rsLocation = p.getLokasiRs();
-                        if (rsLocation != null) {
-                            double distanceInM = GeoFireUtils.getDistanceBetween(new GeoLocation(rsLocation.getLatitude(), rsLocation.getLongitude()), center);
-                            if (distanceInM > radiusInM) {
-                                continue;
+                        List<PermintaanDonor> allActiveRequests = new ArrayList<>();
+                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                            PermintaanDonor permintaan = doc.toObject(PermintaanDonor.class);
+                            if (permintaan != null) {
+                                permintaan.setRequestId(doc.getId());
+                                allActiveRequests.add(permintaan);
                             }
                         }
 
-                        // Filter 3: Golongan Darah
-                        if (!"Semua Gol. Darah".equals(bloodTypeFilter) && p.getGolonganDarahDibutuhkan() != null && !p.getGolonganDarahDibutuhkan().equalsIgnoreCase(bloodTypeFilter)) {
-                            continue;
+                        // 2. Lakukan semua filter di sisi aplikasi
+                        List<PermintaanDonor> filteredList = new ArrayList<>();
+                        for (PermintaanDonor p : allActiveRequests) {
+                            // Filter 1: Bukan postingan sendiri
+                            if (p.getPembuatUid() != null && p.getPembuatUid().equals(currentUser.getUid())) {
+                                continue;
+                            }
+
+                            // Filter 2: Jarak
+                            GeoPoint rsLocation = p.getLokasiRs();
+                            if (rsLocation != null) {
+                                double distanceInM = GeoFireUtils.getDistanceBetween(new GeoLocation(rsLocation.getLatitude(), rsLocation.getLongitude()), center);
+                                if (distanceInM > radiusInM) {
+                                    continue;
+                                }
+                            }
+
+                            // Filter 3: Golongan Darah
+                            if (!"Semua Golongan".equals(bloodTypeFilter) && p.getGolonganDarahDibutuhkan() != null && !p.getGolonganDarahDibutuhkan().equalsIgnoreCase(bloodTypeFilter)) {
+                                continue;
+                            }
+
+                            // Filter 4: Gender Pasien
+                            if (!"Semua Gender".equals(genderFilter) && p.getJenisKelamin() != null && !p.getJenisKelamin().equalsIgnoreCase(genderFilter)) {
+                                continue;
+                            }
+
+                            // Jika lolos semua filter, tambahkan ke daftar
+                            filteredList.add(p);
                         }
 
-                        // Filter 4: Gender Pasien
-                        if (!"Semua Gender".equals(genderFilter) && p.getJenisKelamin() != null && !p.getJenisKelamin().equalsIgnoreCase(genderFilter)) {
-                            continue;
-                        }
+                        // Urutkan berdasarkan jarak terdekat
+                        Collections.sort(filteredList, (p1, p2) -> {
+                            GeoPoint p1Loc = p1.getLokasiRs();
+                            GeoPoint p2Loc = p2.getLokasiRs();
+                            if (p1Loc == null || p2Loc == null) return 0;
 
-                        // Jika lolos semua filter, tambahkan ke daftar
-                        filteredList.add(p);
-                    }
+                            double dist1 = GeoFireUtils.getDistanceBetween(new GeoLocation(p1Loc.getLatitude(), p1Loc.getLongitude()), center);
+                            double dist2 = GeoFireUtils.getDistanceBetween(new GeoLocation(p2Loc.getLatitude(), p2Loc.getLongitude()), center);
+                            return Double.compare(dist1, dist2);
+                        });
 
-                    // Urutkan berdasarkan jarak terdekat
-                    Collections.sort(filteredList, (p1, p2) -> {
-                        GeoPoint p1Loc = p1.getLokasiRs();
-                        GeoPoint p2Loc = p2.getLokasiRs();
-                        if (p1Loc == null || p2Loc == null) return 0;
-
-                        double dist1 = GeoFireUtils.getDistanceBetween(new GeoLocation(p1Loc.getLatitude(), p1Loc.getLongitude()), center);
-                        double dist2 = GeoFireUtils.getDistanceBetween(new GeoLocation(p2Loc.getLatitude(), p2Loc.getLongitude()), center);
-                        return Double.compare(dist1, dist2);
+                        permintaanList.clear();
+                        permintaanList.addAll(filteredList);
+                        adapter.notifyDataSetChanged();
+                        updateUiState(permintaanList.isEmpty() ? UiState.EMPTY : UiState.HAS_DATA, "Tidak ada permintaan terdekat yang cocok.");
+                    })
+                    .addOnFailureListener(e -> {
+                        if (!isAdded()) return;
+                        updateUiState(UiState.EMPTY, "Gagal memuat data.");
+                        Log.e(TAG, "Error loading donation requests", e);
                     });
-
-                    permintaanList.clear();
-                    permintaanList.addAll(filteredList);
-                    adapter.notifyDataSetChanged();
-                    updateUiState(permintaanList.isEmpty() ? UiState.EMPTY : UiState.HAS_DATA, "Tidak ada permintaan terdekat yang cocok.");
-                })
-                .addOnFailureListener(e -> {
-                    if (!isAdded()) return;
-                    updateUiState(UiState.EMPTY, "Gagal memuat data.");
-                    Log.e(TAG, "Error loading donation requests", e);
-                });
+        }, 1000); // Delay selama 1 detik (1000ms)
     }
 
     private void navigateTo(Fragment fragment) {
@@ -243,13 +250,17 @@ public class BerandaFragment extends Fragment {
 
     private void updateUiState(UiState state, String message) {
         if (binding == null) return;
-        binding.progressBar.setVisibility(state == UiState.LOADING ? View.VISIBLE : View.GONE);
-        binding.rvPendonor.setVisibility(state == UiState.HAS_DATA ? View.VISIBLE : View.GONE);
-        binding.tvNoData.setVisibility(state == UiState.EMPTY ? View.VISIBLE : View.GONE);
+
+        // Set visibility for loading state
+        binding.loadingOverlay.setVisibility(state == UiState.LOADING ? View.VISIBLE : View.GONE);  // Update the loading overlay
+        binding.rvPendonor.setVisibility(state == UiState.HAS_DATA ? View.VISIBLE : View.GONE); // RecyclerView
+        binding.tvNoData.setVisibility(state == UiState.EMPTY ? View.VISIBLE : View.GONE); // Empty state
+
         if (state == UiState.EMPTY) {
             binding.tvNoData.setText(message);
         }
     }
+
 
     @Override
     public void onDestroyView() {

@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
-    tools:context=".fragment.PermintaanSayaFragment"
-    android:layout_marginBottom="30dp">
+    tools:context=".fragment.PermintaanSayaFragment">
 
     <LinearLayout
         android:id="@+id/navbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@color/background"
         android:gravity="center_vertical"
-        android:padding="16dp"
-        android:background="@color/background">
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingTop="15dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="5dp">
+
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
@@ -21,7 +27,8 @@
             android:src="@drawable/kembali"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
-            android:focusable="true"/>
+            android:focusable="true" />
+
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -31,29 +38,47 @@
             android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
-        <View android:layout_width="24dp" android:layout_height="24dp"/>
+
+        <View android:layout_width="24dp"
+            android:layout_height="24dp" />
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPermintaanSaya"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/navbar"
-        android:clipToPadding="false"
-        android:padding="8dp" />
+        android:layout_marginBottom="50dp"
+        android:background="@color/background">
 
-    <TextView
-        android:id="@+id/tvEmptyState"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Anda belum membuat permintaan aktif."
-        android:visibility="gone" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvPermintaanSaya"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:background="@color/background"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_permintaan_saya" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone"/>
+        <TextView
+            android:id="@+id/tvEmptyState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Anda belum membuat permintaan."
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/utama"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </RelativeLayout>
 </RelativeLayout>

@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="waktu_chat">#BFFFFFFF</color>
     <color name="utama_dark">#99172F</color>
     <color name="utama">#C11E3B</color>
     <color name="abu_abu">#333333</color>
@@ -11,4 +12,6 @@
     <color name="sukses">#2E7D32</color>
     <color name="penerima">#F9A825</color>
     <color name="fixed_black">#000000</color>
+    <color name="whatsapp_green">#128C7E</color>
+    <color name="garis">#E0E0E0</color>
 </resources>

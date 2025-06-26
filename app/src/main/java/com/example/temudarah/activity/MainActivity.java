@@ -22,7 +22,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -47,11 +46,10 @@ public class MainActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        // Setup badge for the message icon
         badgePesan = binding.bottomNavigation.getOrCreateBadge(R.id.pesan);
         badgePesan.setBackgroundColor(getResources().getColor(R.color.utama, getTheme()));
         badgePesan.setBadgeTextColor(getResources().getColor(android.R.color.white, getTheme()));
-        badgePesan.setVisible(false); // Hide initially until we have notifications
+        badgePesan.setVisible(false);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -67,12 +65,9 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new BerandaFragment();
             } else if (id == R.id.pesan) {
                 selectedFragment = new ChatsFragment();
-                // Don't clear the badge here anymore - we'll only clear it when entering a specific chat
-                // The badge will be maintained as long as there are unread messages
             } else if (id == R.id.riwayat) {
                 selectedFragment = new RiwayatFragment();
-            }
-            else if (id == R.id.profile) {
+            } else if (id == R.id.profile) {
                 selectedFragment = new ProfileFragment();
             }
 
@@ -81,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                         .replace(R.id.fragment_container, selectedFragment)
                         .commit();
             }
-
             return true;
         });
 
@@ -94,15 +88,12 @@ public class MainActivity extends AppCompatActivity {
                 showBottomNav();
             }
         });
-
-        // Start listening for notifications
         setupNotificationListener();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh notification badge when app comes to foreground
         if (currentUser != null) {
             updateNotificationBadge();
         }
@@ -111,17 +102,15 @@ public class MainActivity extends AppCompatActivity {
     private void setupNotificationListener() {
         if (currentUser == null) return;
 
-        // Remove any existing listener to avoid duplicates
         if (notificationListener != null) {
             notificationListener.remove();
         }
 
-        // Listen for unread notifications in real-time
         notificationListener = db.collection("users")
                 .document(currentUser.getUid())
                 .collection("notifikasi")
-                .whereEqualTo("sudahDibaca", false) // Only count unread notifications
-                .whereEqualTo("tipe", "pesan") // Only message notifications
+                .whereEqualTo("sudahDibaca", false)
+                .whereEqualTo("tipe", "pesan")
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
                         Log.w(TAG, "Listen for notifications failed.", e);
@@ -138,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
     private void updateNotificationBadge() {
         if (currentUser == null) return;
 
-        // Query for unread message notifications
         db.collection("users")
                 .document(currentUser.getUid())
                 .collection("notifikasi")
@@ -174,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Clean up listeners when activity is destroyed
         if (notificationListener != null) {
             notificationListener.remove();
         }

@@ -10,6 +10,7 @@ public class RiwayatDonasiTampil {
     private String namaPasien;
     private String statusProses;       // "Berlangsung", "Selesai", "Dibatalkan"
     private Timestamp tanggal;
+    private String golonganDarah;
 
     public RiwayatDonasiTampil() {}
 
@@ -59,5 +60,13 @@ public class RiwayatDonasiTampil {
 
     public void setTanggal(Timestamp tanggal) {
         this.tanggal = tanggal;
+    }
+
+    public String getGolonganDarah() {
+        return golonganDarah;
+    }
+
+    public void setGolonganDarah(String golonganDarah) {
+        this.golonganDarah = golonganDarah;
     }
 }

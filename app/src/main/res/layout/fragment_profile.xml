@@ -46,7 +46,6 @@
                 app:tint="@color/utama" />
         </LinearLayout>
 
-
         <ScrollView
             android:id="@+id/scrollViewProfile"
             android:layout_width="match_parent"
@@ -84,7 +83,8 @@
                                 android:id="@+id/profileImage"
                                 android:layout_width="75dp"
                                 android:layout_height="75dp"
-                                android:src="@drawable/ic_launcher_background"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/foto_profil"
                                 app:civ_border_color="@color/utama"
                                 app:civ_border_width="2dp" />
 
@@ -454,20 +454,22 @@
             </LinearLayout>
         </ScrollView>
 
-    <!-- Tambahkan di bawah ScrollView / RelativeLayout sebelum penutup FrameLayout -->
-    <FrameLayout
-        android:id="@+id/loadingOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#CCFFFFFF"
-        android:visibility="gone">
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminateTint="@color/utama"/>
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/loadingOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/navbar"
+            android:background="@color/background"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone">
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/utama"/>
+        </FrameLayout>
 
     </RelativeLayout>
 </FrameLayout>

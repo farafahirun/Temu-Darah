@@ -1,8 +1,7 @@
 package com.example.temudarah.fragment;
 
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +13,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
 import com.example.temudarah.R;
 import com.example.temudarah.activity.MainActivity;
 import com.example.temudarah.databinding.FragmentDetailPermintaanSayaBinding;
 import com.example.temudarah.model.PermintaanDonor;
 import com.example.temudarah.model.ProsesDonor;
-import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -76,12 +71,25 @@ public class DetailPermintaanSayaFragment extends Fragment {
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
 
         if (requestId != null) {
-            loadRequestDetails();
-        } else {
-            Toast.makeText(getContext(), "Error: ID Permintaan tidak valid.", Toast.LENGTH_SHORT).show();
-            getParentFragmentManager().popBackStack();
+            // ✅ Tampilkan hanya progress bar, sembunyikan semua lainnya
+            binding.loadingOverlay.setVisibility(View.VISIBLE);
+            binding.scrollView.setVisibility(View.GONE);
+            binding.llButtons.setVisibility(View.GONE);
+            binding.appBarLayout.setVisibility(View.GONE); // Sembunyikan AppBar juga
+
+            new Handler().postDelayed(() -> {
+                // ✅ Setelah 1 detik, tampilkan semua kembali
+                binding.loadingOverlay.setVisibility(View.GONE);
+                binding.scrollView.setVisibility(View.VISIBLE);
+                binding.llButtons.setVisibility(View.VISIBLE);
+                binding.appBarLayout.setVisibility(View.VISIBLE);
+
+                loadRequestDetails(); // Pastikan ini tidak mengatur loadingOverlay lagi
+            }, 1000);
         }
     }
+
+
 
     private void loadRequestDetails() {
         binding.progressBar.setVisibility(View.VISIBLE);

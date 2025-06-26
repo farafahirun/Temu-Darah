@@ -5,10 +5,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.example.temudarah.R;
 import com.example.temudarah.adapter.ChatsAdapter;
 import com.example.temudarah.databinding.FragmentChatsBinding;
@@ -16,7 +18,6 @@ import com.example.temudarah.model.ChatPreview;
 import com.example.temudarah.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
@@ -27,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ChatsFragment extends Fragment {
@@ -56,6 +56,7 @@ public class ChatsFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         setupRecyclerView();
+        setupListeners();
     }
 
     @Override
@@ -77,6 +78,20 @@ public class ChatsFragment extends Fragment {
         }
         if (notificationsListener != null) {
             notificationsListener.remove();
+        }
+    }
+
+    private void setupListeners() {
+        binding.ivNotification.setOnClickListener(v -> {
+            navigateTo(new NotifikasiFragment());
+        });
+    }
+    private void navigateTo(Fragment fragment) {
+        if (getParentFragmentManager() != null) {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
         }
     }
 

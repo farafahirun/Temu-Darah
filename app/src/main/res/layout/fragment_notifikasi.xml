@@ -6,56 +6,40 @@
     android:background="#F0F0F0"
     tools:context=".fragment.NotifikasiFragment">
 
-    <!-- Bar Navigasi -->
     <LinearLayout
-        android:id="@+id/linearIcon"
+        android:id="@+id/navbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="20dp"
-        android:paddingTop="30dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="10dp">
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="25dp">
 
         <ImageView
-            android:id="@+id/btn_back"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/kembali"
-            android:contentDescription="Back" />
+            android:id="@+id/btnBack"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/kembali" />
     </LinearLayout>
 
-    <!-- Judul di bawah icon back -->
-    <TextView
-        android:id="@+id/tv_notifications_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/linearIcon"
-        android:layout_marginTop="8dp"
-        android:layout_centerHorizontal="true"
-        android:text="Notifikasi"
-        android:textColor="#212121"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <!-- Garis bawah -->
-    <View
-        android:id="@+id/underline_separator"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/tv_notifications_title"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@color/abu_abu" />
+        android:layout_height="70dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Notifikasi"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </FrameLayout>
 
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_notifikasi"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/underline_separator"
+        android:layout_below="@id/navbar"
         android:padding="16dp"
         tools:listitem="@layout/item_notifikasi" />
 

@@ -87,6 +87,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_weight="1"
+                    android:textColor="@color/black"
                     android:background="@android:color/transparent"
                     android:hint="Telusuri"
                     android:textColorHint="@color/text_info"

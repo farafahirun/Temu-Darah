@@ -6,9 +6,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
-import android.view.View; // Import View for visibility
+import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +16,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.temudarah.databinding.ActivityDaftarBinding;
-import com.example.temudarah.model.User; // Pastikan ini benar
+import com.example.temudarah.model.User;
+import com.example.temudarah.util.AlertUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -56,7 +56,10 @@ public class DaftarActivity extends AppCompatActivity {
             if (validateInput()) {
                 registerUser();
             } else {
-                Toast.makeText(this, "Silakan periksa kembali data yang Anda masukkan", Toast.LENGTH_SHORT).show();
+                AlertUtil.showAlert(this,
+                        "Data Tidak Lengkap",
+                        "Silakan periksa kembali data yang Anda masukkan",
+                        "Mengerti", null, null, null);
             }
         });
 
@@ -78,18 +81,16 @@ public class DaftarActivity extends AppCompatActivity {
         ArrayAdapter<String> donorAdapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, donorOptions);
         binding.spinnerDonorSebelumnya.setAdapter(donorAdapter);
 
-        // Add listener for the donor option spinner to control visibility of date field
         binding.spinnerDonorSebelumnya.setOnItemClickListener((parent, view, position, id) -> {
             String selectedOption = (String) parent.getItemAtPosition(position);
             if ("Ya".equals(selectedOption)) {
-                binding.tilLastDonationDate.setVisibility(View.VISIBLE); // Show the TextInputLayout
-                // Optionally, open date picker immediately if 'Ya' is selected for the first time
+                binding.tilLastDonationDate.setVisibility(View.VISIBLE);
                 if (TextUtils.isEmpty(binding.etLastDonationDate.getText())) {
                     showLastDonationDatePicker();
                 }
             } else {
-                binding.tilLastDonationDate.setVisibility(View.GONE); // Hide the TextInputLayout
-                binding.etLastDonationDate.setText(""); // Clear the text when hidden
+                binding.tilLastDonationDate.setVisibility(View.GONE);
+                binding.etLastDonationDate.setText("");
             }
         });
     }
@@ -108,8 +109,6 @@ public class DaftarActivity extends AppCompatActivity {
                     year, month, day);
             datePickerDialog.show();
         });
-
-        // Add listener for the etLastDonationDate EditText to open date picker when clicked
         binding.etLastDonationDate.setOnClickListener(v -> showLastDonationDatePicker());
     }
 
@@ -122,7 +121,6 @@ public class DaftarActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 DaftarActivity.this,
                 (view, year1, monthOfYear, dayOfMonth) ->
-                        // Set the text of the new EditText
                         binding.etLastDonationDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year1),
                 year, month, day);
         datePickerDialog.show();
@@ -170,7 +168,6 @@ public class DaftarActivity extends AppCompatActivity {
         }
         if (TextUtils.isEmpty(birthDate)) {
             binding.etBirthDate.setError("Tanggal Lahir harus diisi");
-            Toast.makeText(this, "Tanggal Lahir harus diisi", Toast.LENGTH_SHORT).show();
             return false;
         }
         if (TextUtils.isEmpty(weight)) {
@@ -212,7 +209,6 @@ public class DaftarActivity extends AppCompatActivity {
             binding.etLastDonationDate.requestFocus();
             return false;
         }
-
         if (TextUtils.isEmpty(password)) {
             binding.etPassword.setError("Password tidak boleh kosong");
             binding.etPassword.requestFocus();
@@ -242,7 +238,6 @@ public class DaftarActivity extends AppCompatActivity {
         String email = binding.etPhoneEmail.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
 
-        Toast.makeText(this, "Memproses pendaftaran...", Toast.LENGTH_SHORT).show();
         Log.d("DAFTAR_DEBUG", "Fungsi registerUser() dipanggil.");
 
         mAuth.createUserWithEmailAndPassword(email, password)
@@ -252,7 +247,7 @@ public class DaftarActivity extends AppCompatActivity {
                         saveAdditionalUserData(task.getResult().getUser());
                     } else {
                         Log.w("DAFTAR_DEBUG", "createUserWithEmail: GAGAL", task.getException());
-                        Toast.makeText(DaftarActivity.this, "Pendaftaran Gagal: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
+                        AlertUtil.showAlert(DaftarActivity.this, "Pendaftaran Gagal", Objects.requireNonNull(task.getException()).getMessage(), "OK", null, null, null);
                     }
                 });
     }
@@ -269,21 +264,13 @@ public class DaftarActivity extends AppCompatActivity {
         String bloodType = binding.spinnerGolonganDarah.getText().toString();
         String hasDonated = binding.spinnerDonorSebelumnya.getText().toString();
         String lastDonationDate = binding.etLastDonationDate.getText().toString().trim();
-
         int weight = TextUtils.isEmpty(binding.etWeight.getText().toString()) ? 0 : Integer.parseInt(binding.etWeight.getText().toString());
         int height = TextUtils.isEmpty(binding.etHeight.getText().toString()) ? 0 : Integer.parseInt(binding.etHeight.getText().toString());
-        String profileImageUrl = ""; // Placeholder, can be updated later
+        String profileImageUrl = "";
 
 
         if (firebaseUser != null) {
-
-            // --- PERBAIKAN UTAMA ADA DI SINI ---
-
-            // 1. Buat objek User kosong
             User newUser = new User();
-
-            // 2. Isi datanya satu per satu menggunakan setter
-            // Ini jauh lebih mudah dibaca dan dirawat
             newUser.setUid(firebaseUser.getUid());
             newUser.setEmail(firebaseUser.getEmail());
             newUser.setUsername(username);
@@ -303,7 +290,7 @@ public class DaftarActivity extends AppCompatActivity {
                     .set(newUser)
                     .addOnSuccessListener(aVoid -> {
                         Log.d("DAFTAR_DEBUG", "Penyimpanan ke Firestore SUKSES.");
-                        Toast.makeText(DaftarActivity.this, "Pendaftaran berhasil!", Toast.LENGTH_SHORT).show();
+                        AlertUtil.showAlert(DaftarActivity.this, "Pendaftaran Berhasil", "Selamat, pendaftaran Anda berhasil!", "OK", null, null, null);
 
                         Intent intent = new Intent(DaftarActivity.this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -312,7 +299,7 @@ public class DaftarActivity extends AppCompatActivity {
                     })
                     .addOnFailureListener(e -> {
                         Log.w("DAFTAR_DEBUG", "Penyimpanan ke Firestore GAGAL", e);
-                        Toast.makeText(DaftarActivity.this, "Gagal menyimpan data profil.", Toast.LENGTH_SHORT).show();
+                        AlertUtil.showAlert(DaftarActivity.this, "Pendaftaran Gagal", "Gagal menyimpan data profil.", "OK", null, null, null);
                     });
         } else {
             Log.w("DAFTAR_DEBUG", "firebaseUser bernilai null di saveAdditionalUserData.");

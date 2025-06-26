@@ -98,7 +98,6 @@ public class DetailPermintaanFragment extends Fragment {
             if (documentSnapshot.exists()) {
                 currentPermintaan = documentSnapshot.toObject(PermintaanDonor.class);
                 if (currentPermintaan != null) {
-                    // Panggil fungsi untuk mengisi data ke UI
                     populateUi(currentPermintaan);
                 }
             } else {
@@ -111,26 +110,21 @@ public class DetailPermintaanFragment extends Fragment {
         });
     }
 
-    /**
-     * FUNGSI LENGKAP: Mengisi semua komponen UI dengan data dari objek PermintaanDonor.
-     */
     private void populateUi(PermintaanDonor permintaan) {
-        // Mengisi data pembuat permintaan
         binding.tvNamaPembuat.setText("Diposting oleh: " + permintaan.getNamaPembuat());
         if (permintaan.getFotoPembuatBase64() != null && !permintaan.getFotoPembuatBase64().isEmpty() && getContext() != null) {
             try {
                 byte[] imageBytes = Base64.decode(permintaan.getFotoPembuatBase64(), Base64.DEFAULT);
-                Glide.with(requireContext()).asBitmap().load(imageBytes).placeholder(R.drawable.logo_merah).into(binding.ivPembuatFoto);
+                Glide.with(requireContext()).asBitmap().load(imageBytes).placeholder(R.drawable.foto_profil).into(binding.ivPembuatFoto);
             } catch (Exception e) {
-                binding.ivPembuatFoto.setImageResource(R.drawable.logo_merah);
+                binding.ivPembuatFoto.setImageResource(R.drawable.foto_profil);
             }
         } else {
-            binding.ivPembuatFoto.setImageResource(R.drawable.logo_merah);
+            binding.ivPembuatFoto.setImageResource(R.drawable.foto_profil);
         }
 
-        // Mengisi detail permintaan
         binding.tvDetailNamaPasien.setText(permintaan.getNamaPasien());
-        binding.tvDetailJenisKelamin.setText(permintaan.getJenisKelamin() != null ? permintaan.getJenisKelamin() : "-"); // Set Jenis Kelamin
+        binding.tvDetailJenisKelamin.setText(permintaan.getJenisKelamin() != null ? permintaan.getJenisKelamin() : "-");
         binding.tvDetailGolDarah.setText(permintaan.getGolonganDarahDibutuhkan());
         binding.tvDetailJumlah.setText(String.format(Locale.getDefault(), "%d Kantong", permintaan.getJumlahKantong()));
         binding.tvDetailNamaRs.setText(permintaan.getNamaRumahSakit());
@@ -138,12 +132,6 @@ public class DetailPermintaanFragment extends Fragment {
         binding.tvDetailTanggalPenguguman.setText(permintaan.getTanggalPenguguman() != null && !permintaan.getTanggalPenguguman().isEmpty() ? permintaan.getTanggalPenguguman() : "-");
     }
 
-    /**
-     * FUNGSI LENGKAP: Logika untuk tombol "Beri Bantuan".
-     */
-    // Di dalam class DetailPermintaanFragment.java
-
-    // Di dalam DetailPermintaanFragment.java
     private void offerHelp() {
         FirebaseUser donorUser = mAuth.getCurrentUser();
         if (donorUser == null || currentPermintaan == null) return;
@@ -160,7 +148,6 @@ public class DetailPermintaanFragment extends Fragment {
 
         DocumentReference requestRef = db.collection("donation_requests").document(requestId);
         batch.update(requestRef, "status", "Dalam Proses");
-
         DocumentReference donationProcessRef = db.collection("active_donations").document();
 
         ProsesDonor newProcess = new ProsesDonor();
@@ -186,28 +173,25 @@ public class DetailPermintaanFragment extends Fragment {
             Toast.makeText(getContext(), "Anda telah menawarkan bantuan!", Toast.LENGTH_LONG).show();
 
             String notifTitle = "Bantuan Datang!";
-
-            // START OF MODIFICATION for senderName fallback logic
-            String senderName = donorUser.getDisplayName(); // Coba ambil display name dulu
+            String senderName = donorUser.getDisplayName();
             if (senderName == null || senderName.trim().isEmpty()) {
-                senderName = donorUser.getEmail(); // Jika display name kosong/null, fallback ke email
+                senderName = donorUser.getEmail();
                 if (senderName == null || senderName.trim().isEmpty()) {
-                    senderName = "Pengguna Tak Dikenal"; // Jika email juga kosong/null, fallback akhir
+                    senderName = "Pengguna Tak Dikenal";
                 }
             }
-            // END OF MODIFICATION
 
             String notifMessage = senderName + " menawarkan bantuan untuk permintaan Anda.";
 
             NotificationUtil.createNotification(
                     db,
-                    currentPermintaan.getPembuatUid(), // ID Penerima Notif
+                    currentPermintaan.getPembuatUid(),
                     notifTitle,
                     notifMessage,
-                    "bantuan", // Tipe notifikasi
-                    currentPermintaan.getRequestId(), // ID tujuan
-                    donorUser.getUid(), // Mengatur senderId
-                    senderName // Mengatur senderName yang sudah diproses
+                    "bantuan",
+                    currentPermintaan.getRequestId(),
+                    donorUser.getUid(),
+                    senderName
             );
             navigateToChatRoom(chatRoomId, currentPermintaan.getNamaPembuat());
         }).addOnFailureListener(e -> {
@@ -216,20 +200,15 @@ public class DetailPermintaanFragment extends Fragment {
         });
     }
 
-
     private void navigateToChatRoom(String chatRoomId, String otherUserName) {
-        // Pengecekan keamanan untuk memastikan fragment masih "hidup"
         if (getParentFragmentManager() == null || getContext() == null) {
             return;
         }
 
-        // Buat instance baru dari ChatRoomFragment dengan membawa data yang diperlukan
         Fragment chatFragment = ChatRoomFragment.newInstance(chatRoomId, otherUserName);
-
-        // Lakukan transaksi untuk mengganti fragment saat ini dengan fragment chat
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, chatFragment)
-                .addToBackStack(null) // Penting! Agar pengguna bisa menekan tombol back untuk kembali ke halaman detail ini
+                .addToBackStack(null)
                 .commit();
     }
 

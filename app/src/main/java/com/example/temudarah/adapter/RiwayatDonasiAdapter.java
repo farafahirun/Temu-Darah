@@ -2,12 +2,15 @@ package com.example.temudarah.adapter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.temudarah.R;
 import com.example.temudarah.databinding.ItemRiwayatDonasiBinding;
 import com.example.temudarah.model.RiwayatDonasiTampil;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -62,6 +65,7 @@ public class RiwayatDonasiAdapter extends RecyclerView.Adapter<RiwayatDonasiAdap
             binding.tvJudulTampilan.setText(riwayat.getJudulTampilan());
             binding.tvNamaPasien.setText("Untuk pasien: " + riwayat.getNamaPasien());
             binding.tvStatusProses.setText("Status: " + riwayat.getStatusProses());
+            binding.tvGolonganDarah.setText("Golongan darah: " + (riwayat.getGolonganDarah() != null ? riwayat.getGolonganDarah() : "-"));
 
             if (riwayat.getTanggal() != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID"));

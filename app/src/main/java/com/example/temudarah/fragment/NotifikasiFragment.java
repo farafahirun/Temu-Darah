@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.temudarah.R;
+import com.example.temudarah.activity.MainActivity;
 import com.example.temudarah.adapter.NotifikasiAdapter;
 import com.example.temudarah.databinding.FragmentNotifikasiBinding;
 import com.example.temudarah.model.Notifikasi;
@@ -37,6 +38,9 @@ public class NotifikasiFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNotifikasiBinding.inflate(inflater, container, false);
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).hideBottomNav();
+        }
         return binding.getRoot();
     }
 
@@ -45,7 +49,6 @@ public class NotifikasiFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
         setupRecyclerView();
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
     }

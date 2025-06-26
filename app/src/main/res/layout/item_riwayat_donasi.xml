@@ -65,6 +65,15 @@
             android:textSize="14sp"
             tools:text="Untuk pasien: Anisa Putri" />
 
+        <TextView
+            android:id="@+id/tvGolonganDarah"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/text_utama"
+            android:textSize="14sp"
+            tools:text="Golongan Darah: O+" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

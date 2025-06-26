@@ -3,7 +3,6 @@ package com.example.temudarah.fragment;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,17 +21,13 @@ import com.example.temudarah.model.PermintaanDonor;
 import com.example.temudarah.model.ProsesDonor;
 import com.example.temudarah.model.RiwayatDonasiTampil;
 import com.example.temudarah.model.User;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -72,6 +67,7 @@ public class RiwayatFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
+        setupListeners();
     }
 
     @Override
@@ -186,6 +182,20 @@ public class RiwayatFragment extends Fragment {
                 });
     }
 
+    private void setupListeners() {
+        binding.ivNotification.setOnClickListener(v -> {
+            navigateTo(new NotifikasiFragment());
+        });
+    }
+    private void navigateTo(Fragment fragment) {
+        if (getParentFragmentManager() != null) {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
+
     private void enrichInteractionData(ProsesDonor proses, String prosesId, final OnEnrichmentComplete callback) {
         if (proses == null || proses.getRequestId() == null) {
             callback.onComplete(null);
@@ -204,6 +214,7 @@ public class RiwayatFragment extends Fragment {
                         item.setTanggal(proses.getTimestamp());
                         item.setStatusProses(proses.getStatusProses());
                         item.setNamaPasien(permintaan.getNamaPasien());
+                        item.setGolonganDarah(permintaan.getGolonganDarahDibutuhkan());
                         boolean sayaPendonor = currentUser.getUid().equals(proses.getDonorId());
                         item.setPeranSaya(sayaPendonor ? "Sebagai Pendonor" : "Sebagai Penerima");
                         item.setJudulTampilan(sayaPendonor ? "Permintaan dari " + otherUser.getFullName() : "Bantuan dari " + otherUser.getFullName());
@@ -234,6 +245,7 @@ public class RiwayatFragment extends Fragment {
                                 item.setTanggal(permintaan.getWaktuDibuat());
                                 item.setStatusProses(permintaan.getStatus());
                                 item.setNamaPasien(permintaan.getNamaPasien());
+                                item.setGolonganDarah(permintaan.getGolonganDarahDibutuhkan());
                                 item.setPeranSaya("Sebagai Penerima");
                                 item.setJudulTampilan("Permintaan Anda (dibatalkan)");
                                 currentHistory.add(item);

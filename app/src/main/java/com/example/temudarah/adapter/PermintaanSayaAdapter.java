@@ -3,12 +3,15 @@ package com.example.temudarah.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.temudarah.R;
 import com.example.temudarah.databinding.ItemPermintaanSayaBinding;
 import com.example.temudarah.model.PermintaanDonor;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -61,6 +64,9 @@ public class PermintaanSayaAdapter extends RecyclerView.Adapter<PermintaanSayaAd
         void bind(final PermintaanDonor permintaan, final OnItemActionClickListener listener) {
             binding.tvItemNamaPasien.setText("Pasien: " + permintaan.getNamaPasien());
             binding.tvItemGolDarah.setText("Butuh Gol. " + permintaan.getGolonganDarahDibutuhkan());
+            binding.tvItemKantongDarah.setText("Jumlah: " + permintaan.getJumlahKantong() + " kantong");
+            binding.tvItemRumahSakit.setText("Rumah Sakit: " + permintaan.getNamaRumahSakit());
+            binding.tvItemCatatan.setText("Catatan: " + (permintaan.getCatatan() != null ? permintaan.getCatatan() : "-"));
             // tvBloodType tidak ada di item_permintaan_saya.xml yang Anda berikan, jadi saya hapus baris ini
             // Jika ada di item_permintaan_saya.xml Anda yang sebenarnya, tambahkan kembali.
 

@@ -1,78 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="6dp"
+    android:clipToPadding="false"
+    android:paddingVertical="4dp"
     android:paddingStart="8dp"
-    android:paddingEnd="60dp"
-    android:background="?attr/selectableItemBackground"
-    android:clipToPadding="false">
+    android:paddingEnd="80dp">
 
-    <!-- Tambahkan TextView untuk nama pengirim di atas bubble chat -->
     <TextView
         android:id="@+id/tvSenderName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="12dp"
         android:layout_marginBottom="2dp"
-        android:textColor="#3F51B5"
+        android:textColor="@color/utama"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/cardMessage"
-        app:layout_constraintStart_toStartOf="@+id/cardMessage"
-        tools:text="John Doe" />
+        tools:text="Elysa Jane" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardMessage"
+    <LinearLayout
+        android:id="@+id/bubbleLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#E7F3FF"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="1dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_below="@id/tvSenderName"
+        android:background="@drawable/background_pesan_diterima"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
-        <TextView
-            android:id="@+id/tvMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="10dp"
-            android:textColor="@android:color/black"
-            android:textSize="14sp"
-            tools:text="Ini adalah pesan yang saya terima." />
-    </androidx.cardview.widget.CardView>
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        tools:text="Ini adalah pesan yang saya kirim." />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="2dp"
-        android:gravity="center_vertical"
+        android:layout_gravity="bottom"
         android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardMessage">
-
-        <ImageView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_marginEnd="2dp"
-            android:alpha="0.6"
-            android:src="@android:drawable/ic_menu_recent_history" />
+        android:layout_marginStart="8dp">
 
         <TextView
             android:id="@+id/tvTimestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#757575"
+            android:textColor="@color/text_utama"
             android:textSize="10sp"
-            tools:text="10:31" />
+            tools:text="10:32" />
     </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</RelativeLayout>

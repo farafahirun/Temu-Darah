@@ -4,13 +4,16 @@ import android.location.Location;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.temudarah.R;
 import com.example.temudarah.databinding.ItemPermintaanDonorBinding;
 import com.example.temudarah.model.PermintaanDonor;
 import com.google.firebase.firestore.GeoPoint;
+
 import java.util.List;
 import java.util.Locale;
 
@@ -70,12 +73,12 @@ public class PermintaanDonorAdapter extends RecyclerView.Adapter<PermintaanDonor
             if (permintaan.getFotoPembuatBase64() != null && !permintaan.getFotoPembuatBase64().isEmpty()) {
                 try {
                     byte[] imageBytes = Base64.decode(permintaan.getFotoPembuatBase64(), Base64.DEFAULT);
-                    Glide.with(itemView.getContext()).asBitmap().load(imageBytes).placeholder(R.drawable.logo_merah).into(binding.fotoProfilePembuat);
+                    Glide.with(itemView.getContext()).asBitmap().load(imageBytes).placeholder(R.drawable.foto_profil).into(binding.fotoProfilePembuat);
                 } catch (Exception e) {
-                    binding.fotoProfilePembuat.setImageResource(R.drawable.logo_merah);
+                    binding.fotoProfilePembuat.setImageResource(R.drawable.foto_profil);
                 }
             } else {
-                binding.fotoProfilePembuat.setImageResource(R.drawable.logo_merah);
+                binding.fotoProfilePembuat.setImageResource(R.drawable.foto_profil);
             }
 
             if (currentUserLocation != null && permintaan.getLokasiRs() != null) {

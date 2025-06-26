@@ -8,8 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,8 +22,6 @@ import com.example.temudarah.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Locale;
 
 public class PenghargaanFragment extends Fragment {
 
@@ -113,10 +109,6 @@ public class PenghargaanFragment extends Fragment {
         boolean silverUnlocked = donationCount >= SILVER_GOAL;
         boolean goldUnlocked = donationCount >= GOLD_GOAL;
 
-        updateTierUi(binding.sertifikatBronze, bronzeUnlocked);
-        updateTierUi(binding.sertifikatSilver, silverUnlocked);
-        updateTierUi(binding.sertifikatEmas, goldUnlocked);
-
         // Update header utama berdasarkan lencana tertinggi yang diraih
         if (goldUnlocked) {
             binding.infoLencana.setText("Kamu Mendapatkan lencana Emas!");
@@ -130,7 +122,7 @@ public class PenghargaanFragment extends Fragment {
         } else {
             binding.infoLencana.setText("Ayo donorkan darahmu dan dapatkan lencana!");
             // Set gambar default jika belum ada lencana
-            binding.lencanaSaatIni.setImageResource(R.drawable.logo_merah);
+            binding.lencanaSaatIni.setImageResource(R.drawable.lencana_kosong);
         }
     }
 

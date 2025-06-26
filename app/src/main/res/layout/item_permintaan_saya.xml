@@ -29,6 +29,14 @@
         android:textColor="@color/black"
         android:text="Butuh Golongan: A+"
         android:layout_marginTop="4dp" />
+        <TextView
+            android:id="@+id/tvItemKantongDarah"
+            android:text="Jumlah Kantong: 2"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"/>
     <TextView
         android:id="@+id/tvItemWaktu"
         android:text="Dibuat: 21 Juni 2025"
@@ -37,6 +45,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"/>
+        <TextView
+            android:id="@+id/tvItemRumahSakit"
+            android:text="Rumah Sakit: RSUD Kota"
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"/>
+        <TextView
+            android:id="@+id/tvItemCatatan"
+            android:text="Catatan: Pasien membutuhkan golongan darah A+ untuk operasi mendatang."
+            android:textColor="@color/black"
+            android:textSize="12sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"/>
 
     <View
         android:layout_width="match_parent"

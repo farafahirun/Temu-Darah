@@ -75,7 +75,5 @@
             android:indeterminateTint="@color/utama"
             android:visibility="gone"
             tools:visibility="visible" />
-
     </RelativeLayout>
-
 </RelativeLayout>

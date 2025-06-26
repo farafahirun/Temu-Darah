@@ -20,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -35,6 +34,7 @@ import com.example.temudarah.R;
 import com.example.temudarah.activity.MainActivity;
 import com.example.temudarah.databinding.FragmentEditProfileBinding;
 import com.example.temudarah.model.User;
+import com.example.temudarah.util.AlertUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -140,7 +140,7 @@ public class EditProfileFragment extends Fragment {
 
     private void setupListeners() {
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
-        binding.btnSave.setOnClickListener(v -> saveUserData());
+        binding.btnSave.setOnClickListener(v -> showConfirmationDialog());
 
         binding.profileImage.setOnClickListener(v -> {
             if (binding.imageUploadProgressBar.getVisibility() == View.GONE) {
@@ -273,17 +273,28 @@ public class EditProfileFragment extends Fragment {
                 byte[] imageBytes = Base64.decode(user.getProfileImageBase64(), Base64.DEFAULT);
                 Glide.with(requireContext()).asBitmap().load(imageBytes).into(binding.profileImage);
             } catch (Exception e) {
-                binding.profileImage.setImageResource(R.drawable.logo_merah);
+                binding.profileImage.setImageResource(R.drawable.foto_profil);
             }
         } else {
-            binding.profileImage.setImageResource(R.drawable.logo_merah);
+            binding.profileImage.setImageResource(R.drawable.foto_profil);
+        }
+    }
+
+    private void showConfirmationDialog() {
+        if (currentUser == null) return;
+        if (!validateInput()) return;
+
+        if (getContext() != null) {
+            AlertUtil.showAlert(getContext(),
+                    "Konfirmasi Perubahan",
+                    "Apakah Anda yakin ingin menyimpan perubahan data profil?",
+                    "Simpan", "Batal",
+                    v -> saveUserData(),
+                    null);
         }
     }
 
     private void saveUserData() {
-        if (currentUser == null) return;
-        if (!validateInput()) return;
-
         showScreenLoading();
 
         String username = binding.editNamaPengguna.getText().toString().trim();
@@ -477,3 +488,4 @@ public class EditProfileFragment extends Fragment {
         binding = null;
     }
 }
+

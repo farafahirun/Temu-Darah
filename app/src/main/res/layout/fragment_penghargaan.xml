@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/utama"
@@ -41,6 +42,20 @@
         </FrameLayout>
     </RelativeLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateTint="@color/utama" />
+    </FrameLayout>
+
     <!-- Konten utama dengan congratulations -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -74,7 +89,7 @@
             android:layout_width="190dp"
             android:layout_height="190dp"
             android:layout_gravity="center"
-            android:src="@drawable/lencana_bronze" />
+            android:src="@drawable/lencana_kosong" />
 
     </LinearLayout>
 
@@ -88,302 +103,266 @@
         app:cardBackgroundColor="@color/background"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp">
-        <!-- Bottom section dengan achievement cards -->
-        <LinearLayout
+
+
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:scrollbars="none">
 
-            <!-- Header achievement -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp">
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Donasi saat ini: "
-                    android:textColor="@color/text_utama"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/total_donasi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="5"
-                    android:textColor="@color/text_utama"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="x"
-                    android:textColor="@color/text_utama"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <!-- Container untuk achievement cards -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <!-- Achievement Card 1 - Lencana Emas -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="3dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
-
-                        <!-- Medal Icon Emas -->
-                        <ImageView
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:layout_marginEnd="16dp"
-                            android:src="@drawable/lencana_gold" />
-
-                        <!-- Text Content -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="4dp"
-                                android:text="Lencana Gold"
-                                android:textColor="#FFB300"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:text="20x donor diperlukan"
-                                android:textColor="#666666"
-                                android:textSize="14sp" />
-
-                            <!-- Progress Bar -->
-                            <ProgressBar
-                                android:id="@+id/progress_gold"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:max="20"
-                                android:progress="5"
-                                android:progressBackgroundTint="#E0E0E0"
-                                android:progressTint="#FFB300" />
-
-                            <Button
-                                android:id="@+id/sertifikat_emas"
-                                android:layout_width="wrap_content"
-                                android:layout_height="36dp"
-                                android:layout_gravity="end"
-                                android:backgroundTint="#FFB300"
-                                android:text="Lihat Sertifikat"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="3dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
-
-                        <!-- Medal Icon Emas -->
-                        <ImageView
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:layout_marginEnd="16dp"
-                            android:src="@drawable/lencana_silver" />
-
-                        <!-- Text Content -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="4dp"
-                                android:text="Lencana Silver"
-                                android:textColor="#9E9E9E"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:text="10x donor diperlukan"
-                                android:textColor="#666666"
-                                android:textSize="14sp" />
-
-                            <!-- Progress Bar -->
-                            <ProgressBar
-                                android:id="@+id/progress_silver"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:max="10"
-                                android:progress="5"
-                                android:progressBackgroundTint="#E0E0E0"
-                                android:progressTint="#9E9E9E" />
-
-                            <Button
-                                android:id="@+id/sertifikat_silver"
-                                android:layout_width="wrap_content"
-                                android:layout_height="36dp"
-                                android:layout_gravity="end"
-                                android:backgroundTint="#9E9E9E"
-                                android:text="Lihat Sertifikat"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardBackgroundColor="@color/white"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="3dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
-
-                        <!-- Medal Icon Emas -->
-                        <ImageView
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:layout_marginEnd="16dp"
-                            android:src="@drawable/lencana_bronze" />
-
-                        <!-- Text Content -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="4dp"
-                                android:text="Lencana Bronze"
-                                android:textColor="#A97142"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="8dp"
-                                android:text="5x donor diperlukan"
-                                android:textColor="#666666"
-                                android:textSize="14sp" />
-
-                            <!-- Progress Bar -->
-                            <ProgressBar
-                                android:id="@+id/progress_bronze"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:layout_width="match_parent"
-                                android:layout_height="6dp"
-                                android:max="5"
-                                android:progress="1"
-                                android:progressBackgroundTint="#E0E0E0"
-                                android:progressTint="#A97142" />
-
-                            <Button
-                                android:id="@+id/sertifikat_bronze"
-                                android:layout_width="wrap_content"
-                                android:layout_height="36dp"
-                                android:layout_gravity="end"
-                                android:backgroundTint="#A97142"
-                                android:text="Lihat Sertifikat"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Footer Text -->
+                <!-- Header achievement -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:paddingHorizontal="16dp">
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Terima kasih sudah menjadi bagian dari "
-                        android:textColor="#666666"
-                        android:textSize="12sp" />
+                        android:text="Donasi saat ini: "
+                        android:textColor="@color/text_utama"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/total_donasi"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="5"
+                        android:textColor="@color/text_utama"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TemuDarah"
-                        android:textColor="#DC143C"
-                        android:textSize="12sp"
+                        android:text="x"
+                        android:textColor="@color/text_utama"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                 </LinearLayout>
+
+                <!-- Container untuk achievement cards -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Achievement Card 1 - Lencana Emas -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="16dp">
+
+                            <!-- Medal Icon Emas -->
+                            <ImageView
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginEnd="16dp"
+                                android:src="@drawable/lencana_gold" />
+
+                            <!-- Text Content -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="4dp"
+                                    android:text="Lencana Gold"
+                                    android:textColor="#FFB300"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="8dp"
+                                    android:text="20x donor diperlukan"
+                                    android:textColor="#666666"
+                                    android:textSize="14sp" />
+
+                                <!-- Progress Bar -->
+                                <ProgressBar
+                                    android:id="@+id/progress_gold"
+                                    style="?android:attr/progressBarStyleHorizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="6dp"
+                                    android:max="20"
+                                    android:progress="5"
+                                    android:progressBackgroundTint="#E0E0E0"
+                                    android:progressTint="#FFB300" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="16dp">
+
+                            <!-- Medal Icon Emas -->
+                            <ImageView
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginEnd="16dp"
+                                android:src="@drawable/lencana_silver" />
+
+                            <!-- Text Content -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="4dp"
+                                    android:text="Lencana Silver"
+                                    android:textColor="#9E9E9E"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="8dp"
+                                    android:text="10x donor diperlukan"
+                                    android:textColor="#666666"
+                                    android:textSize="14sp" />
+
+                                <!-- Progress Bar -->
+                                <ProgressBar
+                                    android:id="@+id/progress_silver"
+                                    style="?android:attr/progressBarStyleHorizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="6dp"
+                                    android:max="10"
+                                    android:progress="5"
+                                    android:progressBackgroundTint="#E0E0E0"
+                                    android:progressTint="#9E9E9E" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="3dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="16dp">
+
+                            <!-- Medal Icon Emas -->
+                            <ImageView
+                                android:layout_width="100dp"
+                                android:layout_height="100dp"
+                                android:layout_marginEnd="16dp"
+                                android:src="@drawable/lencana_bronze" />
+
+                            <!-- Text Content -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="4dp"
+                                    android:text="Lencana Bronze"
+                                    android:textColor="#A97142"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="8dp"
+                                    android:text="5x donor diperlukan"
+                                    android:textColor="#666666"
+                                    android:textSize="14sp" />
+
+                                <!-- Progress Bar -->
+                                <ProgressBar
+                                    android:id="@+id/progress_bronze"
+                                    style="?android:attr/progressBarStyleHorizontal"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="6dp"
+                                    android:max="5"
+                                    android:progress="1"
+                                    android:progressBackgroundTint="#E0E0E0"
+                                    android:progressTint="#A97142" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Footer Text -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:paddingHorizontal="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Terima kasih sudah menjadi bagian dari "
+                            android:textColor="#666666"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TemuDarah"
+                            android:textColor="#DC143C"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </ScrollView>
     </androidx.cardview.widget.CardView>
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#CCFFFFFF"
-        android:visibility="gone">
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:indeterminateTint="@color/utama"/>
-    </FrameLayout>
 </LinearLayout>

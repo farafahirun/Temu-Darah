@@ -117,14 +117,15 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Pencarian Darah Darurat"
+                                android:text="Notifikasi Pesan Masuk"
                                 android:textColor="@color/black"
+                                android:textStyle="bold"
                                 android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Mendapatkan informasi dilokasi yang sesuai"
+                                android:text="Mendapatkan informasi pesan yang masuk"
                                 android:textColor="@color/text_utama"
                                 android:textSize="13sp" />
                         </LinearLayout>
@@ -157,14 +158,15 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Pemberitahuan Donor Darah Darurat"
+                                android:text="Pemberitahuan Bantuan Donor Darah"
                                 android:textColor="@color/black"
+                                android:textStyle="bold"
                                 android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Mendapatkan informasi kebutuhan donor"
+                                android:text="Mendapatkan informasi ditemukan pendonor"
                                 android:textColor="@color/text_utama"
                                 android:textSize="13sp" />
                         </LinearLayout>
@@ -197,14 +199,15 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Pemberitahuan Ketersediaan Darah"
+                                android:text="Pemberitahuan Donor Darah Sukses"
                                 android:textColor="@color/black"
+                                android:textStyle="bold"
                                 android:textSize="16sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Mendapatkan informasi ketersediaan darah kurang"
+                                android:text="Konfirmasi donor darah yang berhasil"
                                 android:textColor="@color/text_utama"
                                 android:textSize="12sp" />
                         </LinearLayout>

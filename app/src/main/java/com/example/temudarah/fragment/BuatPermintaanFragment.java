@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import com.example.temudarah.databinding.FragmentBuatPermintaanBinding;
 import com.example.temudarah.model.PermintaanDonor;
 import com.example.temudarah.model.User;
+import com.example.temudarah.util.AlertUtil;
 import com.firebase.geofire.GeoFireUtils;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -108,7 +109,7 @@ public class BuatPermintaanFragment extends Fragment {
     private void setupListeners() {
         binding.btnBack.setOnClickListener(v -> getParentFragmentManager().popBackStack());
         binding.btnGunakanLokasi.setOnClickListener(v -> checkLocationPermissionAndGetData());
-        binding.btnKirimPermintaan.setOnClickListener(v -> saveDonationRequest());
+        binding.btnKirimPermintaan.setOnClickListener(v -> showConfirmationDialog());
 
         // --- ADD THIS BLOCK FOR DATE PICKER ---
         binding.editTanggalPenguguman.setOnClickListener(v -> showDatePickerDialog());
@@ -193,12 +194,25 @@ public class BuatPermintaanFragment extends Fragment {
         }
     }
 
-    private void saveDonationRequest() {
-        if (!validateInput() || currentUser == null) {
-            if(currentUser == null) Toast.makeText(getContext(), "Anda harus login.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void showConfirmationDialog() {
+        if (getContext() != null) {
+            // Validasi input terlebih dahulu
+            if (!validateInput() || currentUser == null) {
+                if (currentUser == null) Toast.makeText(getContext(), "Anda harus login.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            // Jika valid, tampilkan konfirmasi
+            AlertUtil.showAlert(getContext(),
+                    "Konfirmasi Permintaan",
+                    "Apakah Anda yakin ingin mengirim permintaan donor darah ini?",
+                    "Kirim", "Batal",
+                    v -> saveDonationRequest(),
+                    null);
+        }
+    }
+
+    private void saveDonationRequest() {
         binding.btnKirimPermintaan.setEnabled(false);
         binding.btnKirimPermintaan.setText("Mengirim...");
 

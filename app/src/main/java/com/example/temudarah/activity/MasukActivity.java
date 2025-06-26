@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,11 +12,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.temudarah.databinding.ActivityMasukBinding;
+import com.example.temudarah.util.AlertUtil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Objects;
 
 public class MasukActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -73,22 +71,27 @@ public class MasukActivity extends AppCompatActivity {
     private void loginUser() {
         String email = binding.etPhoneEmail.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
-        Toast.makeText(this, "Mencoba masuk...", Toast.LENGTH_SHORT).show();
+
+        binding.btnMasuk.setEnabled(false);
+        binding.btnMasuk.setText("Memproses...");
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
+                    binding.btnMasuk.setEnabled(true);
+                    binding.btnMasuk.setText("Masuk");
+
                     if (task.isSuccessful()) {
-                        // Setelah login berhasil, dapatkan token terbaru dan simpan
                         getAndStoreFcmToken();
 
-                        // Lanjutkan ke MainActivity
-                        Toast.makeText(MasukActivity.this, "Login Berhasil!", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(MasukActivity.this, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(MasukActivity.this, "Login Gagal: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_LONG).show();
+                        AlertUtil.showAlert(MasukActivity.this,
+                                "Login Gagal",
+                                "Login gagal, Input Email dan Password dengan Benar",
+                                "OK", null, null, null);
                     }
                 });
     }

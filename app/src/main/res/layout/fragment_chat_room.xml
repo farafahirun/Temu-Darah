@@ -1,90 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F4F7"
+    android:background="@color/background"
+    android:orientation="vertical"
     tools:context=".fragment.ChatRoomFragment">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbarChat"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_alignParentTop="true"
-        android:background="@color/white"
-        app:navigationIcon="@drawable/kembali">
+        android:layout_height="wrap_content">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/navbar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/utama_dark"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="5dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/kembali"
+                app:tint="@color/white" />
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/ivToolbarProfile"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/logo_merah" />
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="15dp"
+                android:paddingVertical="5dp"
+                android:layout_marginVertical="5dp"
+                android:src="@drawable/foto_profil"
+                app:civ_border_color="@android:color/white"
+                app:civ_border_width="1dp" />
 
             <TextView
                 android:id="@+id/tvToolbarTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:textColor="@color/black"
-                android:textSize="18sp"
+                android:layout_marginStart="10dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                tools:text="Nama Lawan Chat" />
-
+                tools:text="Username" />
         </LinearLayout>
-    </com.google.android.material.appbar.MaterialToolbar>
+    </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/layoutSendMessage"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="8dp">
+        android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/etMessage"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/chat_input_background"
-            android:hint="Ketik pesan..."
-            android:inputType="textMultiLine"
-            android:maxLines="4"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="12dp" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvMessages"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/layoutSendMessage"
+            android:clipToPadding="false"
+            android:paddingVertical="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_pesan_diterima" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btnSendMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/kirim"
-            app:backgroundTint="@color/utama"
-            app:fabSize="mini"
-            app:tint="@color/white"
-            android:contentDescription="Kirim Pesan" />
+        <LinearLayout
+            android:id="@+id/layoutSendMessage"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_alignParentBottom="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="8dp">
 
-    </LinearLayout>
+            <EditText
+                android:id="@+id/etMessage"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:background="@drawable/chat_input_background"
+                android:hint="Ketik pesan..."
+                android:inputType="textMultiLine"
+                android:maxLines="4"
+                android:paddingHorizontal="20dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/text_info" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvMessages"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/layoutSendMessage"
-        android:layout_below="@id/toolbarChat"
-        android:clipToPadding="false"
-        android:paddingVertical="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_pesan_diterima" />
-
-</RelativeLayout>
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnSendMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginStart="8dp"
+                android:contentDescription="Kirim Pesan"
+                android:src="@drawable/kirim"
+                app:backgroundTint="@color/utama"
+                app:fabSize="mini"
+                app:tint="@android:color/white" />
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

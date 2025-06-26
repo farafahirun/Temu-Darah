@@ -3,13 +3,18 @@ package com.example.temudarah.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.temudarah.R;
 import com.example.temudarah.model.Pesan;
 import com.google.firebase.auth.FirebaseAuth;
+
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -63,43 +68,78 @@ public class PesanAdapter extends RecyclerView.Adapter<PesanAdapter.ViewHolder> 
         Pesan pesan = pesanList.get(position);
         holder.tvMessage.setText(pesan.getText());
 
-        // Set nama pengirim
-        if (getItemViewType(position) == VIEW_TYPE_DITERIMA) {
-            // Jika ini pesan yang diterima, tampilkan nama pengirimnya
-            if (pesan.getSenderName() != null && !pesan.getSenderName().isEmpty()) {
-                holder.tvSenderName.setText(pesan.getSenderName());
-            } else {
-                holder.tvSenderName.setText("Pengirim");
-            }
-        } else {
-            // Jika ini pesan yang dikirim oleh user, bisa tetap "Anda" seperti di layout
-            // atau bisa kosongkan jika tidak ingin menampilkan teks "Anda"
-            // holder.tvSenderName.setVisibility(View.GONE); // Jika tidak ingin menampilkan "Anda"
+        // Hide sender name for both sent and received messages
+        if (holder.tvSenderName != null) {
+            holder.tvSenderName.setVisibility(View.GONE);
         }
 
-        // Format dan tampilkan timestamp dengan lengkap (jam dan tanggal)
+        // Format dan tampilkan timestamp seperti WhatsApp
         if (pesan.getTimestamp() != null) {
             Date messageDate = pesan.getTimestamp().toDate();
+            formatTimestampWhatsAppStyle(holder.tvTimestamp, messageDate);
 
-            // Format waktu (jam:menit)
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            String timeStr = timeFormat.format(messageDate);
-
-            // Format tanggal (jika perlu)
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
-            String dateStr = dateFormat.format(messageDate);
-
-            // Bandingkan tanggal pesan dengan hari ini
-            Date today = new Date();
-            SimpleDateFormat compareFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-            boolean isToday = compareFormat.format(messageDate).equals(compareFormat.format(today));
-
-            // Tampilkan waktu saja jika hari ini, atau tanggal + waktu jika bukan hari ini
-            if (isToday) {
-                holder.tvTimestamp.setText(timeStr);
-            } else {
-                holder.tvTimestamp.setText(dateStr + " " + timeStr);
+            // Tampilkan read receipt (hanya untuk pesan yang dikirim)
+            if (getItemViewType(position) == VIEW_TYPE_DIKIRIM && holder.ivReadStatus != null) {
+                if (pesan.isRead()) {
+                    // Pesan sudah dibaca, tampilkan double check
+                    holder.ivReadStatus.setImageResource(R.drawable.ic_check_double);
+                } else {
+                    // Pesan belum dibaca, tampilkan single check
+                    holder.ivReadStatus.setImageResource(R.drawable.ic_check_single);
+                }
+                holder.ivReadStatus.setVisibility(View.VISIBLE);
             }
+        }
+    }
+
+    /**
+     * Format timestamp seperti di WhatsApp:
+     * - Jika hari ini: hanya jam (10:30)
+     * - Jika kemarin: "Kemarin 10:30"
+     * - Jika dalam seminggu ini: nama hari (Senin 10:30)
+     * - Jika lebih lama: tanggal (23/6/25 10:30)
+     */
+    private void formatTimestampWhatsAppStyle(TextView textView, Date messageDate) {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        String timeStr = timeFormat.format(messageDate);
+
+        Calendar messageCalendar = Calendar.getInstance();
+        messageCalendar.setTime(messageDate);
+
+        Calendar todayCalendar = Calendar.getInstance();
+
+        // Reset waktu ke 00:00:00 untuk perbandingan tanggal
+        Calendar messageMidnight = Calendar.getInstance();
+        messageMidnight.setTime(messageDate);
+        messageMidnight.set(Calendar.HOUR_OF_DAY, 0);
+        messageMidnight.set(Calendar.MINUTE, 0);
+        messageMidnight.set(Calendar.SECOND, 0);
+        messageMidnight.set(Calendar.MILLISECOND, 0);
+
+        Calendar todayMidnight = Calendar.getInstance();
+        todayMidnight.set(Calendar.HOUR_OF_DAY, 0);
+        todayMidnight.set(Calendar.MINUTE, 0);
+        todayMidnight.set(Calendar.SECOND, 0);
+        todayMidnight.set(Calendar.MILLISECOND, 0);
+
+        // Perbedaan dalam hari
+        long diffDays = (todayMidnight.getTimeInMillis() - messageMidnight.getTimeInMillis()) / (24 * 60 * 60 * 1000);
+
+        if (diffDays == 0) {
+            // Hari ini: tampilkan hanya waktu
+            textView.setText(timeStr);
+        } else if (diffDays == 1) {
+            // Kemarin
+            textView.setText("Kemarin " + timeStr);
+        } else if (diffDays > 1 && diffDays < 7) {
+            // Dalam seminggu: tampilkan nama hari
+            SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", new Locale("id", "ID"));
+            String dayName = dayFormat.format(messageDate);
+            textView.setText(dayName + " " + timeStr);
+        } else {
+            // Lebih dari seminggu: tampilkan tanggal penuh
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
+            textView.setText(dateFormat.format(messageDate) + " " + timeStr);
         }
     }
 
@@ -115,6 +155,7 @@ public class PesanAdapter extends RecyclerView.Adapter<PesanAdapter.ViewHolder> 
         TextView tvMessage;
         TextView tvTimestamp;
         TextView tvSenderName;
+        ImageView ivReadStatus;  // Added for read receipts
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
